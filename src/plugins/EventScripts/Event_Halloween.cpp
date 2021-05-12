@@ -7,10 +7,10 @@ Team  : Sun++
 #include "Setup.h"
 
 //Black Cat
-class BlackCat : public MoonScriptCreatureAI
+class BlackCat : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(BlackCat, MoonScriptCreatureAI);
-		BlackCat(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(BlackCat, AICreatureScript);
+		BlackCat(Creature* pCreature) : AICreatureScript(pCreature) {}
 
 		void OnDied(Unit* pKiller)
 		{
@@ -60,10 +60,10 @@ static LocationExtra WaypointGoldshire[] =
 #define HEADLESS_HORSEMAN_CLEAVE			42587
 #define HEADLESS_HORSEMAN_CONFLAGRATION		42380
 
-class HeadlessHorsemanAI : public MoonScriptCreatureAI
+class HeadlessHorsemanAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(HeadlessHorsemanAI, MoonScriptCreatureAI);
-		HeadlessHorsemanAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(HeadlessHorsemanAI, AICreatureScript);
+		HeadlessHorsemanAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			//Scarlet Monastery Boss
 		}
@@ -72,10 +72,10 @@ class HeadlessHorsemanAI : public MoonScriptCreatureAI
 // Headless Horseman - Fire
 #define CN_HEADLESS_HORSEMAN_FIRE				23537
 
-class HeadlessHorsemanFireAI : public MoonScriptCreatureAI
+class HeadlessHorsemanFireAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(HeadlessHorsemanFireAI, MoonScriptCreatureAI);
-		HeadlessHorsemanFireAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(HeadlessHorsemanFireAI, AICreatureScript);
+		HeadlessHorsemanFireAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			_unit->CastSpell(_unit, 42971, true);
 		}
@@ -92,10 +92,10 @@ class HeadlessHorsemanFireAI : public MoonScriptCreatureAI
  * I guess this is the target of the water spells
  * Need to check all visual auras for these http://www.wowhead.com/?search=horseman#uncategorized-spells
  */
-class ShadeOfTheHorsemanAI : public MoonScriptCreatureAI
+class ShadeOfTheHorsemanAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ShadeOfTheHorsemanAI, MoonScriptCreatureAI);
-		ShadeOfTheHorsemanAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(ShadeOfTheHorsemanAI, AICreatureScript);
+		ShadeOfTheHorsemanAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			SetCanEnterCombat(false);
 			_unit->SetMount(22653);
@@ -172,10 +172,10 @@ class ShadeOfTheHorsemanAI : public MoonScriptCreatureAI
 // Headless Horseman - Wisp Invis
 #define CN_HEADLESS_HORSEMAN_WISP_INVIS				24034//						42394
 
-class HeadlessHorsemanWispInvisAI : public MoonScriptCreatureAI
+class HeadlessHorsemanWispInvisAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(HeadlessHorsemanWispInvisAI, MoonScriptCreatureAI);
-		HeadlessHorsemanWispInvisAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(HeadlessHorsemanWispInvisAI, AICreatureScript);
+		HeadlessHorsemanWispInvisAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 
 		void AIUpdate()
 		{
@@ -195,7 +195,7 @@ class HeadlessHorsemanWispInvisAI : public MoonScriptCreatureAI
 			ParentClass::AIUpdate();
 		}
 
-		MoonScriptCreatureAI*	mHeadlessHorseman;
+		AICreatureScript*	mHeadlessHorseman;
 };
 
 class WaterBarrel : public GameObjectAIScript

@@ -20,11 +20,11 @@
 #include "Setup.h"
 
 #define CN_LadySarevess 4831
-class LadySarevessAI : public MoonScriptCreatureAI
+class LadySarevessAI : public AICreatureScript
 {
 public:
-	MOONSCRIPT_FACTORY_FUNCTION(LadySarevessAI, MoonScriptCreatureAI);
-	LadySarevessAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+	AI_CREATURE_SCRIPT_FUNCTION(LadySarevessAI, AICreatureScript);
+	LadySarevessAI(Creature* pCreature) : AICreatureScript(pCreature)
 	{
 		AddEmote(Event_OnCombatStart, "You should not be here! Slay them!", Text_Yell, 5799);
 
@@ -35,11 +35,11 @@ public:
 };
 
 #define CN_BaronAquanis 12876
-class BaronAquanisAI : public MoonScriptCreatureAI
+class BaronAquanisAI : public AICreatureScript
 {
 public:
-	MOONSCRIPT_FACTORY_FUNCTION(BaronAquanisAI, MoonScriptCreatureAI);
-	BaronAquanisAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+	AI_CREATURE_SCRIPT_FUNCTION(BaronAquanisAI, AICreatureScript);
+	BaronAquanisAI(Creature* pCreature) : AICreatureScript(pCreature)
 	{
 		// Frostbolt
 		AddSpell(15043, Target_Current, 20, 3, 0);
@@ -74,11 +74,11 @@ protected:
 };
 
 #define CN_TwilightLordKelris 4832
-class KelrisAI : public MoonScriptCreatureAI
+class KelrisAI : public AICreatureScript
 {
 public:
-	MOONSCRIPT_FACTORY_FUNCTION(KelrisAI, MoonScriptCreatureAI);
-	KelrisAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+	AI_CREATURE_SCRIPT_FUNCTION(KelrisAI, AICreatureScript);
+	KelrisAI(Creature* pCreature) : AICreatureScript(pCreature)
 	{
 		AddEmote(Event_OnCombatStart, "Who dares disturb my meditation?!", Text_Yell, 5802);
 		AddEmote(Event_OnTargetDied, "Dust to dust.", Text_Yell, 5803);
@@ -89,11 +89,11 @@ public:
 };
 
 #define CN_Akumai 4829
-class AkumaiAI : public MoonScriptCreatureAI
+class AkumaiAI : public AICreatureScript
 {
 public:
-	MOONSCRIPT_FACTORY_FUNCTION(AkumaiAI, MoonScriptCreatureAI);
-	AkumaiAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+	AI_CREATURE_SCRIPT_FUNCTION(AkumaiAI, AICreatureScript);
+	AkumaiAI(Creature* pCreature) : AICreatureScript(pCreature)
 	{
 		AddEmote(Event_OnCombatStart, "Who dares disturb my meditation?!", Text_Yell); // Should this really be here?
 		AddEmote(Event_OnTargetDied, "Dust to dust.", Text_Yell); // Should this really be here?

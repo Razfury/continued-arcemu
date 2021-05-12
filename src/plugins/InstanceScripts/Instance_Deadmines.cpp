@@ -160,10 +160,10 @@ protected:
 	uint32 InstanceEncounter;
 };
 
-class RhahkZorAI : public MoonScriptCreatureAI
+class RhahkZorAI : public AICreatureScript
 {
-	MOONSCRIPT_FACTORY_FUNCTION(RhahkZorAI, MoonScriptCreatureAI);
-	RhahkZorAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+	AI_CREATURE_SCRIPT_FUNCTION(RhahkZorAI, AICreatureScript);
+	RhahkZorAI(Creature* pCreature) : AICreatureScript(pCreature)
 	{
 		// Rhahk'Zor Slam
 		AddSpell(6304, Target_Current, 8, 0, 3);
@@ -181,7 +181,7 @@ enum MrSmiteSpells
 class MrSmiteAI : public MoonScriptBossAI
 {
 public:
-	MOONSCRIPT_FACTORY_FUNCTION(MrSmiteAI, MoonScriptBossAI);
+	AI_CREATURE_SCRIPT_FUNCTION(MrSmiteAI, MoonScriptBossAI);
 	MrSmiteAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
 		AddSpell(SMITE_SLAM, Target_Current, 25, 0.0f, 15, 0.0f, 8.0f, true);
@@ -300,7 +300,7 @@ protected:
 // VanCleef
 class VanCleefAI : public MoonScriptBossAI
 {
-	MOONSCRIPT_FACTORY_FUNCTION(VanCleefAI, MoonScriptBossAI);
+	AI_CREATURE_SCRIPT_FUNCTION(VanCleefAI, MoonScriptBossAI);
 	VanCleefAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
 		AddEmote(Event_OnCombatStart, "None may challenge the brotherhood.", Text_Yell, 5780);
@@ -332,7 +332,7 @@ class VanCleefAI : public MoonScriptBossAI
 			// Defias Blackguard x 2
 			for(int x = 0; x < 2; x++)
 			{
-				MoonScriptCreatureAI* Guard = SpawnCreature(636);
+				AICreatureScript* Guard = SpawnCreature(636);
 				if( Guard != NULL ){
 					Guard->SetDespawnWhenInactive(true);
 					Guard->GetUnit()->m_noRespawn = true;

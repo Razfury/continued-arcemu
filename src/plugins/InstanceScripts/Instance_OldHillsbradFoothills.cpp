@@ -279,13 +279,13 @@ class BrazenGossip : public GossipScript
 
 };
 
-class LieutenantDrakeAI : public MoonScriptCreatureAI
+class LieutenantDrakeAI : public AICreatureScript
 {
 		OldHilsbradInstance* pInstance;
 
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(LieutenantDrakeAI, MoonScriptCreatureAI);
-		LieutenantDrakeAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(LieutenantDrakeAI, AICreatureScript);
+		LieutenantDrakeAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			pInstance = dynamic_cast<OldHilsbradInstance*>(GetInstanceScript());
 		};
@@ -307,10 +307,10 @@ class LieutenantDrakeAI : public MoonScriptCreatureAI
 		};
 };
 
-class ThrallAI : public MoonScriptCreatureAI // this will be replaced with escortAI
+class ThrallAI : public AICreatureScript // this will be replaced with escortAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ThrallAI, MoonScriptCreatureAI);
-		ThrallAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(ThrallAI, AICreatureScript);
+		ThrallAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			SetMoveType(Move_DontMoveWP);
 			for(int i = 1; i < MAX_THRALLWP1; ++i)

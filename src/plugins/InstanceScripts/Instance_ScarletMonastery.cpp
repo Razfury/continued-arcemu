@@ -33,11 +33,11 @@
 #define VISHAS 3983
 #define SHADOW_WORD 2767
 
-class VishasAI : public MoonScriptCreatureAI
+class VishasAI : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(VishasAI, MoonScriptCreatureAI);
-		VishasAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(VishasAI, AICreatureScript);
+		VishasAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SHADOW_WORD, Target_RandomPlayer, 20, 0, 8);
 
@@ -80,11 +80,11 @@ class VishasAI : public MoonScriptCreatureAI
 #define SHADOW_BOLT 9613
 #define FLAME_SPIKE 8814
 
-class ThalnosAI : public MoonScriptCreatureAI
+class ThalnosAI : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(ThalnosAI, MoonScriptCreatureAI);
-		ThalnosAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(ThalnosAI, AICreatureScript);
+		ThalnosAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SHADOW_BOLT, Target_RandomPlayer, 20, 3.0f, 2);
 			AddSpell(FLAME_SPIKE, Target_RandomPlayerDestination, 20, 3.0f, 14);
@@ -124,11 +124,11 @@ class ThalnosAI : public MoonScriptCreatureAI
 
 #define LOKSEY 3974
 
-class LokseyAI : public MoonScriptCreatureAI
+class LokseyAI : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(LokseyAI, MoonScriptCreatureAI);
-		LokseyAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(LokseyAI, AICreatureScript);
+		LokseyAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(6742, Target_Self, 5, 0, 40);
 			AddEmote(Event_OnCombatStart, "Release the hounds!", Text_Yell, 5841);
@@ -144,11 +144,11 @@ class LokseyAI : public MoonScriptCreatureAI
 #define SILENCE 30225
 #define ARCANE_EXP 9433
 
-class DoanAI : public MoonScriptCreatureAI
+class DoanAI : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(DoanAI, MoonScriptCreatureAI);
-		DoanAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(DoanAI, AICreatureScript);
+		DoanAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SILENCE, Target_Self, 25, 1.5f, 14);
 			AddSpell(POLY, Target_SecondMostHated, 15, 1.5f, 10);
@@ -198,11 +198,11 @@ class DoanAI : public MoonScriptCreatureAI
 #define WHIRLWIND 5832
 #define HEROD_ENRAGE 5833
 
-class HerodAI : public MoonScriptCreatureAI
+class HerodAI : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(HerodAI, MoonScriptCreatureAI);
-		HerodAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(HerodAI, AICreatureScript);
+		HerodAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(WHIRLWINDSPELL, Target_Self, 12, 0, 12)->AddEmote("Blades of Light!", Text_Yell, 5832);
 			AddSpell(CHARGE, Target_RandomPlayer, 6, 0, 20);

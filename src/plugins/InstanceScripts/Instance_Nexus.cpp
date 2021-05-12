@@ -58,7 +58,7 @@ enum NexusEncounterList
 class AnomalusAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(AnomalusAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(AnomalusAI, MoonScriptBossAI);
 		AnomalusAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			mInstance = GetInstanceScript();
@@ -163,7 +163,7 @@ class AnomalusAI : public MoonScriptBossAI
 class ChaoticRiftAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(ChaoticRiftAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(ChaoticRiftAI, MoonScriptBossAI);
 		ChaoticRiftAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
@@ -195,7 +195,7 @@ class ChaoticRiftAI : public MoonScriptBossAI
 class CraziedManaWrathAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(CraziedManaWrathAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(CraziedManaWrathAI, MoonScriptBossAI);
 		CraziedManaWrathAI(Creature* pCreature) : MoonScriptBossAI(pCreature) {};
 
 		void OnCombatStop(Unit* pTarget)
@@ -257,7 +257,7 @@ static Location FormSpawns[] =
 class TelestraBossAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(TelestraBossAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(TelestraBossAI, MoonScriptBossAI);
 		TelestraBossAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			mInstance = GetInstanceScript();
@@ -394,7 +394,7 @@ class TelestraBossAI : public MoonScriptBossAI
 class TelestraFireAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(TelestraFireAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(TelestraFireAI, MoonScriptBossAI);
 		TelestraFireAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			if(IsHeroic())
@@ -420,7 +420,7 @@ class TelestraFireAI : public MoonScriptBossAI
 class TelestraFrostAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(TelestraFrostAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(TelestraFrostAI, MoonScriptBossAI);
 		TelestraFrostAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			if(IsHeroic())
@@ -446,7 +446,7 @@ class TelestraFrostAI : public MoonScriptBossAI
 class TelestraArcaneAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(TelestraArcaneAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(TelestraArcaneAI, MoonScriptBossAI);
 		TelestraArcaneAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(TIME_STOP, Target_Self, 30, 1.5, 30);
@@ -489,7 +489,7 @@ class TelestraArcaneAI : public MoonScriptBossAI
 
 class OrmorokAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(OrmorokAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(OrmorokAI, MoonScriptBossAI);
 		OrmorokAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			mInstance = GetInstanceScript();
@@ -543,7 +543,7 @@ class OrmorokAI : public MoonScriptBossAI
 
 class CrystalSpikeAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(CrystalSpikeAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(CrystalSpikeAI, MoonScriptBossAI);
 		CrystalSpikeAI(Creature* pCreature) : MoonScriptBossAI(pCreature) {};
 
 		void OnLoad()
@@ -601,7 +601,7 @@ class CrystalSpikeAI : public MoonScriptBossAI
 
 class KeristraszaAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(KeristraszaAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(KeristraszaAI, MoonScriptBossAI);
 		KeristraszaAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			if(IsHeroic())

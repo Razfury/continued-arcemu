@@ -27,10 +27,10 @@
 
 // Commander Springvale AI
 #define CN_SPRINGVALE 4278
-class SpringvaleAI : public MoonScriptCreatureAI
+class SpringvaleAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SpringvaleAI, MoonScriptCreatureAI);
-		SpringvaleAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(SpringvaleAI, AICreatureScript);
+		SpringvaleAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Holy Light
 			AddSpell(1026, Target_Self, 10, 2.5f, 0);
@@ -68,7 +68,7 @@ class SpringvaleAI : public MoonScriptCreatureAI
 #define CN_BLINDWATCHER 4279
 class BlindWatcherAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(BlindWatcherAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(BlindWatcherAI, MoonScriptBossAI);
 		BlindWatcherAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			// Howling Rage 1
@@ -115,10 +115,10 @@ static Location VWSpawns[] =
 	{ -139.146774f, 2168.201904f, 128.448364f, 2.650803f},
 	{ -150.860092f, 2165.156250f, 128.448502f, 0.999966f},
 };
-class FenrusAI : public MoonScriptCreatureAI
+class FenrusAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(FenrusAI, MoonScriptCreatureAI);
-		FenrusAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(FenrusAI, AICreatureScript);
+		FenrusAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(7125, Target_Current, 12, 1.5f, 60);
 		}
@@ -128,7 +128,7 @@ class FenrusAI : public MoonScriptCreatureAI
 			GetUnit()->SendChatMessageAlternateEntry(4275, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Who dares interfere with the Sons of Arugal?");
 			GetUnit()->PlaySoundToSet(5791);
 
-			MoonScriptCreatureAI* voidwalker = NULL;
+			AICreatureScript* voidwalker = NULL;
 			// Spawn 4 x Arugal's Voidwalkers
 			for(int x = 1; x < 5; x++)
 			{
@@ -146,10 +146,10 @@ class FenrusAI : public MoonScriptCreatureAI
 
 //Arugals Voidwalkers
 #define CN_VOIDWALKER 4627
-class VoidWalkerAI : public MoonScriptCreatureAI
+class VoidWalkerAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(VoidWalkerAI, MoonScriptCreatureAI);
-		VoidWalkerAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(VoidWalkerAI, AICreatureScript);
+		VoidWalkerAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(7154, Target_WoundedFriendly, 5, 0, 7);
 		}
@@ -166,10 +166,10 @@ class VoidWalkerAI : public MoonScriptCreatureAI
 
 // Archmage Arugal AI
 #define CN_ARUGAL 4275
-class ArugalAI : public MoonScriptCreatureAI
+class ArugalAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ArugalAI, MoonScriptCreatureAI);
-		ArugalAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(ArugalAI, AICreatureScript);
+		ArugalAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Void Bolt
 			AddSpell(7588, Target_Current, 25, 3, 0);
@@ -187,10 +187,10 @@ class ArugalAI : public MoonScriptCreatureAI
 
 //Wolf Master Nandos AI
 #define CN_NENDOS 3927
-class NandosAI : public MoonScriptCreatureAI
+class NandosAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(NandosAI, MoonScriptCreatureAI);
-		NandosAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(NandosAI, AICreatureScript);
+		NandosAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 
 		void OnDied(Unit*  pKiller)
 		{
@@ -206,10 +206,10 @@ class NandosAI : public MoonScriptCreatureAI
 
 //Rethilgore AI
 #define CN_RETHILGORE 3914
-class RETHILGOREAI : public MoonScriptCreatureAI
+class RETHILGOREAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(RETHILGOREAI, MoonScriptCreatureAI);
-		RETHILGOREAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(RETHILGOREAI, AICreatureScript);
+		RETHILGOREAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 		void OnDied(Unit*  pKiller)
 		{
 			_unit->SendChatMessageAlternateEntry(3849, CHAT_MSG_MONSTER_SAY, LANG_GUTTERSPEAK, "About time someone killed the wretch.");

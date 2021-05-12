@@ -38,7 +38,7 @@
 
 class NalorakkAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(NalorakkAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(NalorakkAI, MoonScriptBossAI);
 		NalorakkAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddPhaseSpell(1, AddSpell(NALORAKK_BRUTAL_SWIPE, Target_Current, 2, 0, 35));
@@ -128,7 +128,7 @@ class NalorakkAI : public MoonScriptBossAI
 
 class AkilzonAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(AkilzonAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(AkilzonAI, MoonScriptBossAI);
 		AkilzonAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(AKILZON_STATIC_DISRUPTION, Target_Self, 2, 0, 60);
@@ -156,7 +156,7 @@ class AkilzonAI : public MoonScriptBossAI
 
 			if(IsTimerFinished(mSummonTime))
 			{
-				MoonScriptCreatureAI* Eagle = NULL;
+				AICreatureScript* Eagle = NULL;
 				// Spawn 3 Soaring Eagles
 				for(int x = 0; x < 3; x++)
 				{
@@ -181,10 +181,10 @@ class AkilzonAI : public MoonScriptBossAI
 //SOARING_EAGLE Summon Akil'zon
 #define EAGLE_SWOOP		 44732 //INSTANT
 
-class SoaringEagleAI : public MoonScriptCreatureAI
+class SoaringEagleAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SoaringEagleAI, MoonScriptCreatureAI);
-		SoaringEagleAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(SoaringEagleAI, AICreatureScript);
+		SoaringEagleAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(EAGLE_SWOOP, Target_Destination, 5, 0, 0);
 			GetUnit()->m_noRespawn = true;
@@ -207,7 +207,7 @@ class SoaringEagleAI : public MoonScriptCreatureAI
 
 class HalazziAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(HalazziAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(HalazziAI, MoonScriptBossAI);
 		HalazziAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddPhaseSpell(1, AddSpell(HALAZZI_SABER_LASH, Target_Destination, 0.5, 0, 0, 0, 0, false, "Me gonna carve ya now!", Text_Yell, 12023));
@@ -268,7 +268,7 @@ class HalazziAI : public MoonScriptBossAI
 			{
 				if(IsTimerFinished(mTotemTimer))
 				{
-					MoonScriptCreatureAI* Totem = NULL;
+					AICreatureScript* Totem = NULL;
 					Totem = SpawnCreature(CN_TOTEM, (_unit->GetPositionX() + RandomFloat(3) - 3), (_unit->GetPositionY() + RandomFloat(3) - 3), _unit->GetPositionZ(), 0, true);
 					if(Totem)
 					{
@@ -333,10 +333,10 @@ class HalazziAI : public MoonScriptBossAI
 		int SplitCount;
 };
 
-class LynxSpiritAI : public MoonScriptCreatureAI
+class LynxSpiritAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(LynxSpiritAI, MoonScriptCreatureAI);
-		LynxSpiritAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(LynxSpiritAI, AICreatureScript);
+		LynxSpiritAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Lynx Flurry
 			AddSpell(43290, Target_Self, 15, 0, 8);

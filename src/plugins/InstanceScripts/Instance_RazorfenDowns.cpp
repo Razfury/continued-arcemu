@@ -160,10 +160,10 @@ class AmnennarTheColdbringer : public CreatureAIScript
 #define DISEASE_CLOUD	12627
 #define FRENZY			12795
 
-class Glutton : public MoonScriptCreatureAI
+class Glutton : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(Glutton, MoonScriptCreatureAI);
-		Glutton(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(Glutton, AICreatureScript);
+		Glutton(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			//spells
 			mDiseaseCloud = AddSpell(DISEASE_CLOUD, Target_Self, 0, 0, 0, 0, 0);
@@ -185,10 +185,10 @@ class Glutton : public MoonScriptCreatureAI
 #define FIRE_NOVA		12470
 #define FIREBALL		12466
 
-class MordreshFireEye : public MoonScriptCreatureAI
+class MordreshFireEye : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(MordreshFireEye, MoonScriptCreatureAI);
-		MordreshFireEye(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(MordreshFireEye, AICreatureScript);
+		MordreshFireEye(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			//spells
 			AddSpell(FIRE_NOVA, Target_Self, 10, 2, 0);

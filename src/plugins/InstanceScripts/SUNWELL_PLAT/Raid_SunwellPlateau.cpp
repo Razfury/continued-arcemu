@@ -43,10 +43,10 @@
 #define CN_SUNBLADE_PROTECTOR				25507
 #define SUNBLADE_PROTECTOR_FEL_LIGHTNING	46480
 
-class SunbladeProtectorAI : public MoonScriptCreatureAI
+class SunbladeProtectorAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SunbladeProtectorAI, MoonScriptCreatureAI);
-		SunbladeProtectorAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(SunbladeProtectorAI, AICreatureScript);
+		SunbladeProtectorAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SUNBLADE_PROTECTOR_FEL_LIGHTNING, Target_RandomPlayer, 100, 0, 15, 0, 60);
 		}
@@ -60,10 +60,10 @@ class SunbladeProtectorAI : public MoonScriptCreatureAI
 #define SHADOWSWORD_ASSASSIN_SHADOWSTEP				46463
 #define SHADOWSWORD_ASSASSIN_GREATER_INVISIBILITY	16380
 
-class ShadowswordAssassinAI : public MoonScriptCreatureAI
+class ShadowswordAssassinAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ShadowswordAssassinAI, MoonScriptCreatureAI);
-		ShadowswordAssassinAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(ShadowswordAssassinAI, AICreatureScript);
+		ShadowswordAssassinAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SHADOWSWORD_ASSASSIN_ASSASSINS_MARK, Target_RandomPlayer, 100, 0, 15, 0, 100);
 			AddSpell(SHADOWSWORD_ASSASSIN_AIMED_SHOT, Target_Current, 15, 4, 6, 5, 35, true);
@@ -78,10 +78,10 @@ class ShadowswordAssassinAI : public MoonScriptCreatureAI
 #define SHADOWSWORD_COMMANDER_SHIELD_SLAM	46762
 #define SHADOWSWORD_COMMANDER_BATTLESHOUT	46763
 
-class ShadowswordCommanderAI : public MoonScriptCreatureAI
+class ShadowswordCommanderAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ShadowswordCommanderAI, MoonScriptCreatureAI);
-		ShadowswordCommanderAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(ShadowswordCommanderAI, AICreatureScript);
+		ShadowswordCommanderAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SHADOWSWORD_COMMANDER_SHIELD_SLAM, Target_Current, 10, 0, 10);
 			AddSpell(SHADOWSWORD_COMMANDER_BATTLESHOUT, Target_Self, 20, 0, 25);
@@ -95,11 +95,11 @@ class ShadowswordCommanderAI : public MoonScriptCreatureAI
 #define KALECGOS_SPECTRAL_BLAST		44866
 #define KALECGOS_ARCANE_BUFFET		45018
 
-void SpellFunc_Kalecgos_WildMagic(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType);
+void SpellFunc_Kalecgos_WildMagic(SpellDesc* pThis, AICreatureScript* pCreatureAI, Unit* pTarget, TargetType pType);
 
 class KalecgosAI : public MoonScriptBossAI
 {
-    MOONSCRIPT_FACTORY_FUNCTION(KalecgosAI, MoonScriptBossAI);
+    AI_CREATURE_SCRIPT_FUNCTION(KalecgosAI, MoonScriptBossAI);
 	KalecgosAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
 		AddSpell(KALECGOS_FROST_BREATH, Target_Current, 10, 1, 12, 0, 30);
@@ -115,7 +115,7 @@ class KalecgosAI : public MoonScriptBossAI
 	}
 };
 
-void SpellFunc_Kalecgos_WildMagic(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
+void SpellFunc_Kalecgos_WildMagic(SpellDesc* pThis, AICreatureScript* pCreatureAI, Unit* pTarget, TargetType pType)
 {
 	KalecgosAI* Kalecgos = ( pCreatureAI ) ? (KalecgosAI*)pCreatureAI : NULL;
 	if( Kalecgos )
@@ -139,7 +139,7 @@ void SpellFunc_Kalecgos_WildMagic(SpellDesc* pThis, MoonScriptCreatureAI* pCreat
 
 class SathrovarrTheCorruptorAI : public MoonScriptBossAI
 {
-    MOONSCRIPT_FACTORY_FUNCTION(SathrovarrTheCorruptorAI, MoonScriptBossAI);
+    AI_CREATURE_SCRIPT_FUNCTION(SathrovarrTheCorruptorAI, MoonScriptBossAI);
 	SathrovarrTheCorruptorAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
 		AddSpell(SATHROVARR_THE_CORRUPTOR_CURSE_OF_BOUNDLESS_AGONY, Target_RandomPlayer, 20, 0, 12, 0, 40);
@@ -164,7 +164,7 @@ class SathrovarrTheCorruptorAI : public MoonScriptBossAI
 
 class BrutallusAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(BrutallusAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(BrutallusAI, MoonScriptBossAI);
 		BrutallusAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(BRUTALLUS_METEOR_SLASH, Target_Self, 100, 1, 12);
@@ -200,7 +200,7 @@ class BrutallusAI : public MoonScriptBossAI
 
 class FelmystAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(FelmystAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(FelmystAI, MoonScriptBossAI);
 		FelmystAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			//Phase 1 spells
@@ -246,7 +246,7 @@ class FelmystAI : public MoonScriptBossAI
 
 class LadySacrolashAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(LadySacrolashAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(LadySacrolashAI, MoonScriptBossAI);
 		LadySacrolashAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(LADY_SACROLASH_DARK_TOUCHED, Target_RandomPlayerApplyAura, 50, 0, 10, 0, 50);
@@ -262,7 +262,7 @@ class LadySacrolashAI : public MoonScriptBossAI
 
 		void OnDied(Unit* pKiller)
 		{
-			MoonScriptCreatureAI* mGrandWarlockAlythess = GetNearestCreature(CN_GRAND_WARLOCK_ALYTHESS);
+			AICreatureScript* mGrandWarlockAlythess = GetNearestCreature(CN_GRAND_WARLOCK_ALYTHESS);
 			if(mGrandWarlockAlythess != NULL && mGrandWarlockAlythess->IsAlive())
 			{
 				mGrandWarlockAlythess->Emote("Sacrolash!", Text_Yell, 12492);
@@ -282,7 +282,7 @@ class LadySacrolashAI : public MoonScriptBossAI
 
 class GrandWarlockAlythessAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(GrandWarlockAlythessAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(GrandWarlockAlythessAI, MoonScriptBossAI);
 		GrandWarlockAlythessAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(GRAND_WARLOCK_ALYTHESS_PYROGENICS, Target_Self, 100, 0, 10, 0, 50);
@@ -299,7 +299,7 @@ class GrandWarlockAlythessAI : public MoonScriptBossAI
 
 		void OnDied(Unit* pKiller)
 		{
-			MoonScriptCreatureAI* mLadySacrolash = GetNearestCreature(CN_LADY_SACROLASH);
+			AICreatureScript* mLadySacrolash = GetNearestCreature(CN_LADY_SACROLASH);
 			if(mLadySacrolash != NULL && mLadySacrolash->IsAlive())
 			{
 				mLadySacrolash->Emote("Alythess! Your fire burns within me!", Text_Yell, 12488);
@@ -322,7 +322,7 @@ class GrandWarlockAlythessAI : public MoonScriptBossAI
 
 class MuruAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(MuruAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(MuruAI, MoonScriptBossAI);
 		MuruAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(MURU_NEGATIVE_ENERGY, Target_Self, 25, 0, 0);
@@ -334,22 +334,22 @@ class MuruAI : public MoonScriptBossAI
 		}
 };
 
-class ShadowswordBerserkerAI : public MoonScriptCreatureAI
+class ShadowswordBerserkerAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ShadowswordBerserkerAI, MoonScriptCreatureAI);
-		ShadowswordBerserkerAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(ShadowswordBerserkerAI, AICreatureScript);
+		ShadowswordBerserkerAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 };
 
-class ShadowswordFuryMageAI : public MoonScriptCreatureAI
+class ShadowswordFuryMageAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(ShadowswordFuryMageAI, MoonScriptCreatureAI);
-		ShadowswordFuryMageAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(ShadowswordFuryMageAI, AICreatureScript);
+		ShadowswordFuryMageAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 };
 
-class VoidSentinelAI : public MoonScriptCreatureAI
+class VoidSentinelAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(VoidSentinelAI, MoonScriptCreatureAI);
-		VoidSentinelAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature) {}
+		AI_CREATURE_SCRIPT_FUNCTION(VoidSentinelAI, AICreatureScript);
+		VoidSentinelAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -358,7 +358,7 @@ class VoidSentinelAI : public MoonScriptCreatureAI
 
 class EntropiusAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(EntropiusAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(EntropiusAI, MoonScriptBossAI);
 		EntropiusAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			//TODO

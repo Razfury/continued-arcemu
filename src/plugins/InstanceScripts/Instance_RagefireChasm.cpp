@@ -28,10 +28,10 @@
 /* TRASH MOBS */
 // Ragefire Shaman AI
 #define CN_RAGEFIRE_SHAMAN			11319
-class RagefireShamanAI : public MoonScriptCreatureAI
+class RagefireShamanAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(RagefireShamanAI, MoonScriptCreatureAI);
-		RagefireShamanAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(RagefireShamanAI, AICreatureScript);
+		RagefireShamanAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Healing Wave
 			AddSpell(11986, Target_WoundedFriendly, 15, 3, 10);
@@ -42,10 +42,10 @@ class RagefireShamanAI : public MoonScriptCreatureAI
 
 // Ragefire Trogg AI by Soulshifter
 #define CN_RAGEFIRE_TROGG			11318
-class RagefireTroggAI : public MoonScriptCreatureAI
+class RagefireTroggAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(RagefireTroggAI, MoonScriptCreatureAI);
-		RagefireTroggAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(RagefireTroggAI, AICreatureScript);
+		RagefireTroggAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Strike
 			AddSpell(11976, Target_Current, 40, 0, 0);
@@ -54,10 +54,10 @@ class RagefireTroggAI : public MoonScriptCreatureAI
 
 // Searing Blade Warlock AI by Soulshifter
 #define CN_SEARING_BLADE_WARLOCK	11324
-class SearingBladeWarlockAI : public MoonScriptCreatureAI
+class SearingBladeWarlockAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SearingBladeWarlockAI, MoonScriptCreatureAI);
-		SearingBladeWarlockAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(SearingBladeWarlockAI, AICreatureScript);
+		SearingBladeWarlockAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Shadow Bolt
 			AddSpell(20791, Target_Current, 20, 3, 0);
@@ -67,10 +67,10 @@ class SearingBladeWarlockAI : public MoonScriptCreatureAI
 };
 
 #define CN_SEARING_BLADE_ENFORCER	11323
-class SearingBladeEnforcerAI : public MoonScriptCreatureAI
+class SearingBladeEnforcerAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SearingBladeEnforcerAI, MoonScriptCreatureAI);
-		SearingBladeEnforcerAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(SearingBladeEnforcerAI, AICreatureScript);
+		SearingBladeEnforcerAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Shield Slam
 			AddSpell(8242, Target_Current, 15, 0, 0);
@@ -79,10 +79,10 @@ class SearingBladeEnforcerAI : public MoonScriptCreatureAI
 
 // Blade Cultist AI by Soulshifter
 #define CN_BLADE_CULTIST			11322
-class BladeCultistAI : public MoonScriptCreatureAI
+class BladeCultistAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(BladeCultistAI, MoonScriptCreatureAI);
-		BladeCultistAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(BladeCultistAI, AICreatureScript);
+		BladeCultistAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Curse of Agony
 			AddSpell(18266, Target_Current, 30, 0, 15);
@@ -91,10 +91,10 @@ class BladeCultistAI : public MoonScriptCreatureAI
 
 // Molten Elemental AI by Soulshifter
 #define CN_MOLTEN_ELEMENTAL			11321
-class MoltenElementalAI : public MoonScriptCreatureAI
+class MoltenElementalAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(MoltenElementalAI, MoonScriptCreatureAI);
-		MoltenElementalAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(MoltenElementalAI, AICreatureScript);
+		MoltenElementalAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Fire Shield
 			AddSpell(134, Target_Self, 40, 1, 15);
@@ -103,10 +103,10 @@ class MoltenElementalAI : public MoonScriptCreatureAI
 
 // Earthborer AI by Soulshifter
 #define CN_EARTHBORER				11320
-class EarthborerAI : public MoonScriptCreatureAI
+class EarthborerAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(EarthborerAI, MoonScriptCreatureAI);
-		EarthborerAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(EarthborerAI, AICreatureScript);
+		EarthborerAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Earthborer Acid
 			AddSpell(18070, Target_Current, 15, 0, 0);
@@ -147,10 +147,10 @@ class BloodFilledOrb : public GameObjectAIScript
 
 //Oggleflint
 #define CN_OGGLEFLINT	11517
-class OggleflintAI : public MoonScriptCreatureAI
+class OggleflintAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(OggleflintAI, MoonScriptCreatureAI);
-		OggleflintAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(OggleflintAI, AICreatureScript);
+		OggleflintAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Cleave
 			AddSpell(40505, Target_Current, 10, 0, 1);
@@ -159,10 +159,10 @@ class OggleflintAI : public MoonScriptCreatureAI
 
 //Taragaman the Hungerer
 #define CN_TARAGAMAN	11520
-class TaragamanAI : public MoonScriptCreatureAI
+class TaragamanAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(TaragamanAI, MoonScriptCreatureAI);
-		TaragamanAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(TaragamanAI, AICreatureScript);
+		TaragamanAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Fire Nova
 			AddSpell(11970, Target_Self, 10, 2, 0);
@@ -173,10 +173,10 @@ class TaragamanAI : public MoonScriptCreatureAI
 
 //Jergosh The Invoker
 #define CN_JERGOSH			11518
-class JergoshAI : public MoonScriptCreatureAI
+class JergoshAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(JergoshAI, MoonScriptCreatureAI);
-		JergoshAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(JergoshAI, AICreatureScript);
+		JergoshAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Immolate
 			AddSpell(20800, Target_Current, 15, 2, 0);
@@ -187,10 +187,10 @@ class JergoshAI : public MoonScriptCreatureAI
 
 //Bazzalan
 #define CN_BAZZALAN	11519
-class BazzalanAI : public MoonScriptCreatureAI
+class BazzalanAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(BazzalanAI, MoonScriptCreatureAI);
-		BazzalanAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(BazzalanAI, AICreatureScript);
+		BazzalanAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			// Sinister Strike
 			AddSpell(14873, Target_Current, 15, 0, 0);

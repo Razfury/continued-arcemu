@@ -165,7 +165,7 @@ class ObsidianSanctumScript : public MoonInstanceScript
 		};
 };
 
-void SpellFunc_FlameTsunami(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
+void SpellFunc_FlameTsunami(SpellDesc* pThis, AICreatureScript* pCreatureAI, Unit* pTarget, TargetType pType)
 {
 	if(pCreatureAI != NULL)
 	{
@@ -213,7 +213,7 @@ void SpellFunc_FlameTsunami(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI,
 	};
 };
 
-void SpellFunc_LavaSpawn(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
+void SpellFunc_LavaSpawn(SpellDesc* pThis, AICreatureScript* pCreatureAI, Unit* pTarget, TargetType pType)
 {
 	if(pCreatureAI == NULL)
 		return;
@@ -227,7 +227,7 @@ void SpellFunc_LavaSpawn(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Un
 
 class SartharionAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SartharionAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(SartharionAI, MoonScriptBossAI);
 		SartharionAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			mInstance = dynamic_cast<ObsidianSanctumScript*>(GetInstanceScript());
@@ -373,7 +373,7 @@ class SartharionAI : public MoonScriptBossAI
 
 class TsunamiAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(TsunamiAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(TsunamiAI, MoonScriptBossAI);
 		TsunamiAI(Creature* pCreature) : MoonScriptBossAI(pCreature) {};
 
 		void OnLoad()
@@ -401,7 +401,7 @@ class TsunamiAI : public MoonScriptBossAI
 class CyclonAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(CyclonAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(CyclonAI, MoonScriptBossAI);
 		CyclonAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{};
 
@@ -421,7 +421,7 @@ class CyclonAI : public MoonScriptBossAI
 class LavaBlazeAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(LavaBlazeAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(LavaBlazeAI, MoonScriptBossAI);
 		LavaBlazeAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{};
 

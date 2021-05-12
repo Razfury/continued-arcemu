@@ -1476,11 +1476,11 @@ static LocationExtra LakkaWaypoint[] =
 	{ -73.749f, 173.171f, 0.009f, 6.234f, Flag_Walk },
 };
 
-class LakkaAI : public MoonScriptCreatureAI
+class LakkaAI : public AICreatureScript
 {
 	public:
 		ADD_CREATURE_FACTORY_FUNCTION(LakkaAI);
-		LakkaAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		LakkaAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			SetMoveType(Move_DontMoveWP);
 
@@ -1711,7 +1711,7 @@ class DARKWEAVERSYTHAI : public CreatureAIScript
 
 			if(mLakka != NULL && mLakka->GetScript())
 			{
-				MoonScriptCreatureAI* pLakkaAI = TO< MoonScriptCreatureAI* >(mLakka->GetScript());
+				AICreatureScript* pLakkaAI = TO< AICreatureScript* >(mLakka->GetScript());
 				mLakka->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 				pLakkaAI->SetMoveType(Move_WantedWP);
 				pLakkaAI->SetWaypointToMove(1);

@@ -39,7 +39,7 @@
 class ZerekethAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(ZerekethAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(ZerekethAI, MoonScriptBossAI);
 
 		ZerekethAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
@@ -130,7 +130,7 @@ class ZerekethAI : public MoonScriptBossAI
 			float vzX = RandomUInt(5) * cos(RandomFloat(6.28f)) + RTarget->GetPositionX();
 			float vzY = RandomUInt(5) * cos(RandomFloat(6.28f)) + RTarget->GetPositionY();
 			float vzZ = RTarget->GetPositionZ();
-			MoonScriptCreatureAI* VoidZone = SpawnCreature(CN_VOIDZONEARC, vzX, vzY, vzZ);
+			AICreatureScript* VoidZone = SpawnCreature(CN_VOIDZONEARC, vzX, vzY, vzZ);
 			VoidZone->GetUnit()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 			VoidZone->GetUnit()->m_noRespawn = true;
 			if(!VoidZone->GetUnit()->IsInWorld())
@@ -159,11 +159,11 @@ class ZerekethAI : public MoonScriptBossAI
 		int32 VoidTimer;
 };
 
-class VoidZoneARC : public MoonScriptCreatureAI
+class VoidZoneARC : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(VoidZoneARC, MoonScriptCreatureAI);
-		VoidZoneARC(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(VoidZoneARC, AICreatureScript);
+		VoidZoneARC(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			StopMovement();
 			SetCanMove(false);
@@ -197,7 +197,7 @@ class VoidZoneARC : public MoonScriptCreatureAI
 class DalliahTheDoomsayerAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(DalliahTheDoomsayerAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(DalliahTheDoomsayerAI, MoonScriptBossAI);
 		DalliahTheDoomsayerAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(GIFT_OF_THE_DOOMSAYER, Target_Current, 8.0f, 0.0f, -1);
@@ -247,7 +247,7 @@ class DalliahTheDoomsayerAI : public MoonScriptBossAI
 class WrathScryerSoccothratesAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(WrathScryerSoccothratesAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(WrathScryerSoccothratesAI, MoonScriptBossAI);
 		WrathScryerSoccothratesAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(IMMOLATION, Target_Self, 10.0f, 0, -1);
@@ -290,7 +290,7 @@ class WrathScryerSoccothratesAI : public MoonScriptBossAI
 class HarbringerSkyrissAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(HarbringerSkyrissAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(HarbringerSkyrissAI, MoonScriptBossAI);
 
 		HarbringerSkyrissAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
@@ -360,7 +360,7 @@ class HarbringerSkyrissAI : public MoonScriptBossAI
 class WardenMellicharAI : public MoonScriptBossAI
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(WardenMellicharAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(WardenMellicharAI, MoonScriptBossAI);
 		WardenMellicharAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			SetCanMove(false);
@@ -702,11 +702,11 @@ class WardenMellicharAI : public MoonScriptBossAI
 		uint32 Spawncounter;
 		int32 Phase_Timer;
 
-		MoonScriptCreatureAI*	NPC_orb1;
-		MoonScriptCreatureAI*	NPC_orb2;
-		MoonScriptCreatureAI*	NPC_orb3;
-		MoonScriptCreatureAI*	NPC_orb4;
-		MoonScriptCreatureAI*	NPC_orb5;
+		AICreatureScript*	NPC_orb1;
+		AICreatureScript*	NPC_orb2;
+		AICreatureScript*	NPC_orb3;
+		AICreatureScript*	NPC_orb4;
+		AICreatureScript*	NPC_orb5;
 		GameObject* shield;
 		GameObject* orb1;
 		GameObject* orb2;

@@ -44,7 +44,7 @@
 
 class WatchkeeperGargolmarAI : public MoonScriptBossAI
 {
-		MOONSCRIPT_FACTORY_FUNCTION(WatchkeeperGargolmarAI, MoonScriptBossAI);
+		AI_CREATURE_SCRIPT_FUNCTION(WatchkeeperGargolmarAI, MoonScriptBossAI);
 		WatchkeeperGargolmarAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 		{
 			AddSpell(SURGE, Target_RandomUnit, 20, 0, 15, 5, 40, false, "Back off, pup!", Text_Yell, 10330);
@@ -106,11 +106,11 @@ class WatchkeeperGargolmarAI : public MoonScriptBossAI
 #define OMOR_THE_UNSCARRED_TREACHEROUS_AURA			30695
 #define OMOR_THE_UNSCARRED_BANE_OF_TREACHERY		37566
 
-class OmorTheUnscarredAI : public MoonScriptCreatureAI
+class OmorTheUnscarredAI : public AICreatureScript
 {
 	public:
-		MOONSCRIPT_FACTORY_FUNCTION(OmorTheUnscarredAI, MoonScriptCreatureAI);
-		OmorTheUnscarredAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(OmorTheUnscarredAI, AICreatureScript);
+		OmorTheUnscarredAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			SpellDesc* pShield = AddSpell(OMOR_THE_UNSCARRED_DEMONIC_SHIELD, Target_Self, 30, 0, 25);
 			pShield->mEnabled = false;

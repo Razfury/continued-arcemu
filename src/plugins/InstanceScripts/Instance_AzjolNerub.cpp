@@ -38,10 +38,10 @@
 #define KRIKTHIR_MINDFLAY_HC 59367
 #define KRIKTHIR_CURSEOFFATIGUE_HC 59368
 
-class KrikthirAI : public MoonScriptCreatureAI
+class KrikthirAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(KrikthirAI, MoonScriptCreatureAI);
-		KrikthirAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(KrikthirAI, AICreatureScript);
+		KrikthirAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			if(!IsHeroic())
 			{
@@ -97,10 +97,10 @@ class KrikthirAI : public MoonScriptCreatureAI
 #define HADRONOX_LEECHPOISON_HC 59417
 #define HADRONOX_ACIDCLOUD_HC 59419
 
-class HadronoxAI : public MoonScriptCreatureAI
+class HadronoxAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(HadronoxAI, MoonScriptCreatureAI);
-		HadronoxAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(HadronoxAI, AICreatureScript);
+		HadronoxAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			if(!IsHeroic())
 			{
@@ -127,10 +127,10 @@ class HadronoxAI : public MoonScriptCreatureAI
 #define GASHRA_INFECTEDBITE 52469
 #define GASHRA_ENRAGE 52470
 
-class GashraAI : public MoonScriptCreatureAI
+class GashraAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(GashraAI, MoonScriptCreatureAI);
-		GashraAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(GashraAI, AICreatureScript);
+		GashraAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(GASHRA_WEBWRAP, Target_RandomPlayer, 22, 0, 35, 0, 0);
 			AddSpell(GASHRA_INFECTEDBITE, Target_ClosestPlayer, 35, 0, 12, 0, 0);
@@ -145,10 +145,10 @@ class GashraAI : public MoonScriptCreatureAI
 #define NARJIL_INFECTEDBITE 52469
 #define NARJIL_BLINDINGWEBS 52524
 
-class NarjilAI : public MoonScriptCreatureAI
+class NarjilAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(NarjilAI, MoonScriptCreatureAI);
-		NarjilAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(NarjilAI, AICreatureScript);
+		NarjilAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(NARJIL_WEBWRAP, Target_RandomPlayer, 22, 0, 35, 0, 0);
 			AddSpell(NARJIL_INFECTEDBITE, Target_ClosestPlayer, 35, 0, 12, 0, 0);
@@ -164,10 +164,10 @@ class NarjilAI : public MoonScriptCreatureAI
 #define SILTHIK_INFECTEDBITE 52469
 #define SILTHIK_POISONSPRAY 52493
 
-class SilthikAI : public MoonScriptCreatureAI
+class SilthikAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(SilthikAI, MoonScriptCreatureAI);
-		SilthikAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(SilthikAI, AICreatureScript);
+		SilthikAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(NARJIL_WEBWRAP, Target_RandomPlayer, 22, 0, 35, 0, 0);
 			AddSpell(NARJIL_INFECTEDBITE, Target_ClosestPlayer, 35, 0, 12, 0, 0);
@@ -182,10 +182,10 @@ class SilthikAI : public MoonScriptCreatureAI
 #define SHADOWCASTER_SHADOWBOLT 52534
 #define SHADOWCASTER_SHADOW_NOVA 52535
 
-class AnubShadowcasterAI : public MoonScriptCreatureAI
+class AnubShadowcasterAI : public AICreatureScript
 {
-		MOONSCRIPT_FACTORY_FUNCTION(AnubShadowcasterAI, MoonScriptCreatureAI);
-		AnubShadowcasterAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+		AI_CREATURE_SCRIPT_FUNCTION(AnubShadowcasterAI, AICreatureScript);
+		AnubShadowcasterAI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
 			AddSpell(SHADOWCASTER_SHADOWBOLT, Target_RandomPlayer, 36, 0, 8);
 			AddSpell(SHADOWCASTER_SHADOW_NOVA, Target_Self, 22, 0, 15);
