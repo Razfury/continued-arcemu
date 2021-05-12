@@ -1646,7 +1646,7 @@ void MoonScriptBossAI::OnCombatStart(Unit* pTarget)
 	{
 		mEnrageTimer = AddTimer(mEnrageTimerDuration);
 	}
-	TriggerCooldownOnAllSpells();
+	//TriggerCooldownOnAllSpells(); //Razfury: Find out more info on this it causes big delay on spell events.
 	MoonScriptCreatureAI::OnCombatStart(pTarget);
 }
 
