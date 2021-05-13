@@ -6411,6 +6411,11 @@ void CombatStatusHandler::UpdateFlag()
 		{
 			//printf(I64FMT" is no longer in combat.\n", m_Unit->GetGUID());
 			m_Unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_COMBAT);
+			if (m_Unit->IsPlayer() == false)
+			{
+				m_Unit->m_attacking = NULL;
+			}
+
 			if(m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->clearStateFlag(UF_ATTACKING);
 
 			// remove any of our healers from combat too, if they are able to be.
@@ -6548,6 +6553,13 @@ void CombatStatusHandler::OnDamageDealt(Unit* pTarget)
 	//no need to be in combat if dead
 	if(!pTarget->isAlive() || !m_Unit->isAlive())
 		return;
+
+	// GetVictim is whoever we are dealing damage to and this can change
+	if (m_Unit->IsPlayer() == false)
+	{
+		m_Unit->m_attacking = pTarget;
+	}
+
 
 	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());
 	if(itr == m_attackTargets.end())

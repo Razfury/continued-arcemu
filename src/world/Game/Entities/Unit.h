@@ -1246,6 +1246,8 @@ class SERVER_DECL Unit : public Object
 
 		SummonHandler summonhandler;
 
+		Unit* GetVictim() const { return m_attacking; }
+
 		// Spell Effect Variables
 		int32 m_silenced;
 		bool m_damgeShieldsInUse;
@@ -1633,6 +1635,8 @@ class SERVER_DECL Unit : public Object
 		bool IsTaggable();
 		uint64 GetTaggerGUID();
 		bool isLootable();
+
+		Unit* m_attacking;
 
 		void Root();
 		void Unroot();
