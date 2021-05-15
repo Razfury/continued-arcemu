@@ -74,19 +74,19 @@ class AnomalusAI : public MoonScriptBossAI
 			mSummon = 0;
 		};
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			mSummon = 0;
 			mRift = false;
 			mSummonTimer = AddTimer(IsHeroic() ? 14000 : 18000);   // check heroic
 
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, NEXUS_ANOMALUS, State_InProgress);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if((GetHealthPercent() <= 50 && mSummon == 0))
 				mSummon += 1;
@@ -106,7 +106,7 @@ class AnomalusAI : public MoonScriptBossAI
 				mRift = false;
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		void SummonRift(bool bToCharge)
@@ -137,12 +137,12 @@ class AnomalusAI : public MoonScriptBossAI
 			mSummon += 1;
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, NEXUS_ANOMALUS, State_Finished);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -178,10 +178,10 @@ class ChaoticRiftAI : public MoonScriptBossAI
 			ParentClass::OnLoad();
 		};
 
-		void OnDied(Unit*  mKiller)
+		void JustDied(Unit*  mKiller)
 		{
 			Despawn(2000, 0);
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -204,10 +204,10 @@ class CraziedManaWrathAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void OnDied(Unit*  mKiller)
+		void JustDied(Unit*  mKiller)
 		{
 			Despawn(2000, 0);
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		};
 
 };
@@ -287,7 +287,7 @@ class TelestraBossAI : public MoonScriptBossAI
 			mAddArray[0] = mAddArray[1] = mAddArray[2] = NULL;
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() == 1 && GetHealthPercent() <= (mPhaseRepeat * 25))
 			{
@@ -338,15 +338,15 @@ class TelestraBossAI : public MoonScriptBossAI
 				SetPhase(mHeroic  ? 1 : 3);   //3 disables p2
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, NEXUS_TELESTRA, State_InProgress);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -366,7 +366,7 @@ class TelestraBossAI : public MoonScriptBossAI
 				mInstance->SetInstanceData(Data_EncounterState, NEXUS_TELESTRA, State_Performed);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			for(int i = 0; i < 3; ++i)
 			{
@@ -380,7 +380,7 @@ class TelestraBossAI : public MoonScriptBossAI
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, NEXUS_TELESTRA, State_Finished);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 	private:
@@ -509,13 +509,13 @@ class OrmorokAI : public MoonScriptBossAI
 			mEnraged = false;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mEnraged = false;
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 25 && mEnraged == false)
 			{
@@ -524,15 +524,15 @@ class OrmorokAI : public MoonScriptBossAI
 				mEnraged = true;
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, NEXUS_ORMOROK, State_Finished);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 	private:
@@ -559,7 +559,7 @@ class CrystalSpikeAI : public MoonScriptBossAI
 			ParentClass::OnLoad();
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			m_part += 1;
 
@@ -629,7 +629,7 @@ class KeristraszaAI : public MoonScriptBossAI
 			ParentClass::OnLoad();
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(mEnraged == false && GetHealthPercent() <= 25)
 			{

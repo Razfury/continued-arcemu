@@ -43,7 +43,7 @@ class AmbassadorFlamelash : public CreatureAIScript
 			m_spellcheck = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -54,7 +54,7 @@ class AmbassadorFlamelash : public CreatureAIScript
 			spell.casttime = spell.cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -66,13 +66,13 @@ class AmbassadorFlamelash : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -149,7 +149,7 @@ class AnubShiah : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -161,7 +161,7 @@ class AnubShiah : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -173,13 +173,13 @@ class AnubShiah : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -273,7 +273,7 @@ class BaelGar : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -285,7 +285,7 @@ class BaelGar : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -297,13 +297,13 @@ class BaelGar : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -406,7 +406,7 @@ class EmperorDagranThaurissan : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -418,7 +418,7 @@ class EmperorDagranThaurissan : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -430,13 +430,13 @@ class EmperorDagranThaurissan : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -530,7 +530,7 @@ class Eviscerator : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -542,7 +542,7 @@ class Eviscerator : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -554,13 +554,13 @@ class Eviscerator : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -654,7 +654,7 @@ class FineousDarkvire : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -666,7 +666,7 @@ class FineousDarkvire : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -678,13 +678,13 @@ class FineousDarkvire : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -787,7 +787,7 @@ class GeneralAngerforge : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -799,7 +799,7 @@ class GeneralAngerforge : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -811,13 +811,13 @@ class GeneralAngerforge : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -920,7 +920,7 @@ class GolemLordArgelmach : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -932,7 +932,7 @@ class GolemLordArgelmach : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -944,13 +944,13 @@ class GolemLordArgelmach : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1044,7 +1044,7 @@ class GoroshTheDervish : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1056,7 +1056,7 @@ class GoroshTheDervish : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1068,13 +1068,13 @@ class GoroshTheDervish : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1168,7 +1168,7 @@ class Grizzle : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1180,7 +1180,7 @@ class Grizzle : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1192,13 +1192,13 @@ class Grizzle : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1301,7 +1301,7 @@ class HedrumTheCreeper : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1313,7 +1313,7 @@ class HedrumTheCreeper : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1325,13 +1325,13 @@ class HedrumTheCreeper : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1433,7 +1433,7 @@ class HighInterrogatorGerstahn : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1445,7 +1445,7 @@ class HighInterrogatorGerstahn : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1457,13 +1457,13 @@ class HighInterrogatorGerstahn : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1556,7 +1556,7 @@ class HoundmasterGrebmar : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1568,7 +1568,7 @@ class HoundmasterGrebmar : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1580,13 +1580,13 @@ class HoundmasterGrebmar : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1689,7 +1689,7 @@ class HurleyBlackbreath : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1701,7 +1701,7 @@ class HurleyBlackbreath : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1713,13 +1713,13 @@ class HurleyBlackbreath : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1822,7 +1822,7 @@ class LordIncendius : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1834,7 +1834,7 @@ class LordIncendius : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1846,13 +1846,13 @@ class LordIncendius : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1955,7 +1955,7 @@ class LordRoccor : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1967,7 +1967,7 @@ class LordRoccor : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1979,13 +1979,13 @@ class LordRoccor : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2078,7 +2078,7 @@ class Magmus : public CreatureAIScript
 			m_spellcheck[1] = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2090,7 +2090,7 @@ class Magmus : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2102,13 +2102,13 @@ class Magmus : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2201,7 +2201,7 @@ class OkThorTheBreaker : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2213,7 +2213,7 @@ class OkThorTheBreaker : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2225,13 +2225,13 @@ class OkThorTheBreaker : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2333,7 +2333,7 @@ class Phalanx : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2345,7 +2345,7 @@ class Phalanx : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2357,13 +2357,13 @@ class Phalanx : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2456,7 +2456,7 @@ class PrincessMoiraBronzebeard : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2468,7 +2468,7 @@ class PrincessMoiraBronzebeard : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2480,13 +2480,13 @@ class PrincessMoiraBronzebeard : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2579,7 +2579,7 @@ class PyromancerLoregrain : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2591,7 +2591,7 @@ class PyromancerLoregrain : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2603,13 +2603,13 @@ class PyromancerLoregrain : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

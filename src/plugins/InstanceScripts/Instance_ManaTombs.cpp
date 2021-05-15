@@ -61,7 +61,7 @@ class ETHEREALDARKCASTERAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -73,12 +73,12 @@ class ETHEREALDARKCASTERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -165,7 +165,7 @@ class ETHEREALPRIESTAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -177,12 +177,12 @@ class ETHEREALPRIESTAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -269,7 +269,7 @@ class ETHEREALTHEURGISTAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -281,12 +281,12 @@ class ETHEREALTHEURGISTAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -367,7 +367,7 @@ class ETHEREALSORCERERAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -379,12 +379,12 @@ class ETHEREALSORCERERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -441,7 +441,7 @@ class ETHEREALSORCERERAI : public CreatureAIScript
 
 #define GOUGE 29425 // not sure, maybe should be : 36862, 
 #define POISON 34969 // no idea if this is correct one
-#define STEALTH 32615 // Can be also: 31621, 31526, 30991 and others // maybe I should set it's proc chance to 0.0 and add spell casting OnCombatStart...
+#define STEALTH 32615 // Can be also: 31621, 31526, 30991 and others // maybe I should set it's proc chance to 0.0 and add spell casting EnterCombat...
 
 class NEXUSSTALKERAI : public CreatureAIScript
 {
@@ -478,7 +478,7 @@ class NEXUSSTALKERAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -490,12 +490,12 @@ class NEXUSSTALKERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -576,7 +576,7 @@ class NEXUSTERRORAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -588,12 +588,12 @@ class NEXUSTERRORAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -674,7 +674,7 @@ class MANALEECHAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -686,13 +686,13 @@ class MANALEECHAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -794,7 +794,7 @@ class ETHEREALSPELLBINDERAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -806,12 +806,12 @@ class ETHEREALSPELLBINDERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -893,7 +893,7 @@ class ETHEREALWRAITHAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -905,12 +905,12 @@ class ETHEREALWRAITHAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1010,7 +1010,7 @@ class PANDEMONIUSAI : public CreatureAIScript
 			spells[1].maxdist2cast = 40.0f;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 2; i++)
 				spells[i].casttime = 0;
@@ -1035,9 +1035,9 @@ class PANDEMONIUSAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -1062,7 +1062,7 @@ class PANDEMONIUSAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Do the void... once... more.");
 			_unit->PlaySoundToSet(10566);
@@ -1070,7 +1070,7 @@ class PANDEMONIUSAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[1].casttime && _unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->getNextTarget())
@@ -1233,7 +1233,7 @@ class TAVAROKAI : public CreatureAIScript
 			spells[2].cooldown = 10;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = 0;
@@ -1249,12 +1249,12 @@ class TAVAROKAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1431,7 +1431,7 @@ class NEXUSPRINCESHAFFARAI : public CreatureAIScript
 			spells[4].cooldown = 10;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 3; i++)
 				spells[i].casttime = 0;
@@ -1459,9 +1459,9 @@ class NEXUSPRINCESHAFFARAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -1486,7 +1486,7 @@ class NEXUSPRINCESHAFFARAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I must bid you... Farewell."); // I don't think it's correct.
 			_unit->PlaySoundToSet(10546);
@@ -1494,7 +1494,7 @@ class NEXUSPRINCESHAFFARAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// not sure if it should be like that
 			uint32 t = (uint32)time(NULL);
@@ -1666,7 +1666,7 @@ class YorAI : public CreatureAIScript
 			spells[1].cooldown = 25;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			uint32 t = (uint32)time(NULL);
 			spells[0].casttime = 0;
@@ -1683,12 +1683,12 @@ class YorAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

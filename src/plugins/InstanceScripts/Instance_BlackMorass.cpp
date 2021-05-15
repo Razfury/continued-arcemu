@@ -67,7 +67,7 @@ class CHRONOLORDDEJAAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;*/
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "If you will not cease this foolish quest, then you will die!");
@@ -81,7 +81,7 @@ class CHRONOLORDDEJAAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -111,7 +111,7 @@ class CHRONOLORDDEJAAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Time ... is on our side.");
@@ -119,7 +119,7 @@ class CHRONOLORDDEJAAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -220,7 +220,7 @@ class TEMPORUSAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;*/
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "So be it ... you have been warned.");
@@ -234,7 +234,7 @@ class TEMPORUSAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -264,7 +264,7 @@ class TEMPORUSAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "My death means ... little.");
@@ -272,7 +272,7 @@ class TEMPORUSAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -373,7 +373,7 @@ class AEONUSAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Let us see what fate lays in store...");
@@ -387,7 +387,7 @@ class AEONUSAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -417,7 +417,7 @@ class AEONUSAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "It is only a matter...of time.");
@@ -425,7 +425,7 @@ class AEONUSAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

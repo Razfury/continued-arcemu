@@ -68,7 +68,7 @@ class SetupCarnies_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(120000); 			// Start initial update after: 2mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -158,7 +158,7 @@ class ActiveCarnies_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(120000); 			// Start initial update after: 2mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -266,7 +266,7 @@ class Flik_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(180000); 			// Start initial update after: 3mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -349,7 +349,7 @@ class GevasGrimegate_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(60000); 			// Start initial update after: 1mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -394,7 +394,7 @@ class Lhara_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(90000); 			// Start initial update after: 1.5mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -472,7 +472,7 @@ class Morja_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(240000); 			// Start initial update after: 4mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, BARK_MORJA_1);
 
@@ -493,7 +493,7 @@ class MusicDoodad : public CreatureAIScript
 			RegisterAIUpdateEvent(1000); 			// Get that music playing right away!
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->PlaySoundToSet(8440);			// Play Darkmoon Faire music if player is in range.
 		}
@@ -602,7 +602,7 @@ class ProfessorThaddeusPaleo_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(210000); 			// Start initial update after: 3.5mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -861,7 +861,7 @@ class Sayge_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(135000); 			// Start initial update after: 2.25mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;
@@ -1008,7 +1008,7 @@ class SilasDarkmoon_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(180000); 			// Start initial update after: 3mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 6;
@@ -1062,7 +1062,7 @@ class StampThunderhorn_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(180000); 			// Start initial update after: 3mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 5;
@@ -1111,7 +1111,7 @@ class Sylannia_Bark : public CreatureAIScript
 			RegisterAIUpdateEvent(120000); 			// Start initial update after: 2mins
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			int randGossip;
 			randGossip = rand() % 4;

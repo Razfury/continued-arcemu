@@ -55,15 +55,15 @@ class ZerekethAI : public MoonScriptBossAI
 			AddEmote(Event_OnTargetDied, "No... more... life.", Text_Yell, 11252);
 			AddEmote(Event_OnDied, "The Void... beckons.", Text_Yell, 11255);
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			VoidTimer = AddTimer((RandomUInt(10) + 30) * 1000);
 			SpeechTimer = AddTimer((RandomUInt(10) + 40) * 1000);
 
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			//despawn voids
 			Creature* creature = NULL;
@@ -82,7 +82,7 @@ class ZerekethAI : public MoonScriptBossAI
 				}
 			}
 
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		}
 
 		void Speech()
@@ -142,7 +142,7 @@ class ZerekethAI : public MoonScriptBossAI
 			VoidZone->Despawn(60000, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(SpeechTimer))
 				Speech();
@@ -150,7 +150,7 @@ class ZerekethAI : public MoonScriptBossAI
 			if(IsTimerFinished(VoidTimer))
 				VoidZoneArc();
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 	protected:
@@ -171,7 +171,7 @@ class VoidZoneARC : public AICreatureScript
 			RegisterAIUpdateEvent(1000);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// M4ksiu: I'm not sure if it should be cast once, on start
 			uint32 SpellId = CONSUMPTION;
@@ -219,14 +219,14 @@ class DalliahTheDoomsayerAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "Now I'm really... angry...", Text_Yell, 11093);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GameObject* door2 = NULL;
 			door2 = GetNearestGameObject(184319);
 			if(door2 != NULL)
 				door2->SetByte(GAMEOBJECT_BYTES_1, 0, 0);
 
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		}
 
 };
@@ -262,14 +262,14 @@ class WrathScryerSoccothratesAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "Knew this was... the only way out.", Text_Yell, 11243);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GameObject* door1 = NULL;
 			door1 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(199.969f, 118.5837f, 22.379f, 184318);
 			if(door1 != NULL)
 				door1->SetByte(GAMEOBJECT_BYTES_1, 0, 0);
 
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		}
 
 };
@@ -318,13 +318,13 @@ class HarbringerSkyrissAI : public MoonScriptBossAI
 			IllusionCount = 0;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			IllusionCount = 0;
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 66 && IllusionCount == 0)
 			{
@@ -336,7 +336,7 @@ class HarbringerSkyrissAI : public MoonScriptBossAI
 				IllusionCount = 2;
 				CastSpell(Illusion33);
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 
@@ -379,7 +379,7 @@ class WardenMellicharAI : public MoonScriptBossAI
 			orb4 = NULL;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			SetPhase(0);
 			Phasepart = 0;
@@ -398,7 +398,7 @@ class WardenMellicharAI : public MoonScriptBossAI
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "The naaru kept some of the most dangerous beings in existence here in these cells. Let me introduce you to another...", 27000);
 			sEventMgr.AddEvent(TO_OBJECT(_unit), &Object::PlaySoundToSet, (uint32)11223, EVENT_UNK, 27000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 		}
 
 		void OnCombatStop(Unit* mTarget)
@@ -407,7 +407,7 @@ class WardenMellicharAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(mTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SetCanEnterCombat(false);
 			SetCanMove(false);
@@ -634,7 +634,7 @@ class WardenMellicharAI : public MoonScriptBossAI
 
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			SetCanMove(false);
 			SetAllowMelee(false);
 			SetAllowSpell(false);

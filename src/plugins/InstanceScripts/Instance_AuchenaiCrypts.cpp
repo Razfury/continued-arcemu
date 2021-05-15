@@ -87,7 +87,7 @@ class SHIRRAKTHEDEADWATCHERAI : public CreatureAIScript
 			spells[3].cooldown = 15;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = 0;
@@ -102,12 +102,12 @@ class SHIRRAKTHEDEADWATCHERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -273,7 +273,7 @@ class AvatarOfTheMartyredAI : public CreatureAIScript
 			Appear = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -285,12 +285,12 @@ class AvatarOfTheMartyredAI : public CreatureAIScript
 			//RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(Appear)
 			{
@@ -418,7 +418,7 @@ class EXARCHMALADAARAI : public CreatureAIScript
 			Avatar = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 4; i++)
 				spells[i].casttime = 0;
@@ -445,9 +445,9 @@ class EXARCHMALADAARAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -475,7 +475,7 @@ class EXARCHMALADAARAI : public CreatureAIScript
 			Avatar = false;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This is... Where... I belong...");
 			_unit->PlaySoundToSet(10518);
@@ -483,7 +483,7 @@ class EXARCHMALADAARAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 25 && !Avatar && !_unit->IsStunned())
 			{

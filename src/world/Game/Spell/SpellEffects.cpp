@@ -3924,6 +3924,17 @@ void Spell::SpellEffectSummonObjectWild(uint32 i)
 
 void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 {
+	switch (m_spellInfo->Id)
+	{
+		//Copy of Summon Minions
+	    case 59933:
+			for (uint8 i = 0; i < 4; ++i)
+			{
+				u_caster->CastSpell((Unit*)NULL, 59933, true);
+			}
+			return;
+		break;
+	}
 	// Try a dummy SpellHandler
 	if(sScriptMgr.CallScriptedDummySpell(m_spellInfo->Id, i, this))
 		return;

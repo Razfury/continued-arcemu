@@ -65,7 +65,7 @@ class AStarScryerAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -77,7 +77,7 @@ class AStarScryerAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -89,13 +89,13 @@ class AStarScryerAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -231,7 +231,7 @@ class StarScryerAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -243,7 +243,7 @@ class StarScryerAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -255,13 +255,13 @@ class StarScryerAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -391,7 +391,7 @@ class AstromancerAI : public AICreatureScript
 			SetAIUpdateFreq(250);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!IsCasting())
 			{
@@ -405,13 +405,13 @@ class AstromancerAI : public AICreatureScript
 							mArcaneBurstTimer = AddTimer(6000);
 						else
 							ResetTimer(mArcaneBurstTimer, 6000);
-						ParentClass::AIUpdate();
+						ParentClass::UpdateAI();
 						return;
 					}
 				}
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*      mArcaneBurst;
@@ -463,7 +463,7 @@ class AstromancerLordAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -475,7 +475,7 @@ class AstromancerLordAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -487,13 +487,13 @@ class AstromancerLordAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -637,7 +637,7 @@ class BloodVindicatorAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -649,7 +649,7 @@ class BloodVindicatorAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -661,13 +661,13 @@ class BloodVindicatorAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -811,7 +811,7 @@ class BloodLegionnareAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -823,7 +823,7 @@ class BloodLegionnareAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -835,13 +835,13 @@ class BloodLegionnareAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -985,7 +985,7 @@ class BloodMarshalAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -997,7 +997,7 @@ class BloodMarshalAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1009,13 +1009,13 @@ class BloodMarshalAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1161,7 +1161,7 @@ class PhoenixHawkAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1173,7 +1173,7 @@ class PhoenixHawkAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1185,13 +1185,13 @@ class PhoenixHawkAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1335,7 +1335,7 @@ class CrystalSentinelAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1347,7 +1347,7 @@ class CrystalSentinelAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1359,13 +1359,13 @@ class CrystalSentinelAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1502,7 +1502,7 @@ class CrystalMechanicAI : public CreatureAIScript
 			spells[0].maxdist2cast = 40.0f;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1514,7 +1514,7 @@ class CrystalMechanicAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -1526,13 +1526,13 @@ class CrystalMechanicAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1683,9 +1683,9 @@ class VoidReaverAI : public MoonScriptBossAI
 			mArcaneOrbTimer = INVALIDATE_TIMER;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			if(mArcaneOrb != NULL)
 			{
 				mArcaneOrbTimer = AddTimer(10000);
@@ -1693,7 +1693,7 @@ class VoidReaverAI : public MoonScriptBossAI
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(mArcaneOrb != NULL && !mArcaneOrb->mEnabled && IsTimerFinished(mArcaneOrbTimer))
 			{
@@ -1701,7 +1701,7 @@ class VoidReaverAI : public MoonScriptBossAI
 				mArcaneOrb->mEnabled = true;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		int32		mArcaneOrbTimer;
@@ -1770,13 +1770,13 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 			AddEmote(Event_OnTargetDied, "For the Sunwell!", Text_Yell, 11138);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mSplitTimer = AddTimer(50000);	//First split after 50sec
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() == 1)
 			{
@@ -1811,7 +1811,7 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 					RemoveTimer(mAgentsTimer);
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*	mVoidForm;
@@ -2061,7 +2061,7 @@ class AlarAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			FlameQuills = false;
 			Meteor = false;
@@ -2115,7 +2115,7 @@ class AlarAI : public CreatureAIScript
 			lasttime = timer;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			nDeath++;
 			//azolex: commenting this "tag" code, no idea what is it for, nothing like this in arcemu
@@ -2159,7 +2159,7 @@ class AlarAI : public CreatureAIScript
 				if(spells[i].casttime > 0) spells[i].casttime--;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			UPCastTime();
 			if(!HostileInMeleeRange() && spells[0].casttime == 0 && !FlameQuills && !Flying)
@@ -2438,7 +2438,7 @@ class EmberAlarAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2450,7 +2450,7 @@ class EmberAlarAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2478,7 +2478,7 @@ class EmberAlarAI : public CreatureAIScript
 			return NULL;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 
 			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
@@ -2537,7 +2537,7 @@ class PatchAlarAI : public CreatureAIScript
 			_unit->Despawn(120000, 0);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2550,7 +2550,7 @@ class PatchAlarAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -2563,7 +2563,7 @@ class PatchAlarAI : public CreatureAIScript
 		}
 
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 		}
@@ -2616,9 +2616,9 @@ class DarkenerAI : public AICreatureScript
 			mGazeSwitchTimer = 0;
 		}
 
-		void OnCombatStart(Unit*  mTarget)
+		void EnterCombat(Unit*  mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			SetCanEnterCombat(true);
 			SwitchTarget();
 
@@ -2636,12 +2636,12 @@ class DarkenerAI : public AICreatureScript
 			}
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			SwitchTarget();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mGazeSwitchTimer))
 			{
@@ -2650,7 +2650,7 @@ class DarkenerAI : public AICreatureScript
 					return;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		bool SwitchTarget()
@@ -2693,9 +2693,9 @@ class SanguinarAI : public AICreatureScript
 			SetCanEnterCombat(false);
 		}
 
-		void OnCombatStart(Unit*  mTarget)
+		void EnterCombat(Unit*  mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			SetCanEnterCombat(true);
 		}
 
@@ -2730,9 +2730,9 @@ class CapernianAI : public AICreatureScript
 			SetCanEnterCombat(false);
 		}
 
-		void OnCombatStart(Unit*  mTarget)
+		void EnterCombat(Unit*  mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			SetCanEnterCombat(true);
 
 			if(GetRangeToUnit(mTarget) <= 30.0f)
@@ -2752,7 +2752,7 @@ class CapernianAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SetBehavior(Behavior_Default);
 			SetCanMove(true);
@@ -2765,7 +2765,7 @@ class CapernianAI : public AICreatureScript
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL && GetRangeToUnit(pTarget) <= 30.0f)
 			{
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 				if(GetBehavior() != Behavior_Spell)
 				{
 					SetBehavior(Behavior_Spell);
@@ -2795,9 +2795,9 @@ class TelonicusAI : public AICreatureScript
 			SetCanEnterCombat(false);
 		}
 
-		void OnCombatStart(Unit*  mTarget)
+		void EnterCombat(Unit*  mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			SetCanEnterCombat(true);
 		}
 
@@ -2831,14 +2831,14 @@ class FlameStrikeAI : public AICreatureScript
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			RemoveAura(FLAME_STRIKE_TRIGGER_FLAME_STRIKE_EFFECT);
 			Despawn(500);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 			ApplyAura(FLAME_STRIKE_TRIGGER_FLAME_STRIKE);
@@ -2870,18 +2870,18 @@ class PhoenixAI : public AICreatureScript
 			mBurnTimer = AddTimer(3000);
 		}
 
-		void OnCombatStart(Unit*  mTarget) {}
+		void EnterCombat(Unit*  mTarget) {}
 
 		void OnCombatStop(Unit*  pTarget) {}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
-			ParentClass::OnTargetDied(mTarget);
+			ParentClass::KilledUnit(mTarget);
 			Unit* pTarget = GetBestPlayerTarget(TargetFilter_Closest);
 			if(pTarget != NULL)
 			{
 				_unit->GetAIInterface()->AttackReaction(pTarget, 500);
-				ParentClass::OnCombatStart(pTarget);
+				ParentClass::EnterCombat(pTarget);
 			}
 			else
 			{
@@ -2889,15 +2889,15 @@ class PhoenixAI : public AICreatureScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			ApplyAura(PHOENIX_REBIRTH);
 			SpawnCreature(21364);
 			Despawn(500);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			double CurrentHP = (double)_unit->GetUInt32Value(UNIT_FIELD_HEALTH);
 			double PercMaxHP = (double)_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH) * 0.05;
@@ -2914,7 +2914,7 @@ class PhoenixAI : public AICreatureScript
 				return;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		int32	mBurnTimer;
@@ -2935,13 +2935,13 @@ class PhoenixEggAI : public AICreatureScript
 			SetCanMove(false);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			Despawn(500);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SpawnCreature(CN_PHOENIX);
 			Despawn(0);
@@ -3133,11 +3133,11 @@ class KaelThasAI : public MoonScriptBossAI
 			}
 		}
 
-		void OnCombatStart(Unit*  mTarget)
+		void EnterCombat(Unit*  mTarget)
 		{
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			SetAIUpdateFreq(24000);
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			SetBehavior(Behavior_Spell);
 			SetCanMove(false);
 
@@ -3243,7 +3243,7 @@ class KaelThasAI : public MoonScriptBossAI
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() < 5)
 			{
@@ -3333,13 +3333,13 @@ class KaelThasAI : public MoonScriptBossAI
 					mAdvCoords.clear();
 				}
 
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 				SetBehavior(Behavior_Spell);
 				SetCanMove(false);
 			}
 			if(GetPhase() == 6)
 			{
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 				if(IsTimerFinished(mEventTimer))
 				{
 					mArcaneDisruptionTimer = AddTimer(20000);
@@ -3395,7 +3395,7 @@ class KaelThasAI : public MoonScriptBossAI
 					RemoveTimer(mPhoenixTimer);
 				}
 
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 			}
 		}
 

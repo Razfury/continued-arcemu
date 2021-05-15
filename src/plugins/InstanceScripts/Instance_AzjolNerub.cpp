@@ -62,7 +62,7 @@ class KrikthirAI : public AICreatureScript
 			mEnraged = false;
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 10 && mEnraged == false)
 			{
@@ -70,16 +70,16 @@ class KrikthirAI : public AICreatureScript
 				mEnraged = true;
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			GameObject* Doors = GetNearestGameObject(192395);
 			if(Doors != NULL)
 				Doors->Despawn(0, 0);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 		bool mEnraged;

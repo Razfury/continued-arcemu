@@ -12,10 +12,10 @@ class BlackCat : public AICreatureScript
 		AI_CREATURE_SCRIPT_FUNCTION(BlackCat, AICreatureScript);
 		BlackCat(Creature* pCreature) : AICreatureScript(pCreature) {}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			pKiller->CastSpell(pKiller, 39477, true);
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 
@@ -155,13 +155,13 @@ class ShadeOfTheHorsemanAI : public AICreatureScript
 			ParentClass::OnReachWP(iWaypointId, bForwards);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			GameObject* Pumpkin = sEAS.SpawnGameobject(TO_PLAYER(pKiller), 2883, _unit->GetPositionX() + RandomFloat(5.0f), _unit->GetPositionY() + RandomFloat(5.0f), _unit->GetPositionZ(), 0, 1, 0, 0, 0, 0);
 			if(Pumpkin != NULL)
 				_unit->CastSpell(Pumpkin->GetGUID(), 42277, true);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
 		int8		WPCount;
@@ -177,7 +177,7 @@ class HeadlessHorsemanWispInvisAI : public AICreatureScript
 		AI_CREATURE_SCRIPT_FUNCTION(HeadlessHorsemanWispInvisAI, AICreatureScript);
 		HeadlessHorsemanWispInvisAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			time_t tiempo;
 			struct tm* tmPtr;
@@ -192,7 +192,7 @@ class HeadlessHorsemanWispInvisAI : public AICreatureScript
 					SetAIUpdateFreq(4 * 60 * 1000);
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		AICreatureScript*	mHeadlessHorseman;

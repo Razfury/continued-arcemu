@@ -710,7 +710,7 @@ void GameObject::Activate()
 void GameObject::CallScriptUpdate()
 {
 	ARCEMU_ASSERT(myScript != NULL);
-	myScript->AIUpdate();
+	myScript->UpdateAI();
 }
 
 void GameObject::OnPushToWorld()

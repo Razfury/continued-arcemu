@@ -86,7 +86,7 @@ class Bartleby : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->RemoveNegativeAuras();
 			_unit->SetFaction(11);
@@ -99,7 +99,7 @@ class Bartleby : public CreatureAIScript
 			_unit->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}

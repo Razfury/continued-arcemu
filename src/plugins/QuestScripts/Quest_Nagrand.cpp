@@ -284,7 +284,7 @@ class NotOnMyWatch : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(NotOnMyWatch);
 		NotOnMyWatch(Creature* pCreature) : CreatureAIScript(pCreature) {};
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(1000);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "In Nagrand, food hunt ogre!");
@@ -295,7 +295,7 @@ class NotOnMyWatch : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		};
 
-		void OnDied(Unit* mTarget)
+		void JustDied(Unit* mTarget)
 		{
 			RemoveAIUpdateEvent();
 		};
@@ -306,7 +306,7 @@ class NotOnMyWatch : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() < 30)
 			{

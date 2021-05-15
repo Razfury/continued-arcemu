@@ -257,7 +257,7 @@ class SartharionAI : public MoonScriptBossAI
 			m_iDrakeCount = 0;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			m_bEnraged = false;
 			mFlameTsunami->TriggerCooldown();
@@ -271,10 +271,10 @@ class SartharionAI : public MoonScriptBossAI
 				Regenerate();// Lets heal him as aura increase his hp for 25%
 			};
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(m_iDrakeCount >= 1)
 			{
@@ -299,7 +299,7 @@ class SartharionAI : public MoonScriptBossAI
 				m_bEnraged = true;
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		void CheckDrakes()
@@ -351,12 +351,12 @@ class SartharionAI : public MoonScriptBossAI
 			m_bDrakes[DRAKE_VESPERON] = false;
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			Emote("Such is the price... of failure...", Text_Yell, 14107);
 
 			RemoveAIUpdateEvent();
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 	private:
@@ -387,7 +387,7 @@ class TsunamiAI : public MoonScriptBossAI
 			ParentClass::OnLoad();
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			ApplyAura(TSUNAMI);
 			ApplyAura(TSUNAMI_VISUAL);
@@ -436,7 +436,7 @@ class LavaBlazeAI : public MoonScriptBossAI
 			Despawn(1000, 0);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			Despawn(1000, 0);
 		};

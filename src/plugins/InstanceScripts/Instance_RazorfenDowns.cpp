@@ -68,7 +68,7 @@ class AmnennarTheColdbringer : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -80,7 +80,7 @@ class AmnennarTheColdbringer : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -92,13 +92,13 @@ class AmnennarTheColdbringer : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -171,11 +171,11 @@ class Glutton : public AICreatureScript
 			mFrenzy->AddEmote("Glutton is getting hungry!", Text_Yell);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			CastSpellNowNoScheduling(mDiseaseCloud);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
 		SpellDesc*      mDiseaseCloud;
@@ -230,7 +230,7 @@ class PlaguemawTheRotting : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -242,7 +242,7 @@ class PlaguemawTheRotting : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -254,13 +254,13 @@ class PlaguemawTheRotting : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -353,7 +353,7 @@ class Ragglesnout : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -365,7 +365,7 @@ class Ragglesnout : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -377,13 +377,13 @@ class Ragglesnout : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -477,7 +477,7 @@ class TutenKash : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -489,7 +489,7 @@ class TutenKash : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
@@ -501,13 +501,13 @@ class TutenKash : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

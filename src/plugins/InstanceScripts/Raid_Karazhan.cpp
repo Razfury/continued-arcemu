@@ -104,7 +104,7 @@ class AttumenTheHuntsmanAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() == 1)
 			{
@@ -120,7 +120,7 @@ class AttumenTheHuntsmanAI : public MoonScriptBossAI
 					midnight->SetAllowMelee(false);
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 };
 
@@ -138,16 +138,16 @@ class MidnightAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		}
 
-		void OnTargetDied(Unit* pTarget)
+		void KilledUnit(Unit* pTarget)
 		{
 			if(GetLinkedCreature() && GetLinkedCreature()->IsAlive())
 			{
 				TO< AICreatureScript* >(GetLinkedCreature())->Emote("Well done Midnight!", Text_Yell, 9173);
 			}
-			ParentClass::OnTargetDied(pTarget);
+			ParentClass::KilledUnit(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() == 1)
 			{
@@ -191,7 +191,7 @@ class MidnightAI : public MoonScriptBossAI
 					else MoveTo(attumen);
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 };
 
@@ -231,20 +231,20 @@ class MoroesAI : public MoonScriptBossAI
 			AddEmote(Event_OnTargetDied, "I've gone and made a mess.", Text_Yell, 9315);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mEnrage->mEnabled = true;
 			mVanishTimer = AddTimer(35000);	//First vanish after 35sec
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			RemoveAuraOnPlayers(MOROES_GARROTE);
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() == 1)
 			{
@@ -269,7 +269,7 @@ class MoroesAI : public MoonScriptBossAI
 					RemoveTimer(mGarroteTimer);
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*	mVanish;
@@ -307,10 +307,10 @@ class MaidenOfVirtueAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "Death comes. Will your conscience be clear?", Text_Yell, 9206);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mRepentance->TriggerCooldown();	//No repentance at the beginning of the fight
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
 		SpellDesc* mRepentance;
@@ -372,7 +372,7 @@ class BigBadWolfAI : public CreatureAIScript
 			spells[3].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = 0;
@@ -393,7 +393,7 @@ class BigBadWolfAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->PlaySoundToSet(9275);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Aarrhhh.");
@@ -409,13 +409,13 @@ class BigBadWolfAI : public CreatureAIScript
 				DoorRightO->SetState(0);
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(9277);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Mmmm... delicious.");
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(ThreatAdd == true)
 			{
@@ -564,7 +564,7 @@ class THEBIGBADWOLFAI : public CreatureAIScript
 			spells[2].speech = "Run away little girl, run away!";
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			_unit->PlaySoundToSet(9276);
@@ -593,7 +593,7 @@ class THEBIGBADWOLFAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GameObject*  DoorLeft = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-10917.1445f, -1774.05f, 90.478f, 184279);
 			GameObject*  DoorRight = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-10872.195f, -1779.42f, 90.45f, 184278);
@@ -615,13 +615,13 @@ class THEBIGBADWOLFAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(9277);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Mmmm... delicious.");
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1184,7 +1184,7 @@ class CuratorAI : public CreatureAIScript
 			spells[3].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = spells[i].cooldown;
@@ -1205,14 +1205,14 @@ class CuratorAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->PlaySoundToSet(9184);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This Curator is no longer op... er... ation... al.");
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1234,7 +1234,7 @@ class CuratorAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!evocation)
 			{
@@ -1498,7 +1498,7 @@ class ShadeofAranAI : public CreatureAIScript
 			info_pyroblast = dbcSpell.LookupEntry(AOE_PYROBLAST);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			//Atiesh check
 			bool HasAtiesh = false;
@@ -1583,7 +1583,7 @@ class ShadeofAranAI : public CreatureAIScript
 				SDoor->SetUInt32Value(GAMEOBJECT_FLAGS, 34);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			_unit->PlaySoundToSet(9244);
@@ -1596,7 +1596,7 @@ class ShadeofAranAI : public CreatureAIScript
 				SDoor->SetUInt32Value(GAMEOBJECT_FLAGS, 34);
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(rand() % 2)
 			{
@@ -1612,7 +1612,7 @@ class ShadeofAranAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(FlameWreathTimer)
 			{
@@ -1995,7 +1995,7 @@ class WaterEleAI : public CreatureAIScript
 		{
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			WaterBolt = (RandomUInt(3) + 5);
 			RegisterAIUpdateEvent(1250);
@@ -2008,13 +2008,13 @@ class WaterEleAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			_unit->Despawn(20000, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			WaterBolt--;
 			if(!WaterBolt)
@@ -2039,7 +2039,7 @@ class ShadowofAranAI : public CreatureAIScript
 		{
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			ShadowPyro = (RandomUInt(2) + 4);
 			RegisterAIUpdateEvent(1250);
@@ -2053,13 +2053,13 @@ class ShadowofAranAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			_unit->Despawn(5000, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			ShadowPyro--;
 			if(!ShadowPyro)
@@ -2136,7 +2136,7 @@ class IllhoofAI : public CreatureAIScript
 			*/
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			uint32 t = (uint32)time(NULL);
 			for(int i = 0; i < nrspells; i++)
@@ -2159,7 +2159,7 @@ class IllhoofAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			clean();
 			_unit->PlaySoundToSet(9262);
@@ -2178,7 +2178,7 @@ class IllhoofAI : public CreatureAIScript
 				portal2->Despawn(0, 0);
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			uint32 sound = 0;
 			const char* text = 0;
@@ -2197,7 +2197,7 @@ class IllhoofAI : public CreatureAIScript
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2374,7 +2374,7 @@ class KilrekAI : public CreatureAIScript
 			spells[1].instant = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			spells[0].casttime = (uint32)time(NULL) + spells[0].cooldown;
 
@@ -2388,7 +2388,7 @@ class KilrekAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 
@@ -2397,7 +2397,7 @@ class KilrekAI : public CreatureAIScript
 				Illhoof->CastSpell(Illhoof, spells[1].info, spells[1].instant);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2531,7 +2531,7 @@ class FiendishImpAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
@@ -2553,13 +2553,13 @@ class FiendishImpAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			_unit->Despawn(1, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 			if(_unit->GetAIInterface()->getNextTarget() && _unit->GetDistance2dSq(_unit->GetAIInterface()->getNextTarget()) <= 1225.0f)
@@ -2686,7 +2686,7 @@ class DemonChains : public CreatureAIScript
 				_unit->Despawn(10000, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Unit* uIllhoof = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(),
 			                 _unit->GetPositionZ(), CN_ILLHOOF);
@@ -2713,7 +2713,7 @@ class FiendPortal : public CreatureAIScript
 			RegisterAIUpdateEvent(10000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FIENDISH_IMP, _unit->GetPositionX(), _unit->GetPositionY(),
 			        _unit->GetPositionZ(), 0, true, false, 0, 0);
@@ -2843,7 +2843,7 @@ class MalchezaarAI : public AICreatureScript
 			}
 		}
 
-		void OnCombatStart(Unit*  mTarget)
+		void EnterCombat(Unit*  mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = 0;
@@ -2904,7 +2904,7 @@ class MalchezaarAI : public AICreatureScript
 				MAxes->Despawn(1000, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->PlaySoundToSet(9221);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I refuse to concede defeat. I am a prince of the Eredar! I am...");
@@ -2925,7 +2925,7 @@ class MalchezaarAI : public AICreatureScript
 				MDoor->SetState(0);
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 			switch(rand() % 3)
 			{
@@ -2946,7 +2946,7 @@ class MalchezaarAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(m_phase)
 			{
@@ -3276,10 +3276,10 @@ class NetherInfernalAI : public MoonScriptBossAI
 			ParentClass::OnLoad();
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->CastSpell(_unit, dbcSpell.LookupEntry(HELLFIRE), true);
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 };
@@ -3330,7 +3330,7 @@ class MAxesAI : public CreatureAIScript
 			spells[0].cooldown = 1;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(6000);
 
@@ -3369,12 +3369,12 @@ class MAxesAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[0].casttime)
@@ -3431,7 +3431,7 @@ class NetherspiteAI : public CreatureAIScript
 			spells[2].instant = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = spells[i].cooldown;
@@ -3463,7 +3463,7 @@ class NetherspiteAI : public CreatureAIScript
 				NDoor->SetState(0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 
@@ -3472,7 +3472,7 @@ class NetherspiteAI : public CreatureAIScript
 				NDoor->SetState(0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > VoidTimer && _unit->GetAIInterface()->getNextTarget())
@@ -3581,7 +3581,7 @@ class VoidZoneAI : public CreatureAIScript
 			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[0].casttime)
@@ -3693,7 +3693,7 @@ class NightbaneAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			ResetCastTime();
 			m_phase = 0;
@@ -3715,12 +3715,12 @@ class NightbaneAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(m_phase)
 			{
@@ -4072,7 +4072,7 @@ class DorotheeAI : public CreatureAIScript
 			spells[1].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -4091,7 +4091,7 @@ class DorotheeAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			//Check to see if we can spawn The Crone now
 			Creature* Dorothee	= _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10897.650f, -1755.8311f, 90.476f, 17535); //Dorothee
@@ -4111,7 +4111,7 @@ class DorotheeAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 		}
 		void SpawnTito()	// Lacking in collision checks!
@@ -4131,7 +4131,7 @@ class DorotheeAI : public CreatureAIScript
 
 			tito = _unit->GetMapMgr()->GetInterface()->SpawnCreature(17548, newposx, newposy, _unit->GetPositionZ() + 0.5f, 2.177125f, true, false, 0, 0);
 		}
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -4294,7 +4294,7 @@ class TitoAI : public CreatureAIScript
 			_unit->m_noRespawn = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -4310,13 +4310,13 @@ class TitoAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -4425,7 +4425,7 @@ class StrawmanAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -4444,7 +4444,7 @@ class StrawmanAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			//Check to see if we can spawn The Crone now
 			Creature* Dorothee	= _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10897.650f, -1755.8311f, 90.476f, 17535);	//Dorothee
@@ -4464,13 +4464,13 @@ class StrawmanAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 			_unit->PlaySoundToSet(SOUND_KILL_STRAWMAN);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_KILL_STRAWMAN);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -4578,7 +4578,7 @@ class TinheadAI : public CreatureAIScript
 			spells[1].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -4597,7 +4597,7 @@ class TinheadAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			//Check to see if we can spawn The Crone now
 			Creature* Dorothee	= _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10897.650f, -1755.8311f, 90.476f, 17535);	//Dorothee
@@ -4617,13 +4617,13 @@ class TinheadAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 			_unit->PlaySoundToSet(SOUND_KILL_TINHEAD);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_KILL_TINHEAD);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -4702,7 +4702,7 @@ class RoarAI : public CreatureAIScript
 
 		RoarAI(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(SOUND_AGGRO_ROAR);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_AGGRO_ROAR);
@@ -4715,7 +4715,7 @@ class RoarAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			//Check to see if we can spawn The Crone now
 			Creature* Dorothee	= _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10897.650f, -1755.8311f, 90.476f, 17535); //Dorothee
@@ -4778,7 +4778,7 @@ class CroneAI : public CreatureAIScript
 			spells[1].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -4813,7 +4813,7 @@ class CroneAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GameObject*  DoorLeft = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-10917.1445f, -1774.05f, 90.478f, 184279);
 			GameObject*  DoorRight = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-10872.195f, -1779.42f, 90.45f, 184278);
@@ -4835,11 +4835,11 @@ class CroneAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -4920,7 +4920,7 @@ class CycloneOZ : public CreatureAIScript
 			_unit->m_noRespawn = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(1000);
 		}
@@ -4930,12 +4930,12 @@ class CycloneOZ : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->CastSpell(_unit, dbcSpell.LookupEntry(CYCLONE_KNOCK), true);
 		}
@@ -5020,7 +5020,7 @@ class RomuloAI : public CreatureAIScript
 			spells[3].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -5054,7 +5054,7 @@ class RomuloAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GameObject*  DoorLeft = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-10917.1445f, -1774.05f, 90.478f, 184279);
 			GameObject*  DoorRight = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-10872.195f, -1779.42f, 90.45f, 184278);
@@ -5076,13 +5076,13 @@ class RomuloAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 			_unit->PlaySoundToSet(SOUND_KILL_ROMULO);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_KILL_ROMULO);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -5212,7 +5212,7 @@ class JulianneAI : public CreatureAIScript
 			spells[3].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(1000);
@@ -5246,7 +5246,7 @@ class JulianneAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			//_unit->RemoveAllAuras();
 			//_unit->setEmoteState(EMOTE_ONESHOT_EAT);
@@ -5262,13 +5262,13 @@ class JulianneAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit*  mTarget)
+		void KilledUnit(Unit*  mTarget)
 		{
 			_unit->PlaySoundToSet(SOUND_KILL_JULIANNE);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_KILL_JULIANNE);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

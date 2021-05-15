@@ -49,7 +49,7 @@ class DashelStonefist : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Okay, okay! Enough fighting. No one else needs to get hurt.");
 			_unit->RemoveNegativeAuras();

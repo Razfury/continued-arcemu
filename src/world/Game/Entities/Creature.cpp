@@ -1039,7 +1039,7 @@ void Creature::CallScriptUpdate()
 	if(!IsInWorld())
 		return;
 
-	_myScriptClass->AIUpdate();
+	_myScriptClass->UpdateAI();
 }
 
 void Creature::AddVendorItem(uint32 itemid, uint32 amount, ItemExtendedCostEntry* ec)
@@ -2132,7 +2132,7 @@ void Creature::Die(Unit* pAttacker, uint32 damage, uint32 spellid)
 
 	RemoveAllNonPersistentAuras();
 
-	CALL_SCRIPT_EVENT(pAttacker, OnTargetDied)(this);
+	CALL_SCRIPT_EVENT(pAttacker, KilledUnit)(this);
 	pAttacker->stopAttack(this);
 
 	/* Tell Unit that it's target has Died */

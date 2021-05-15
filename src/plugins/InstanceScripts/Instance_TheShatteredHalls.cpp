@@ -54,7 +54,7 @@ class FELORCCONVERTAI : public CreatureAIScript
 			spells[0].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -74,13 +74,13 @@ class FELORCCONVERTAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -176,7 +176,7 @@ class SHATTEREDHANDHEATHENAI : public CreatureAIScript
 			spells[1].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -197,13 +197,13 @@ class SHATTEREDHANDHEATHENAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -306,7 +306,7 @@ class SHATTEREDHANDLEGIONNAIREAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -327,13 +327,13 @@ class SHATTEREDHANDLEGIONNAIREAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -437,7 +437,7 @@ class SHATTEREDHANDSAVAGEAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -458,13 +458,13 @@ class SHATTEREDHANDSAVAGEAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -587,7 +587,7 @@ class SHADOWMOONACOLYTEAI : public CreatureAIScript
 			*/
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -611,13 +611,13 @@ class SHADOWMOONACOLYTEAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -724,7 +724,7 @@ class SHATTEREDHANDASSASSINAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -747,13 +747,13 @@ class SHATTEREDHANDASSASSINAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -842,7 +842,7 @@ class SHATTEREDHANDGLADIATORAI : public CreatureAIScript
 			spells[0].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -862,13 +862,13 @@ class SHATTEREDHANDGLADIATORAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -957,7 +957,7 @@ class SHATTEREDHANDHOUNDMASTERAI : public CreatureAIScript
 			spells[0].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -977,13 +977,13 @@ class SHATTEREDHANDHOUNDMASTERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1086,7 +1086,7 @@ class SHATTEREDHANDREAVERAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1110,13 +1110,13 @@ class SHATTEREDHANDREAVERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1212,7 +1212,7 @@ class SHATTEREDHANDSENTRYAI : public CreatureAIScript
 			spells[1].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1232,13 +1232,13 @@ class SHATTEREDHANDSENTRYAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetAIInterface()->getNextTarget() && _unit->GetCurrentSpell())
 			{
@@ -1361,7 +1361,7 @@ class SHATTEREDHANDSHARPSHOOTERAI : public CreatureAIScript
 			spells[3].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -1373,12 +1373,12 @@ class SHATTEREDHANDSHARPSHOOTERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 			if(_unit->GetAIInterface()->getNextTarget() && _unit->GetDistance2dSq(_unit->GetAIInterface()->getNextTarget()) <= 900.0f)
@@ -1460,7 +1460,7 @@ class SHATTEREDHANDBRAWLERAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -1480,13 +1480,13 @@ class SHATTEREDHANDBRAWLERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1584,7 +1584,7 @@ class ShadowmoonDarkcasterAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			Unit* GrandWarlock = NULL;
 			GrandWarlock = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(178.811996f, 292.377991f, -8.190210f, 16807);
@@ -1619,7 +1619,7 @@ class ShadowmoonDarkcasterAI : public CreatureAIScript
 			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Creature* GrandWarlock = NULL;
 			GrandWarlock = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(178.811996f, 292.377991f, -8.190210f, 16807);
@@ -1716,7 +1716,7 @@ class GrandWarlockNethekurseAI : public CreatureAIScript
 			Started = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 3; i++)
 				spells[i].casttime = 0;
@@ -1747,9 +1747,9 @@ class GrandWarlockNethekurseAI : public CreatureAIScript
 				RegisterAIUpdateEvent(4000);
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -1775,7 +1775,7 @@ class GrandWarlockNethekurseAI : public CreatureAIScript
 				RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "What a... shame.");
 			_unit->PlaySoundToSet(10276);
@@ -1783,7 +1783,7 @@ class GrandWarlockNethekurseAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!Started)
 			{
@@ -2000,7 +2000,7 @@ class BloodGuardPorungAI : public CreatureAIScript
 			spells[0].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2020,13 +2020,13 @@ class BloodGuardPorungAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -2105,9 +2105,9 @@ class WarbringerOmroggAI : public AICreatureScript
 			mRightHead = mLeftHead = NULL;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			mAggroShiftTimer = AddTimer(20000 + RandomUInt(10) * 1000);
 			mBlastWaveTimer = mSpeechTimer = mSpeechId = INVALIDATE_TIMER;
 			mLeftHead = SpawnCreature(19523);
@@ -2162,7 +2162,7 @@ class WarbringerOmroggAI : public AICreatureScript
 			}
 		}
 
-		void OnTargetDied(Unit* pTarget)
+		void KilledUnit(Unit* pTarget)
 		{
 			if(mLeftHead == NULL || mRightHead == NULL || mSpeechTimer != INVALIDATE_TIMER)
 				return;
@@ -2180,9 +2180,9 @@ class WarbringerOmroggAI : public AICreatureScript
 			}
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 			if(mLeftHead == NULL || mRightHead == NULL)
 				return;
 
@@ -2194,9 +2194,9 @@ class WarbringerOmroggAI : public AICreatureScript
 			mRightHead = NULL;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			if(mSpeechTimer != INVALIDATE_TIMER && IsTimerFinished(mSpeechTimer))
 			{
@@ -2331,7 +2331,7 @@ class HeadAI : public AICreatureScript
 			_unit->m_noRespawn = true;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetEntry() != CN_RIGHT_HEAD)
 				return;
@@ -2385,7 +2385,7 @@ class WarchiefKargathBladefistAI : public CreatureAIScript
 			spells[0].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			int RandomSpeach = rand() % 3;
 			switch(RandomSpeach)
@@ -2409,9 +2409,9 @@ class WarchiefKargathBladefistAI : public CreatureAIScript
 			spells[0].casttime = (uint32)time(NULL) + 30;
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach;
 				RandomUInt(1000);
@@ -2437,14 +2437,14 @@ class WarchiefKargathBladefistAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The true horde... will... prevail!");
 			_unit->PlaySoundToSet(10328);
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[0].casttime && _unit->GetAIInterface()->getNextTarget() && _unit->GetCurrentSpell() == NULL)

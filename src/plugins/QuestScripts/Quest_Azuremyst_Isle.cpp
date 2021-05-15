@@ -298,7 +298,7 @@ class ChieftainOomoorooQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(ChieftainOomoorooQAI);
 		ChieftainOomoorooQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{

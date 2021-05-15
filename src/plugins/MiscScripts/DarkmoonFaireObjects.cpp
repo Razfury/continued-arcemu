@@ -39,7 +39,7 @@ class Blastenheimer5000 : public GameObjectAIScript
 			RegisterAIUpdateEvent(2200);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Player* CurrentPlayer = objmgr.GetPlayer(mPlayerGuid);
 			if(CurrentPlayer == NULL)
@@ -120,7 +120,7 @@ public:
 		Console = tonkConsole;
 	}
 
-	void AIUpdate()
+	void UpdateAI()
 	{
 		if (!Plr->HasAura(33849) || Tonk->isDead())
 		{

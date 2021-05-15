@@ -61,7 +61,7 @@ class CABALACOLYTEAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -73,12 +73,12 @@ class CABALACOLYTEAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -172,7 +172,7 @@ class CABALDEATHSWORNAI : public CreatureAIScript
 			spells[2].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -184,12 +184,12 @@ class CABALDEATHSWORNAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -269,7 +269,7 @@ class CABALFANATICAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -281,12 +281,12 @@ class CABALFANATICAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -373,7 +373,7 @@ class CABALSHADOWPRIESTAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -385,12 +385,12 @@ class CABALSHADOWPRIESTAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -477,7 +477,7 @@ class CABALSPELLBINDERAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -489,12 +489,12 @@ class CABALSPELLBINDERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -582,7 +582,7 @@ class CABALWARLOCKAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -594,12 +594,12 @@ class CABALWARLOCKAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -687,7 +687,7 @@ class CABALZEALOTAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -699,12 +699,12 @@ class CABALZEALOTAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -836,7 +836,7 @@ class CABALRITUALISTAI : public CreatureAIScript
 			spells[5].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -848,12 +848,12 @@ class CABALRITUALISTAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -962,7 +962,7 @@ class FELOVERSEERAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			HealCooldown = 1;
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -976,13 +976,13 @@ class FELOVERSEERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			HealCooldown = 1;
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			HealCooldown--;
 			if(_unit->GetHealthPct() <= 25 && HealCooldown <= 0)
@@ -1079,7 +1079,7 @@ class MALICIOUSINSTRUCTORAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -1091,12 +1091,12 @@ class MALICIOUSINSTRUCTORAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1192,7 +1192,7 @@ class AMBASSADORHELLMAWAI : public CreatureAIScript
 			spells[1].cooldown = 25;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 2; i++)
 				spells[i].casttime = 0;
@@ -1217,9 +1217,9 @@ class AMBASSADORHELLMAWAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -1244,7 +1244,7 @@ class AMBASSADORHELLMAWAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Do not... grow... overconfident... mortal!");
 			_unit->PlaySoundToSet(10480);
@@ -1252,7 +1252,7 @@ class AMBASSADORHELLMAWAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[1].casttime && _unit->GetCurrentSpell() == NULL)
@@ -1369,7 +1369,7 @@ class BLACKHEARTTHEINCITERAI : public CreatureAIScript
 			spells[2].maxdist2cast = 40.0f;
 		}
 		// sound corrections needed!
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 3; i++)
 				spells[i].casttime = 0;
@@ -1394,9 +1394,9 @@ class BLACKHEARTTHEINCITERAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -1420,14 +1420,14 @@ class BLACKHEARTTHEINCITERAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This...no..good");
 			_unit->PlaySoundToSet(10491);
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[2].casttime && _unit->GetCurrentSpell() == NULL)
@@ -1555,7 +1555,7 @@ class BLACKHEARTTHEINCITERAI : public CreatureAIScript
 #define RAIN_OF_FIRE		33617 // 33617 or 34360	// breaks model behavior
 #define VOID_PORTAL_VISUAL	33569 // must work on that 33566
 // Help sound and it's case?
-// Should OnCombatStart should spawn 3 portals for Voidwalkers? (33569 ?)
+// Should EnterCombat should spawn 3 portals for Voidwalkers? (33569 ?)
 /*The fight starts as soon as one of the players moves close enough
 to Vorpil to aggro him. Vorpil will immediately open the Void Rifts
 around him, and Voidwalkers will start spawning, at an increasingly
@@ -1608,7 +1608,7 @@ class GRANDMASTERVORPILAI : public CreatureAIScript
 			Teleported = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 4; i++)
 				spells[i].casttime = 0;
@@ -1635,9 +1635,9 @@ class GRANDMASTERVORPILAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 2;
 				switch(RandomSpeach)
@@ -1662,7 +1662,7 @@ class GRANDMASTERVORPILAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I give my life... Gladly.");
 			_unit->PlaySoundToSet(10529);
@@ -1670,7 +1670,7 @@ class GRANDMASTERVORPILAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(Teleported && _unit->GetCurrentSpell() == NULL)
 			{
@@ -1807,7 +1807,7 @@ class MURMURAI : public CreatureAIScript
 			SonicBoom = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 3; i++)
 				spells[i].casttime = 0;
@@ -1838,12 +1838,12 @@ class MURMURAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(SonicBoom)
 			{

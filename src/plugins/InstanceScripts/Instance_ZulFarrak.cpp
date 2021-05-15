@@ -50,7 +50,7 @@ class thekaAI : public CreatureAIScript
 			plague = dbcSpell.LookupEntry(fevered_plague);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			morphcheck = true;
 			plaguecount = 0;
@@ -66,14 +66,14 @@ class thekaAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			morphcheck = false;
 			plaguecount = 0;
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			plaguecount++;
 			randomplague = 16 + RandomUInt(3);
@@ -133,7 +133,7 @@ class antusulTriggerAI : public CreatureAIScript
 
 		antusulTriggerAI(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->GetAIInterface()->m_canMove = false;
 			_unit->GetAIInterface()->disable_melee = true;
@@ -171,7 +171,7 @@ class antusulAI : public CreatureAIScript
 			//earthgrab_ward = dbcSpell.LookupEntry(earthgrabward);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			add1 = add2 = add3 = add4 = add5 = add6 = trigger = NULL;
 			spawns = firstspawn = secondspawn = true;
@@ -193,7 +193,7 @@ class antusulAI : public CreatureAIScript
 			deletespawns();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			spawns = spawns2 = attack = firstspawn = secondspawn = false;
 			/*healingwardcount = earthgrabcount = hmax = emax =*/
@@ -204,7 +204,7 @@ class antusulAI : public CreatureAIScript
 				trigger->Despawn(100, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//healingwardcount++;
 			//earthgrabcount++;

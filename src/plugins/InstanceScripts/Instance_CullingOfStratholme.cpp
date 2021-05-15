@@ -58,7 +58,7 @@ class MEATHOOK_AI : public CreatureAIScript
 			spells.push_back(Frenzy);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "New toys!");
 			_unit->PlaySoundToSet(13428);
@@ -73,14 +73,14 @@ class MEATHOOK_AI : public CreatureAIScript
 			_unit->RemoveAllAuras();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This not fun...");
 			_unit->PlaySoundToSet(13433);
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(rand() % 3)
 			{
@@ -99,7 +99,7 @@ class MEATHOOK_AI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(spells.size() > 0)
 			{
@@ -241,7 +241,7 @@ class SALRAMM_THE_FLESHCRAFTER_AI : public CreatureAIScript
 			spells.push_back(ExplodeGhoul);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ah, the entertainment has arrived!");
 			_unit->PlaySoundToSet(13471);
@@ -256,14 +256,14 @@ class SALRAMM_THE_FLESHCRAFTER_AI : public CreatureAIScript
 			_unit->RemoveAllAuras();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You only advance... the master's plan...");
 			_unit->PlaySoundToSet(13483);
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(rand() % 3)
 			{
@@ -282,7 +282,7 @@ class SALRAMM_THE_FLESHCRAFTER_AI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(spells.size() > 0)
 			{
@@ -423,7 +423,7 @@ class CHRONO_LORD_EPOCH_AI : public CreatureAIScript
 			spells.push_back(TimeStop);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "We'll see about that, young prince.");
 			_unit->PlaySoundToSet(13408);
@@ -438,12 +438,12 @@ class CHRONO_LORD_EPOCH_AI : public CreatureAIScript
 			_unit->RemoveAllAuras();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(rand() % 3)
 			{
@@ -462,7 +462,7 @@ class CHRONO_LORD_EPOCH_AI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(spells.size() > 0)
 			{
@@ -578,7 +578,7 @@ class INFINITE_CORRUPTOR_AI : public CreatureAIScript
 			spells.push_back(CorruptingBlight);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "How dare you interfere with our work here!");
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -592,12 +592,12 @@ class INFINITE_CORRUPTOR_AI : public CreatureAIScript
 			_unit->RemoveAllAuras();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(spells.size() > 0)
 			{
@@ -732,7 +732,7 @@ class MALGANIS_AI : public CreatureAIScript
 			spells.push_back(VampiricTouch);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This will be a fine test, Prince Arthas.");
 			_unit->PlaySoundToSet(14413);
@@ -747,7 +747,7 @@ class MALGANIS_AI : public CreatureAIScript
 			_unit->RemoveAllAuras();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(rand() % 3)
 			{
@@ -787,12 +787,12 @@ class MALGANIS_AI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!scene && spells.size() > 0)
 			{
@@ -1165,7 +1165,7 @@ class ARTHAS_AI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(phase)
 			{

@@ -27,7 +27,7 @@ class Flayer : public CreatureAIScript
 		Flayer(Creature* pCreature) : CreatureAIScript(pCreature) { }
 		static CreatureAIScript* Create(Creature* c) { return new Flayer(c); }
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(!mKiller->IsPlayer())
 				return;
@@ -78,7 +78,7 @@ class ArajTheSummoner : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(ArajTheSummoner);
 		ArajTheSummoner(Creature* pCreature) : CreatureAIScript(pCreature) { }
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(!mKiller->IsPlayer())
 				return;

@@ -655,6 +655,22 @@ class AICreatureScript : public CreatureAIScript
 		// Event Handler
 		EventMap2 events;
 
+		Player* GetRandomPlayerTarget()
+		{
+			vector< uint32 > possible_targets;
+			for (set< Object* >::iterator iter = _unit->GetInRangePlayerSetBegin(); iter != _unit->GetInRangePlayerSetEnd(); ++iter)
+			{
+				if ((*iter) && (TO< Player* >(*iter))->isAlive())
+					possible_targets.push_back((uint32)(*iter)->GetGUID());
+			}
+			if (possible_targets.size() > 0)
+			{
+				uint32 random_player = possible_targets[Rand(uint32(possible_targets.size() - 1))];
+				return _unit->GetMapMgr()->GetPlayer(random_player);
+			}
+			return NULL;
+		}
+
 		//Movement
 		bool					GetCanMove();
 		void					SetCanMove(bool pCanMove);
@@ -687,7 +703,6 @@ class AICreatureScript : public CreatureAIScript
 		void					AggroRandomUnit(int pInitialThreat = 1);
 		void					AggroNearestPlayer(int pInitialThreat = 1);
 		void					AggroRandomPlayer(int pInitialThreat = 1);
-		void					GetRandomPlayerTarget();
 
 
 		//Status
@@ -792,12 +807,13 @@ class AICreatureScript : public CreatureAIScript
 		void					AddRareLoot(Unit* pTarget, uint32 pItemID, float pPercentChance);
 
 		//Reimplemented Events
-		virtual void			OnCombatStart(Unit* pTarget);
+		virtual void			EnterCombat(Unit* pTarget);
 		virtual void			OnCombatStop(Unit* pTarget);
-		virtual void			OnTargetDied(Unit* pTarget);
-		virtual void			OnDied(Unit* pKiller);
-		virtual void			AIUpdate();
+		virtual void			KilledUnit(Unit* pTarget);
+		virtual void			JustDied(Unit* pKiller);
+		virtual void			UpdateAI();
 		virtual void			Destroy();
+		virtual void            DoAction(int32 param);
 
 	protected:
 
@@ -860,9 +876,9 @@ class MoonScriptBossAI : public AICreatureScript
 		void			SetEnrageInfo(SpellDesc* pSpell, int32 pTriggerMilliseconds);
 
 		//Reimplemented Events
-		virtual void	OnCombatStart(Unit* pTarget);
+		virtual void	EnterCombat(Unit* pTarget);
 		virtual void	OnCombatStop(Unit* pTarget);
-		virtual void	AIUpdate();
+		virtual void	UpdateAI();
 
 	protected:
 		int32			mPhaseIndex;

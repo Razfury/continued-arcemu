@@ -246,12 +246,12 @@ class GeneralBjarngrimAI : public MoonScriptBossAI
 			mStanceTimer = INVALIDATE_TIMER;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mStanceTimer = AddTimer(TIMER_STANCE_CHANGE + (RandomUInt(7) * 1000));
 			switchStance(RandomUInt(2));
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
@@ -265,7 +265,7 @@ class GeneralBjarngrimAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mStanceTimer))
 			{
@@ -289,7 +289,7 @@ class GeneralBjarngrimAI : public MoonScriptBossAI
 				ResetTimer(mStanceTimer, TIMER_STANCE_CHANGE + (RandomUInt(7) * 1000));
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		void switchStance(int32 pStance)
@@ -380,13 +380,13 @@ class Volkhan : public AICreatureScript
 			mPhase = 0;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			m_bStomp = false;
 			mStompTimer = AddTimer(TIMER_STOMP + (RandomUInt(6) * 1000));
 			mPhase = 0;
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
@@ -400,7 +400,7 @@ class Volkhan : public AICreatureScript
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mStompTimer))
 			{
@@ -425,7 +425,7 @@ class Volkhan : public AICreatureScript
 				++mPhase;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		void OnReachWP(uint32 iWaypointId, bool bForwards)
@@ -487,7 +487,7 @@ class MoltenGolem : public AICreatureScript
 			AddSpell(SPELL_IMMOLATION_STRIKE, Target_Current, 15, 0, 15);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			SpawnCreature(CN_BRITTLE_GOLEM);
 			Despawn(1);
@@ -548,9 +548,9 @@ class IonarAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "Master... you have guests.", Text_Yell, 14459);
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
@@ -600,9 +600,9 @@ class LokenAI : public AICreatureScript
 			mSpeech = 1;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			mSpeech = 1;
 			ApplyAura(PULSING_SHOCKWAVE);
 			mNovaTimer = AddTimer(TIMER_NOVA);
@@ -621,13 +621,13 @@ class LokenAI : public AICreatureScript
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_Performed);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			RemoveAuraOnPlayers(PULSING_SHOCKWAVE_AURA);
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mNovaTimer))
 			{
@@ -676,7 +676,7 @@ class LokenAI : public AICreatureScript
 				RemoveAIUpdateEvent();
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		SpellDesc*	mNova;

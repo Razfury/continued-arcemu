@@ -1407,7 +1407,7 @@ class LuaCreature : public CreatureAIScript
 		~LuaCreature()
 		{}
 		ARCEMU_INLINE void SetUnit(Creature* ncrc) { _unit = ncrc; }
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CHECK_BINDING_ACQUIRELOCK
 
@@ -1433,7 +1433,7 @@ class LuaCreature : public CreatureAIScript
 			RELEASE_LOCK
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			CHECK_BINDING_ACQUIRELOCK
 
@@ -1446,7 +1446,7 @@ class LuaCreature : public CreatureAIScript
 			RELEASE_LOCK
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CHECK_BINDING_ACQUIRELOCK
 
@@ -1658,7 +1658,7 @@ class LuaCreature : public CreatureAIScript
 			sLuaMgr.ExecuteCall(4);
 			RELEASE_LOCK
 		}
-		void AIUpdate()
+		void UpdateAI()
 		{
 			CHECK_BINDING_ACQUIRELOCK
 
@@ -1852,7 +1852,7 @@ class LuaGameObjectScript : public GameObjectAIScript
 			RELEASE_LOCK
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			CHECK_BINDING_ACQUIRELOCK
 			sLuaMgr.BeginCall(m_binding->m_functionReferences[GAMEOBJECT_EVENT_AIUPDATE]);

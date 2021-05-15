@@ -99,7 +99,7 @@ class JeklikAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			// bat transform
@@ -115,12 +115,12 @@ class JeklikAI : public CreatureAIScript
 			_unit->RemoveAura(TRANSFORM_BAT);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 50 && m_spellcheck[0])
 			{
@@ -246,7 +246,7 @@ class VenoxisAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -259,12 +259,12 @@ class VenoxisAI : public CreatureAIScript
 			_unit->RemoveAura(TRANSFORM_SNAKE);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 50 && m_spellcheck[0])
 			{

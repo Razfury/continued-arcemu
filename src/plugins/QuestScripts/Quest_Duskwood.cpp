@@ -43,9 +43,9 @@ class ElizaAI : public AICreatureScript
 
 			RegisterAIUpdateEvent(1000);
 		}
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			if(IsTimerFinished(mElizaCombatTimer))
 			{
 				SetCanEnterCombat(true);

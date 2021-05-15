@@ -94,7 +94,7 @@ class HydrossTheUnstableAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			ResetCastTime();
 			MarkCount = 0;
@@ -122,7 +122,7 @@ class HydrossTheUnstableAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -159,7 +159,7 @@ class HydrossTheUnstableAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are the disease, not I.");
 			_unit->PlaySoundToSet(11300);
@@ -167,7 +167,7 @@ class HydrossTheUnstableAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!form) //water form
 			{
@@ -514,7 +514,7 @@ class LurkerAI : public CreatureAIScript
 			spells[3].attackstoptimer = 2000; // 2sec
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -526,17 +526,17 @@ class LurkerAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -666,7 +666,7 @@ class LeotherasAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			if(LeotherasEventGreyheartToKill[_unit->GetInstanceID()] != 0)
 				return;
@@ -703,7 +703,7 @@ class LeotherasAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -748,7 +748,7 @@ class LeotherasAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You cannot kill me! Fools, I'll be back! I'll... aarghh...");
 			_unit->PlaySoundToSet(11317);
@@ -769,7 +769,7 @@ class LeotherasAI : public CreatureAIScript
 			_unit->SetEquippedItem(OFFHAND, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(Phase == 0 || Phase == 3) //nightelf phase
 			{
@@ -1004,7 +1004,7 @@ class GreyheartSpellbinderAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SetChannelSpellTargetGUID(0);
 			_unit->SetChannelSpellId(0);
@@ -1020,13 +1020,13 @@ class GreyheartSpellbinderAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			LeotherasEventGreyheartToKill[_unit->GetInstanceID()]--;
 
@@ -1167,7 +1167,7 @@ class ShadowofLeotherasAI : public CreatureAIScript
 			sEventMgr.AddEvent(TO_OBJECT(_unit), &Object::EventSetUInt32Value, (uint32)UNIT_FIELD_FLAGS, (uint32)0, EVENT_CREATURE_UPDATE, 7500, 0, 1);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
 			RegisterAIUpdateEvent(1000);
@@ -1178,7 +1178,7 @@ class ShadowofLeotherasAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//Chaos Blast
 			if(_unit->GetAIInterface()->getNextTarget())
@@ -1251,7 +1251,7 @@ class KarathressAI : public CreatureAIScript
 				if(advisor && advisor->isAlive()) AdvisorsLeft--;
 			}*/
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CataclysmicBoltTimer = 10;
 			EnrageTimer = 600;
@@ -1268,7 +1268,7 @@ class KarathressAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Her ... excellency ... awaits!");
 			_unit->PlaySoundToSet(11285);
@@ -1281,13 +1281,13 @@ class KarathressAI : public CreatureAIScript
 				olum->Despawn(180000, 0);
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I am rid of you.");
 			_unit->PlaySoundToSet(11284);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//Cataclysmic Bolt
 			CataclysmicBoltTimer--;
@@ -1371,15 +1371,15 @@ class FathomGuardSharkissAI : public AICreatureScript
 			AddSpell(THE_BEAST_WITHIN, Target_Current, 10.0f, 0, 40);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			CurrentPet = NULL;
 			SummonPetTimer = 5;
 
-			AICreatureScript::OnCombatStart(pTarget);
+			AICreatureScript::EnterCombat(pTarget);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			Creature* FLK = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), CN_FATHOM_LORD_KARATHRESS);
 			if(FLK)
@@ -1392,10 +1392,10 @@ class FathomGuardSharkissAI : public AICreatureScript
 				FLK->RemoveAura(BLESSING_OF_THE_TIDES);
 			}
 
-			AICreatureScript::OnDied(pKiller);
+			AICreatureScript::JustDied(pKiller);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//Summon Pet
 			if(!CurrentPet || !CurrentPet->isAlive())
@@ -1418,7 +1418,7 @@ class FathomGuardSharkissAI : public AICreatureScript
 				}
 			}
 
-			AICreatureScript::AIUpdate();
+			AICreatureScript::UpdateAI();
 		}
 
 	private:
@@ -1448,7 +1448,7 @@ class FathomGuardTidalvessAI : public AICreatureScript
 			AddSpell(WINDFURY, Target_Current, 10.0f, 0, 0);
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			Creature* FLK = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), CN_FATHOM_LORD_KARATHRESS);
 			if(FLK)
@@ -1461,7 +1461,7 @@ class FathomGuardTidalvessAI : public AICreatureScript
 				FLK->RemoveAura(BLESSING_OF_THE_TIDES);
 			}
 
-			AICreatureScript::OnDied(pKiller);
+			AICreatureScript::JustDied(pKiller);
 		}
 };
 
@@ -1480,14 +1480,14 @@ class FathomGuardCaribdisAI : public AICreatureScript
 			AddSpell(SUMMON_CYCLONE, Target_Self, 2.0f, 0, 0);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			HealingWaveTimer = 15;
 
-			AICreatureScript::OnCombatStart(pTarget);
+			AICreatureScript::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			/*HealingWaveTimer--;
 			if(!HealingWaveTimer)
@@ -1502,10 +1502,10 @@ class FathomGuardCaribdisAI : public AICreatureScript
 				HealingWaveTimer = 15;
 			}*/
 
-			AICreatureScript::AIUpdate();
+			AICreatureScript::UpdateAI();
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			Creature* FLK = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), CN_FATHOM_LORD_KARATHRESS);
 			if(FLK)
@@ -1517,7 +1517,7 @@ class FathomGuardCaribdisAI : public AICreatureScript
 					TO< KarathressAI* >(FLK->GetScript())->AdvisorsLeft--;
 				FLK->RemoveAura(BLESSING_OF_THE_TIDES);
 			}
-			AICreatureScript::OnDied(pKiller);
+			AICreatureScript::JustDied(pKiller);
 		}
 
 	private:
@@ -1559,7 +1559,7 @@ class MorogrimAI : public CreatureAIScript
 			spells[3].cooldown = 30;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Flood of the deep, take you!");
 			_unit->PlaySoundToSet(11321);
@@ -1579,7 +1579,7 @@ class MorogrimAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Great... currents of... Ageon.");
 			_unit->PlaySoundToSet(11329);
@@ -1587,7 +1587,7 @@ class MorogrimAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1610,7 +1610,7 @@ class MorogrimAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetAIInterface()->getNextTarget() != NULL && _unit->GetCurrentSpell() == NULL)
 			{
@@ -1711,7 +1711,7 @@ class TidewalkerLurkerAI : public CreatureAIScript
 			_unit->Despawn(1, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->Despawn(1, 0);
 		}
@@ -1960,7 +1960,7 @@ class VashjAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			ResetCastTime();
 			Phase = 1;
@@ -2026,14 +2026,14 @@ class VashjAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Lord Illidan, I... I am... sorry.");
 			_unit->PlaySoundToSet(11544);
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(rand() % 2)
 			{
@@ -2049,7 +2049,7 @@ class VashjAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(Phase)
 			{
@@ -2428,7 +2428,7 @@ class TaintedElementalAI : public CreatureAIScript
 			_unit->GetAIInterface()->m_canMove = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -2439,7 +2439,7 @@ class TaintedElementalAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Creature* Vashj = NULL;
 			Vashj = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), CN_LADY_VASHJ);
@@ -2450,7 +2450,7 @@ class TaintedElementalAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//TODO: Despawn after 15 secs
 			if(_unit->GetCurrentSpell() == NULL)
@@ -2554,7 +2554,7 @@ class ToxicSporeBatAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Phase 1 Test!");
 			_unit->PlaySoundToSet(11243);
@@ -2605,7 +2605,7 @@ class ToxicSporeBatAI : public CreatureAIScript
 			//RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Phase = 0;
 			FlameQuills = false;
@@ -2616,7 +2616,7 @@ class ToxicSporeBatAI : public CreatureAIScript
 			//RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(FlameQuills == true)
 			{
@@ -3022,7 +3022,7 @@ class UnderbogColossusAI : public AICreatureScript
 			}
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			//There will also be a choice of abilities he might use as he dies:
 			switch(rand() % 3)
@@ -3046,7 +3046,7 @@ class UnderbogColossusAI : public AICreatureScript
 					//Refreshing mist, TODO
 			}
 
-			AICreatureScript::OnDied(pKiller);
+			AICreatureScript::JustDied(pKiller);
 		}
 };
 

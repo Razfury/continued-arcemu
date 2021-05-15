@@ -88,21 +88,21 @@ class SelinFireheartAI : public AICreatureScript
 			FelExplosion = AddSpell(SF_FELEXPLOSION, Target_Self, 0, 0, 0);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			/*
 				Selin Fireheart starts with 0 mana and drains it from the felcrystals in the room
 				- ToDo: Set it so mana regen is off
 			*/
 			_unit->SetUInt32Value(UNIT_FIELD_POWER1, 0);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
 		/*
-			During the AIUpdate() Selin will spam FelExplosion until hes out of mana
+			During the UpdateAI() Selin will spam FelExplosion until hes out of mana
 			He will then attempt to gain mana from a FelCrystal thats in the room by running to them
 		*/
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// 10% of his mana according to wowhead is 3231 which is whats needed to cast FelExplosion
 			if(GetManaPercent() < 10 || FelExplosion->mEnabled == false)
@@ -110,7 +110,7 @@ class SelinFireheartAI : public AICreatureScript
 			else if(!IsCasting())// Mana is greater than 10%
 				CastFelExplosion();
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		void Mana()
@@ -144,7 +144,7 @@ class SelinFireheartAI : public AICreatureScript
 			if(!FelCrystal->GetCurrentSpell())
 				FelCrystal->CastSpell(_unit, ManaRage, false);
 
-			// Mana Rage giving of mana doesnt work so we give 10%(3231) / AIUpdate() Event.
+			// Mana Rage giving of mana doesnt work so we give 10%(3231) / UpdateAI() Event.
 			CastSpellNowNoScheduling(ManaRageTrigger);
 			uint32 mana = _unit->GetPower(POWER_TYPE_MANA) + 3231;
 			if(mana >= _unit->GetMaxPower(POWER_TYPE_MANA))
@@ -224,14 +224,14 @@ class VexallusAI : public MoonScriptBossAI
 			mSummon = 0;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			Emote("Drain... life...", Text_Yell, 12389);
 			SetPhase(1);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if((GetHealthPercent() <= 85  && mSummon == 0) ||
 			        (GetHealthPercent() <= 70 && mSummon == 1) ||
@@ -248,7 +248,7 @@ class VexallusAI : public MoonScriptBossAI
 				SetPhase(2);
 
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*	mPureEnergy;
@@ -281,16 +281,16 @@ class Priestess_DelrissaAI : public MoonScriptBossAI
 			mKilledPlayers = 0;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			Emote("Annihilate them!", Text_Yell, 12395);
 			//AggroRandomUnit();	// Want to aggro random unit ? Set it instead of calling premade
 			// method that in this case recursively loops this procedure
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
-		void OnTargetDied(Unit* pTarget)
+		void KilledUnit(Unit* pTarget)
 		{
 			if(!pTarget || !pTarget->IsPlayer())
 				return;
@@ -308,7 +308,7 @@ class Priestess_DelrissaAI : public MoonScriptBossAI
 			else if(mKilledPlayers == 5)
 				Emote("It's been a kick, really.", Text_Yell, 12411);
 
-			ParentClass::OnTargetDied(pTarget);
+			ParentClass::KilledUnit(pTarget);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -319,7 +319,7 @@ class Priestess_DelrissaAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mClearHateList))
 			{
@@ -328,7 +328,7 @@ class Priestess_DelrissaAI : public MoonScriptBossAI
 				ResetTimer(mClearHateList, 15000);
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 	protected:

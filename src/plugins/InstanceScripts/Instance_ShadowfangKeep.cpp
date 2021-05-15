@@ -42,22 +42,22 @@ class SpringvaleAI : public AICreatureScript
 			AddSpell(5588, Target_Current, 12, 0, 60);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			if(!GetUnit()->HasAura(DevoAura->mInfo->Id))
 				CastSpellNowNoScheduling(DevoAura);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 20 && DivineProt->mEnabled == true)
 			{
 				CastSpellNowNoScheduling(DivineProt);
 				DivineProt->mEnabled = false;
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc* DevoAura;
@@ -79,7 +79,7 @@ class BlindWatcherAI : public MoonScriptBossAI
 			HowlingRage3 = AddSpell(7484, Target_Self, 0, 1.5f, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 75 && GetPhase() == 1)
 			{
@@ -97,7 +97,7 @@ class BlindWatcherAI : public MoonScriptBossAI
 					RemoveAura(7483);
 				SetPhase(4, HowlingRage3);
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc* HowlingRage1;
@@ -123,7 +123,7 @@ class FenrusAI : public AICreatureScript
 			AddSpell(7125, Target_Current, 12, 1.5f, 60);
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			GetUnit()->SendChatMessageAlternateEntry(4275, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Who dares interfere with the Sons of Arugal?");
 			GetUnit()->PlaySoundToSet(5791);
@@ -140,7 +140,7 @@ class FenrusAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 
@@ -154,13 +154,13 @@ class VoidWalkerAI : public AICreatureScript
 			AddSpell(7154, Target_WoundedFriendly, 5, 0, 7);
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			GameObject*  pDoor = GetUnit()->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-129.034f, 2166.16f, 129.187f, 18972);
 			if(pDoor)
 				pDoor->SetState(0);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 
@@ -192,13 +192,13 @@ class NandosAI : public AICreatureScript
 		AI_CREATURE_SCRIPT_FUNCTION(NandosAI, AICreatureScript);
 		NandosAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			GameObject*  pDoor = GetUnit()->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-118.11f, 2161.86f, 155.678f, 18971);
 			if(pDoor)
 				pDoor->SetState(0);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 //Deathstalker Adamant
@@ -210,11 +210,11 @@ class RETHILGOREAI : public AICreatureScript
 {
 		AI_CREATURE_SCRIPT_FUNCTION(RETHILGOREAI, AICreatureScript);
 		RETHILGOREAI(Creature* pCreature) : AICreatureScript(pCreature) {}
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			_unit->SendChatMessageAlternateEntry(3849, CHAT_MSG_MONSTER_SAY, LANG_GUTTERSPEAK, "About time someone killed the wretch.");
 			_unit->SendChatMessageAlternateEntry(3850, CHAT_MSG_MONSTER_SAY, LANG_COMMON, "For once I agree with you... scum.");      // dont know the allys text yet
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 

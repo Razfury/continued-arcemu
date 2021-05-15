@@ -58,7 +58,7 @@ class DruidFangAI : public AICreatureScript
 			DruidsSlumber = AddSpell(8040, Target_RandomPlayerNotCurrent, 20, 2.5, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 50 && SerpentForm->mEnabled == true)
 			{
@@ -81,7 +81,7 @@ class DruidFangAI : public AICreatureScript
 				HealingTouch->mEnabled = false;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc* SerpentForm;
@@ -130,7 +130,7 @@ class LordCobrahnAI : public AICreatureScript
 			SerpentForm = AddSpell(7965, Target_Self, 0, 0, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 20 && SerpentForm->mEnabled == true)
 			{
@@ -144,7 +144,7 @@ class LordCobrahnAI : public AICreatureScript
 				// Enable Lightning Bolt
 				LightningBolt->mEnabled = true;
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 		SpellDesc* LightningBolt;
 		SpellDesc* SerpentForm;
@@ -207,7 +207,7 @@ class SkumAI : public AICreatureScript
 			AddSpell(6254, Target_Current, 50, 1.8f, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 10 && GetBehavior() != Behavior_Flee)
 			{
@@ -218,7 +218,7 @@ class SkumAI : public AICreatureScript
 				SetAllowSpell(false);
 				MoveTo(-262.829742f, -299.363159f, -68.293579f, true);
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 };
 
@@ -377,7 +377,7 @@ class DofNaralexAI : public MoonScriptBossAI
 			ParentClass::OnReachWP(iWaypointId, bForwards);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(SpawnTimer && IsTimerFinished(SpawnTimer))
 			{
@@ -416,7 +416,7 @@ class DofNaralexAI : public MoonScriptBossAI
 				}
 				SetPhase(6);
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		void Moccasin()

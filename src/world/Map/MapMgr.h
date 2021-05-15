@@ -241,6 +241,14 @@ class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,
 
 		uint32 GetMapId() { return _mapId; }
 
+		//Boss selection GUID for dungeons
+		uint32 m_BossGUID1;
+		uint32 m_BossGUID2;
+		uint32 m_BossGUID3;
+		uint32 m_BossGUID4;
+		uint32 m_BossGUID5;
+		uint32 m_BossGUID6;
+
 		void PushToProcessed(Player* plr);
 
 		bool HasPlayers() { return (m_PlayerStorage.size() > 0); }

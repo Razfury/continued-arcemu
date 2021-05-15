@@ -402,12 +402,12 @@ class SladranAI : public AICreatureScript
 			AddEmote(Event_OnDied, "I sssee now... Ssscourge wasss not... our greatessst enemy...", Text_Yell, 14449);
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -443,12 +443,12 @@ class GalDarahAI : public AICreatureScript
 			AddEmote(Event_OnDied, "Even the mighty... can fall.", Text_Yell, 14439);
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 		void OnCombatStop(Unit* pTarget)

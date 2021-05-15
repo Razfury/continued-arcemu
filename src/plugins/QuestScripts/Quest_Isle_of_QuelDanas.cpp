@@ -147,7 +147,7 @@ class TheBattleForTheSunReachArmory : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(TheBattleForTheSunReachArmory);
 		TheBattleForTheSunReachArmory(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(pKiller->IsPlayer())
 			{

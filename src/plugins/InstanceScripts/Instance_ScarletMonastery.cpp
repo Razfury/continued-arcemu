@@ -54,7 +54,7 @@ class VishasAI : public AICreatureScript
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 75 && m_uiSay == 0)
 			{
@@ -68,7 +68,7 @@ class VishasAI : public AICreatureScript
 				m_uiSay = 2;
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 	private:
@@ -102,7 +102,7 @@ class ThalnosAI : public AICreatureScript
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 50 && m_bEmoted == false)
 			{
@@ -110,7 +110,7 @@ class ThalnosAI : public AICreatureScript
 				m_bEmoted = true;
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 	private:
@@ -221,7 +221,7 @@ class HerodAI : public AICreatureScript
 			ParentClass::OnCombatStop(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 40 && m_bEnraged == false)
 			{
@@ -229,7 +229,7 @@ class HerodAI : public AICreatureScript
 				Emote("Light, give me strength!", Text_Yell,  5833);
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		bool    m_bEnraged;
@@ -286,7 +286,7 @@ class MograineAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Infidels. They must be purified!");
 
@@ -295,7 +295,7 @@ class MograineAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 
 			if(_unit->GetHealthPct() > 0)
@@ -324,7 +324,7 @@ class MograineAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GameObject*  pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(1173.01f, 1389.91f, 31.9723f, 104600);
 			if(pDoor == 0)
@@ -337,7 +337,7 @@ class MograineAI : public CreatureAIScript
 		}
 
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Timer = Timer + 1;
 
@@ -457,7 +457,7 @@ class WhitemaneAI : public CreatureAIScript
 			Timer = 0;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Mograine has fallen? You shall pay for this treachery!");
 
@@ -466,7 +466,7 @@ class WhitemaneAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 
 			if(_unit->GetHealthPct() > 0)
@@ -533,14 +533,14 @@ class WhitemaneAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 
 			RemoveAIUpdateEvent();
 		}
 
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Timer = Timer + 1;
 
@@ -646,12 +646,12 @@ class FairbanksAI : public CreatureAIScript
 			Timer = 0;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 
 			if(_unit->GetHealthPct() > 0)
@@ -680,13 +680,13 @@ class FairbanksAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Timer = Timer + 1;
 

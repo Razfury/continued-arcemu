@@ -287,6 +287,7 @@ class SERVER_DECL AIInterface
 		virtual ~AIInterface();
 
 		// Misc
+		virtual void DoAction(int32 param);
 		void Init(Unit* un, AIType at, MovementType mt);
 		void Init(Unit* un, AIType at, MovementType mt, Unit* owner); // used for pets
 		Unit* GetUnit() { return m_Unit; }

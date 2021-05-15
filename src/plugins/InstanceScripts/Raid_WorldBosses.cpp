@@ -113,14 +113,14 @@ class EmerissAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Hope is a DISEASE of the soul! This land shall wither and die!");
 			RegisterAIUpdateEvent(1000); //Attack time is to slow on this boss
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -144,12 +144,12 @@ class EmerissAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// M4ksiu: Someone who wrote this hadn't thought about it much, so it should be rewritten
 			Unit* Target = _unit->GetAIInterface()->getNextTarget();
@@ -302,7 +302,7 @@ class TaerarAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			Shades = false;
 			Shade_timer = 0;
@@ -311,7 +311,7 @@ class TaerarAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -335,7 +335,7 @@ class TaerarAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			Shades = false;
@@ -348,7 +348,7 @@ class TaerarAI : public CreatureAIScript
 			Summoned->GetAIInterface()->setNextTarget(mTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// M4ksiu: Someone who wrote this hadn't thought about it much, so it should be rewritten
 			Unit* Target = _unit->GetAIInterface()->getNextTarget();
@@ -486,13 +486,13 @@ class ShadeofTaerarAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			//You died kek
 		}
@@ -512,13 +512,13 @@ class ShadeofTaerarAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			CastTime();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -651,14 +651,14 @@ class YsondreAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The strands of LIFE have been severed! The Dreamers must be avenged!");
 			RegisterAIUpdateEvent(1000); //Attack time is to slow on this boss
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -680,13 +680,13 @@ class YsondreAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// M4ksiu: Someone who wrote this hadn't thought about it much, so it should be rewritten
 			Unit* Target = _unit->GetAIInterface()->getNextTarget();
@@ -794,13 +794,13 @@ class DementedDruidSpiritAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CastTime();
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			//You died kek
 		}
@@ -820,13 +820,13 @@ class DementedDruidSpiritAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -955,7 +955,7 @@ class LethonAI : public CreatureAIScript
 			spells[5].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			Shade1 = false;
 			Shade2 = false;
@@ -965,7 +965,7 @@ class LethonAI : public CreatureAIScript
 			RegisterAIUpdateEvent(1000); //Attack time is to slow on this boss
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -990,7 +990,7 @@ class LethonAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Shade1 = false;
 			Shade2 = false;
@@ -999,7 +999,7 @@ class LethonAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 
 		{
 			std::list<Player*> mTargets;
@@ -1105,13 +1105,13 @@ class ShadeofLethonAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			CheckDist();
 			RegisterAIUpdateEvent(1000); //they cant attack anyway, update every sec instead
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			//Will nevah happenz! haha
 		}
@@ -1124,7 +1124,7 @@ class ShadeofLethonAI : public CreatureAIScript
 			_unit->Despawn(15, 0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
@@ -1154,7 +1154,7 @@ class ShadeofLethonAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//Repeat this, if they move Lethon while the ghosts move, they need to update his position
 			CheckDist();
@@ -1250,7 +1250,7 @@ class KruulAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			hounds_timer = 45;
 			enrage = 0;
@@ -1278,7 +1278,7 @@ class KruulAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1303,7 +1303,7 @@ class KruulAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			hounds_timer = 45;
 			enrage = 0;
@@ -1340,7 +1340,7 @@ class KruulAI : public CreatureAIScript
 			Summoned->GetAIInterface()->setNextTarget(mTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(hounds_timer == 0)
 			{
@@ -1519,7 +1519,7 @@ class KazzakAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			enrage = 0;
 			int RandomSpeach;
@@ -1538,7 +1538,7 @@ class KazzakAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1575,7 +1575,7 @@ class KazzakAI : public CreatureAIScript
 				spells[i].casttime = spells[i].cooldown;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			enrage = 0;
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
@@ -1601,7 +1601,7 @@ class KazzakAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->CombatStatus.IsInCombat())
 			{
@@ -1741,7 +1741,7 @@ class AzuregosAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This Place is under my Protection! The mysteries of the arcane shall remain untouched.");
 			masstele = 60;
@@ -1749,7 +1749,7 @@ class AzuregosAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1767,7 +1767,7 @@ class AzuregosAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			masstele = 60;
 			RemoveAIUpdateEvent();
@@ -1781,7 +1781,7 @@ class AzuregosAI : public CreatureAIScript
 		}
 
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(masstele == 0)
 			{
@@ -1924,7 +1924,7 @@ class DoomwalkerAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			enraged = false;
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Do not proceed. You will be eliminated.");
@@ -1933,7 +1933,7 @@ class DoomwalkerAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1967,7 +1967,7 @@ class DoomwalkerAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->RemoveAura(AURA_OF_DEATH);
 			enraged = false;
@@ -1984,7 +1984,7 @@ class DoomwalkerAI : public CreatureAIScript
 		}
 
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() == 20 && enraged == false)  //if he stays to long on 20% it could double activate without this check?
 			{
@@ -2125,13 +2125,13 @@ class TeremusAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(1000);
 			CastTime();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 
 		}
@@ -2143,7 +2143,7 @@ class TeremusAI : public CreatureAIScript
 			CastTime();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			CastTime();
@@ -2156,7 +2156,7 @@ class TeremusAI : public CreatureAIScript
 		}
 
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

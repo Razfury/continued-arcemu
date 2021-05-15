@@ -120,7 +120,7 @@ class OnyxiaAI : public CreatureAIScript
 			m_Cleave = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			m_phase = 1;
 			m_eFlamesCooldown = 1;
@@ -153,7 +153,7 @@ class OnyxiaAI : public CreatureAIScript
 				RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(m_useSpell)
 				RemoveAIUpdateEvent();
@@ -234,7 +234,7 @@ class OnyxiaAI : public CreatureAIScript
 			};
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(m_phase)
 			{

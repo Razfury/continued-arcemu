@@ -17,7 +17,7 @@ class PX238WinterWondervolt : public GameObjectAIScript
 			RegisterAIUpdateEvent(1);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Player* plr = _gameobject->GetMapMgr()->GetInterface()->GetPlayerNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ());
 			if(!plr)

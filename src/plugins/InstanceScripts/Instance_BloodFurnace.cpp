@@ -75,13 +75,13 @@ class KelidanTheBreakerAI : public MoonScriptBossAI
 			SetAIUpdateFreq(800);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mBurningNovaTimer = AddTimer(15000);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!IsCasting())
 			{
@@ -93,11 +93,11 @@ class KelidanTheBreakerAI : public MoonScriptBossAI
 
 					ResetTimer(mBurningNovaTimer, 30000);
 
-					ParentClass::AIUpdate();
+					ParentClass::UpdateAI();
 				};
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*      mShadowBoltVolley;
@@ -127,14 +127,14 @@ class BroggokAI : public AICreatureScript
 			AddSpell(SLIME_SPRAY, Target_Self, 10.0f, 0, 25);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			GameObject* pDoor = NULL;
 			pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(456.157349f, 34.248005f, 9.559463f, 181819);
 			if(pDoor)
 				pDoor->SetState(0);
 
-			AICreatureScript::OnDied(pKiller);
+			AICreatureScript::JustDied(pKiller);
 		}
 };
 
@@ -165,14 +165,14 @@ class TheMakerAI : public AICreatureScript
 			AddSpell(THROW_BEAKER, Target_RandomPlayerDestination, 20.0f, 0, 0, 0, 40);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			GameObject* pDoor = NULL;
 			pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(327.155487f, 149.753418f, 9.559869f, 181812);
 			if(pDoor)
 				pDoor->SetState(0);
 
-			AICreatureScript::OnDied(pKiller);
+			AICreatureScript::JustDied(pKiller);
 		}
 };
 

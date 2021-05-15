@@ -78,7 +78,7 @@ class Chicken : public CreatureAIScript
 			RegisterAIUpdateEvent(120000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
 				OnLoad();

@@ -115,7 +115,7 @@ class MagtheridonTriggerAI : public CreatureAIScript
 			RegisterAIUpdateEvent(1000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Magtheridon yells when raid progresses, but during fight with himself
 			YellTimer--;
@@ -508,7 +508,7 @@ class ManticronCubeGO : public GameObjectAIScript
 			RegisterAIUpdateEvent(1000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Channeler settings check
 			// We check if pointer has Channeler data and if so we check if that channeler is alive, in world and if channels Cube
@@ -736,7 +736,7 @@ class HellfireWarderAI : public CreatureAIScript
 			spells[6].attackstoptimer = 8;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 
@@ -751,12 +751,12 @@ class HellfireWarderAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -936,7 +936,7 @@ class HellfireChannelerAI : public CreatureAIScript
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 
@@ -974,7 +974,7 @@ class HellfireChannelerAI : public CreatureAIScript
 				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 
@@ -982,7 +982,7 @@ class HellfireChannelerAI : public CreatureAIScript
 			_unit->SetChannelSpellId(0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1130,7 +1130,7 @@ class BurningAbyssalAI : public CreatureAIScript
 			_unit->m_noRespawn = true;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 
@@ -1145,12 +1145,12 @@ class BurningAbyssalAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1340,7 +1340,7 @@ class MagtheridonAI : public CreatureAIScript
 			PhaseSwitch = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			timer_quake = timer_enrage = timer_blastNova = timer_caveIn = 0;
 			PhaseSwitch = false;
@@ -1381,7 +1381,7 @@ class MagtheridonAI : public CreatureAIScript
 				Gate->SetState(0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Legion... will consume you... all....");
 			_unit->PlaySoundToSet(10258);
@@ -1389,7 +1389,7 @@ class MagtheridonAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1398,7 +1398,7 @@ class MagtheridonAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(PhaseSwitch)
 				PhaseThree();

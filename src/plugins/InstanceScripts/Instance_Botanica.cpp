@@ -59,7 +59,7 @@ class BloodProtectorAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -71,12 +71,12 @@ class BloodProtectorAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -171,7 +171,7 @@ class BloodGreenkeeperAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -183,12 +183,12 @@ class BloodGreenkeeperAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -279,7 +279,7 @@ class SunchemistAI : public CreatureAIScript
 			spells[1].attackstoptimer = 2000; // 1sec
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -291,12 +291,12 @@ class SunchemistAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -402,7 +402,7 @@ class SunResearcherAI : public CreatureAIScript
 			spells[3].attackstoptimer = 2000; // 1sec
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
@@ -415,12 +415,12 @@ class SunResearcherAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -524,7 +524,7 @@ class CommanderSarannisAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			GuardAdds = false;
 			CastTime();
@@ -548,9 +548,9 @@ class CommanderSarannisAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach;
 				RandomUInt(1000);
@@ -569,7 +569,7 @@ class CommanderSarannisAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			GuardAdds = false;
 			CastTime();
@@ -578,7 +578,7 @@ class CommanderSarannisAI : public CreatureAIScript
 			_unit->PlaySoundToSet(11079);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 50 && GuardAdds == false)
 			{
@@ -743,7 +743,7 @@ class HighBotanistFreywinnAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			PlantTimer = 10;
 			CastTime();
@@ -767,9 +767,9 @@ class HighBotanistFreywinnAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach;
 				RandomUInt(1000);
@@ -788,7 +788,7 @@ class HighBotanistFreywinnAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			PlantTimer = 10;
 			CastTime();
@@ -797,7 +797,7 @@ class HighBotanistFreywinnAI : public CreatureAIScript
 			_unit->PlaySoundToSet(11149);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			PlantTimer--;
 			if(!PlantTimer)
@@ -967,7 +967,7 @@ class ThorngrinTheTenderAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			Enraged = false;
 			CastTime();
@@ -991,9 +991,9 @@ class ThorngrinTheTenderAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach;
 				RandomUInt(1000);
@@ -1012,7 +1012,7 @@ class ThorngrinTheTenderAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Enraged = false;
 			CastTime();
@@ -1021,7 +1021,7 @@ class ThorngrinTheTenderAI : public CreatureAIScript
 			_unit->PlaySoundToSet(11212);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 20 && Enraged == false)
 			{
@@ -1186,7 +1186,7 @@ class LajAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			TeleportTimer = 20;
 			CastTime();
@@ -1208,18 +1208,18 @@ class LajAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			TeleportTimer = 20;
 			CastTime();
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			TeleportTimer--;
 
@@ -1337,7 +1337,7 @@ class WarpSplinterAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			SummonTimer = 20;
 			CastTime();
@@ -1361,9 +1361,9 @@ class WarpSplinterAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach;
 				RandomUInt(1000);
@@ -1382,7 +1382,7 @@ class WarpSplinterAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			SummonTimer = 20;
 			CastTime();
@@ -1391,7 +1391,7 @@ class WarpSplinterAI : public CreatureAIScript
 			_unit->PlaySoundToSet(11235);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SummonTimer--;
 

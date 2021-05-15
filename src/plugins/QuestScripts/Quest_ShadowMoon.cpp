@@ -29,7 +29,7 @@ class InfiltratingDragonmawFortressQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(InfiltratingDragonmawFortressQAI);
 		InfiltratingDragonmawFortressQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -52,7 +52,7 @@ class KneepadsQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(KneepadsQAI);
 		KneepadsQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -115,7 +115,7 @@ class DeathbringerJovaanAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mJovaanTimer))
 			{
@@ -178,7 +178,7 @@ class DeathbringerJovaanAI : public AICreatureScript
 						break;
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		void OnReachWP(uint32 iWaypointId, bool bForwards)
@@ -220,7 +220,7 @@ class WarbringerRazuunAI : public AICreatureScript
 			mRazuunPhase = 0;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mRazuunTimer))
 			{
@@ -268,7 +268,7 @@ class WarbringerRazuunAI : public AICreatureScript
 						break;
 				}
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		int32	mRazuunTimer;

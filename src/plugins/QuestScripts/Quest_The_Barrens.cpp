@@ -468,7 +468,7 @@ class VerogtheDervish : public CreatureAIScript
 	public:
 		ADD_CREATURE_FACTORY_FUNCTION(VerogtheDervish);
 		VerogtheDervish(Creature* pCreature) : CreatureAIScript(pCreature) {}
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			kolkarskilled++;
 			if(mKiller->IsPlayer())

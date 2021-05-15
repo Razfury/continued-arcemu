@@ -1055,7 +1055,7 @@ class DeathGate1 : public GameObjectAIScript
 			RegisterAIUpdateEvent(500);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Player* plr = _gameobject->GetMapMgr()->GetInterface()->GetPlayerNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ());
 			if(!plr)
@@ -1086,7 +1086,7 @@ class DeathGate2 : public GameObjectAIScript
 			RegisterAIUpdateEvent(500);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Player* plr = _gameobject->GetMapMgr()->GetInterface()->GetPlayerNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ());
 			if(!plr)

@@ -42,7 +42,7 @@ class CoreRagerAI : public CreatureAIScript
 			info_mangle = dbcSpell.LookupEntry(MANGLE);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -54,12 +54,12 @@ class CoreRagerAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 val = RandomUInt(1000);
 			SpellCast(val);
@@ -112,7 +112,7 @@ class SulfuronAI : public CreatureAIScript
 			info_flamespear = dbcSpell.LookupEntry(FLAME_SPEAR);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -124,12 +124,12 @@ class SulfuronAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 val = RandomUInt(1000);
 			SpellCast(val);
@@ -233,7 +233,7 @@ class RagnarosAI : public CreatureAIScript
 			_unit->Root();
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->GetAIInterface()->skip_reset_hp = true;
@@ -246,18 +246,18 @@ class RagnarosAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "DIE, INSECT!");
 			_unit->PlaySoundToSet(8051);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 val = RandomUInt(1000);
 			SpellCast(val);
@@ -533,10 +533,10 @@ class FlameguardAI : public AICreatureScript
 			mFlames = AddSpell(FLAMEGUARD_FLAMES, Target_Self, 0, 0, 0);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			CastSpellNowNoScheduling(mFlames);
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
 		SpellDesc* mFlames;
@@ -686,25 +686,25 @@ class FireswornAI : public AICreatureScript
 			mSeparationAnxiety = AddSpell(FIRESWORN_SEPARATION_ANXIETY, Target_Self, 0, 5, 5);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mGarr = TO< MoonScriptBossAI* >(GetNearestCreature(CN_GARR));
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			CastSpellNowNoScheduling(mEruption);
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(mGarr && mGarr->IsAlive() && GetRange(mGarr) > 100)
 			{
 				CastSpell(mSeparationAnxiety);
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*			mEruption;

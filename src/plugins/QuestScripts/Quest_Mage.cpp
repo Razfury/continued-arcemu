@@ -45,7 +45,7 @@ class FragmentedMagic : public CreatureAIScript
 			m_target->GetAIInterface()->HandleEvent(EVENT_WANDER, p_caster, 0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// search for the one of the polymorph auras and its caster
 			Player* p_caster = NULL;

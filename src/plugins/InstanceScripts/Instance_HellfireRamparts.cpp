@@ -66,13 +66,13 @@ class WatchkeeperGargolmarAI : public MoonScriptBossAI
 			_retaliation = false;
 		};
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->PlaySoundToSet(10336);
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 40 && !mCalledForHelp)
 			{
@@ -87,7 +87,7 @@ class WatchkeeperGargolmarAI : public MoonScriptBossAI
 				CastSpellNowNoScheduling(mRetaliation);
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
 		bool		mCalledForHelp;
@@ -137,9 +137,9 @@ class OmorTheUnscarredAI : public AICreatureScript
 			AddEmote(Event_OnDied, "It is... not over.", Text_Yell, 10284);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SetCanMove(false);
 		}
 
@@ -152,7 +152,7 @@ class OmorTheUnscarredAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SpellDesc* pShield = FindSpellById(OMOR_THE_UNSCARRED_DEMONIC_SHIELD);
 			if(GetHealthPercent() <= 20 && pShield != NULL && !pShield->mEnabled)
@@ -195,7 +195,7 @@ class OmorTheUnscarredAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			SetCanMove(false);
 		}
 };

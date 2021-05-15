@@ -284,7 +284,7 @@ bool AICreatureScript::GetAllowTargeting()
 
 void AICreatureScript::AggroNearestUnit(int pInitialThreat)
 {
-	//Pay attention: if this is called before pushing the Creature to world, OnCombatStart will NOT be called.
+	//Pay attention: if this is called before pushing the Creature to world, EnterCombat will NOT be called.
 	Unit* NearestRandomTarget = GetBestUnitTarget(TargetFilter_Closest);
 	if(NearestRandomTarget)
 		_unit->GetAIInterface()->AttackReaction(NearestRandomTarget, pInitialThreat);
@@ -297,7 +297,7 @@ void AICreatureScript::AggroRandomUnit(int pInitialThreat)
 	{
 		_unit->GetAIInterface()->AttackReaction(RandomTarget, pInitialThreat);
 		if(!IsInCombat())
-			OnCombatStart(RandomTarget);	//Patch, for some reason, OnCombatStart isn't called in this case
+			EnterCombat(RandomTarget);	//Patch, for some reason, EnterCombat isn't called in this case
 	}
 }
 
@@ -308,7 +308,7 @@ void AICreatureScript::AggroNearestPlayer(int pInitialThreat)
 	{
 		_unit->GetAIInterface()->AttackReaction(NearestRandomPlayer, pInitialThreat);
 		if(!IsInCombat())
-			OnCombatStart(NearestRandomPlayer);	//Patch, for some reason, OnCombatStart isn't called in this case
+			EnterCombat(NearestRandomPlayer);	//Patch, for some reason, EnterCombat isn't called in this case
 	}
 }
 
@@ -319,7 +319,7 @@ void AICreatureScript::AggroRandomPlayer(int pInitialThreat)
 	{
 		_unit->GetAIInterface()->AttackReaction(RandomPlayer, pInitialThreat);
 		if(!IsInCombat())
-			OnCombatStart(RandomPlayer);	//Patch, for some reason, OnCombatStart isn't called in this case
+			EnterCombat(RandomPlayer);	//Patch, for some reason, EnterCombat isn't called in this case
 	}
 }
 
@@ -1074,7 +1074,7 @@ bool AICreatureScript::HasWaypoints()
 	return _unit->GetAIInterface()->hasWaypoints();
 }
 
-void AICreatureScript::OnCombatStart(Unit* pTarget)
+void AICreatureScript::EnterCombat(Unit* pTarget)
 {
 	RandomEmote(mOnCombatStartEmotes);
 	SetBehavior(Behavior_Melee);
@@ -1083,6 +1083,7 @@ void AICreatureScript::OnCombatStart(Unit* pTarget)
 
 void AICreatureScript::OnCombatStop(Unit* pTarget)
 {
+	events.Reset();
 	CancelAllSpells();
 	CancelAllTimers();
 	RemoveAllEvents();
@@ -1094,17 +1095,18 @@ void AICreatureScript::OnCombatStop(Unit* pTarget)
 	if(mDespawnWhenInactive) Despawn(DEFAULT_DESPAWN_TIMER);
 }
 
-void AICreatureScript::OnTargetDied(Unit* pTarget)
+void AICreatureScript::KilledUnit(Unit* pTarget)
 {
-	if(GetHealthPercent() > 0)	//Prevent double yelling (OnDied and OnTargetDied)
+	if(GetHealthPercent() > 0)	//Prevent double yelling (JustDied and KilledUnit)
 	{
 		RandomEmote(mOnTargetDiedEmotes);
 	}
 }
 
-void AICreatureScript::OnDied(Unit* pKiller)
+void AICreatureScript::JustDied(Unit* pKiller)
 {
 	RandomEmote(mOnDiedEmotes);
+	events.Reset();
 	CancelAllSpells();
 	CancelAllTimers();
 	RemoveAllEvents();
@@ -1113,7 +1115,7 @@ void AICreatureScript::OnDied(Unit* pKiller)
 	if(mDespawnWhenInactive) Despawn(DEFAULT_DESPAWN_TIMER);
 }
 
-void AICreatureScript::AIUpdate()
+void AICreatureScript::UpdateAI()
 {
 	SpellDesc*	Spell;
 	uint32		CurrentTime = (uint32)time(NULL);
@@ -1218,6 +1220,10 @@ void AICreatureScript::AIUpdate()
 		//Random taunts
 		if(ChanceRoll >= 95) RandomEmote(mOnTauntEmotes);
 	}
+}
+
+void AICreatureScript::DoAction(int32 param)
+{
 }
 
 void AICreatureScript::Destroy()
@@ -1639,7 +1645,7 @@ void MoonScriptBossAI::SetEnrageInfo(SpellDesc* pSpell, int32 pTriggerMillisecon
 	mEnrageTimerDuration = pTriggerMilliseconds;
 }
 
-void MoonScriptBossAI::OnCombatStart(Unit* pTarget)
+void MoonScriptBossAI::EnterCombat(Unit* pTarget)
 {
 	SetPhase(1);
 	if(mEnrageSpell && mEnrageTimerDuration > 0)
@@ -1647,7 +1653,7 @@ void MoonScriptBossAI::OnCombatStart(Unit* pTarget)
 		mEnrageTimer = AddTimer(mEnrageTimerDuration);
 	}
 	//TriggerCooldownOnAllSpells(); //Razfury: Find out more info on this it causes big delay on spell events.
-	AICreatureScript::OnCombatStart(pTarget);
+	AICreatureScript::EnterCombat(pTarget);
 }
 
 void MoonScriptBossAI::OnCombatStop(Unit* pTarget)
@@ -1657,14 +1663,14 @@ void MoonScriptBossAI::OnCombatStop(Unit* pTarget)
 	AICreatureScript::OnCombatStop(pTarget);
 }
 
-void MoonScriptBossAI::AIUpdate()
+void MoonScriptBossAI::UpdateAI()
 {
 	if(mEnrageSpell && mEnrageTimerDuration > 0 && IsTimerFinished(mEnrageTimer))
 	{
 		CastSpell(mEnrageSpell);
 		RemoveTimer(mEnrageTimer);
 	}
-	AICreatureScript::AIUpdate();
+	AICreatureScript::UpdateAI();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

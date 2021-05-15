@@ -81,7 +81,7 @@ class Nightlash : public CreatureAIScript
 	public:
 		ADD_CREATURE_FACTORY_FUNCTION(Nightlash);
 		Nightlash(Creature* pCreature) : CreatureAIScript(pCreature) {}
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{

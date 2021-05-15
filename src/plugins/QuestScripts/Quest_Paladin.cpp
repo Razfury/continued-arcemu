@@ -77,7 +77,7 @@ class stillbladeQAI : public CreatureAIScript
 
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			float SSX = mKiller->GetPositionX();
 			float SSY = mKiller->GetPositionY();

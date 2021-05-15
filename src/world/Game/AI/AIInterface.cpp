@@ -3957,7 +3957,7 @@ void AIInterface::EventEnterCombat(Unit* pUnit, uint32 misc1)
 		Creature* creature = TO_CREATURE(m_Unit);
 		creature->HandleMonsterSayEvent(MONSTER_SAY_EVENT_ENTER_COMBAT);
 
-		CALL_SCRIPT_EVENT(m_Unit, OnCombatStart)(pUnit);
+		CALL_SCRIPT_EVENT(m_Unit, EnterCombat)(pUnit);
 
 		if(creature->m_spawn && (creature->m_spawn->channel_target_go || creature->m_spawn->channel_target_creature))
 		{
@@ -4201,6 +4201,10 @@ void AIInterface::EventFollowOwner(Unit* pUnit, uint32 misc1)
 	SetRun();
 }
 
+void AIInterface::DoAction(int32 param)
+{
+}
+
 void AIInterface::EventFear(Unit* pUnit, uint32 misc1)
 {
 	if(pUnit == NULL) return;
@@ -4293,7 +4297,7 @@ void AIInterface::EventUnitDied(Unit* pUnit, uint32 misc1)
 	if(m_Unit->IsCreature())
 		TO< Creature* >(m_Unit)->HandleMonsterSayEvent(MONSTER_SAY_EVENT_ON_DIED);
 
-	CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
+	CALL_SCRIPT_EVENT(m_Unit, JustDied)(pUnit);
 	if(m_Unit->IsCreature())
 		CALL_INSTANCE_SCRIPT_EVENT(m_Unit->GetMapMgr(), OnCreatureDeath)(TO_CREATURE(m_Unit), pUnit);
 

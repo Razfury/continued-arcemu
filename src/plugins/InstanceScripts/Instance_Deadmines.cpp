@@ -203,7 +203,7 @@ public:
 		ParentClass::OnCombatStop(pTarget);
 	}
 
-	void AIUpdate()
+	void UpdateAI()
 	{
 		if(GetHealthPercent() <= 66 && GetPhase() == 1)
 		{
@@ -228,7 +228,7 @@ public:
 		if(IsTimerFinished(mWaitAtChest))
 			MoveToPlayer();
 
-		ParentClass::AIUpdate();
+		ParentClass::UpdateAI();
 	}
 
 	void MoveToChest()
@@ -308,7 +308,7 @@ class VanCleefAI : public MoonScriptBossAI
 		AddSpell(3391, Target_Self, 25, 0, 0);	//Thrash (Gives the caster 2 extra attacks.)
 	}
 
-	void OnTargetDied(Unit* pTarget)
+	void KilledUnit(Unit* pTarget)
 	{
 		char msg[200];
 		if(pTarget->IsPlayer())
@@ -317,10 +317,10 @@ class VanCleefAI : public MoonScriptBossAI
 			sprintf(msg, "And stay down, %s.", TO_PET(pTarget)->GetName().c_str());
 
 		Emote(msg, Text_Yell, 5781);
-		ParentClass::OnTargetDied(pTarget);
+		ParentClass::KilledUnit(pTarget);
 	}
 
-	void AIUpdate()
+	void UpdateAI()
 	{
 		if(GetHealthPercent() <= 75 && GetPhase() == 1)
 		{
@@ -346,7 +346,7 @@ class VanCleefAI : public MoonScriptBossAI
 			Emote("The brotherhood shall remain.", Text_Yell, 5784);
 			SetPhase(4);
 		}
-		ParentClass::AIUpdate();
+		ParentClass::UpdateAI();
 	}
 };
 

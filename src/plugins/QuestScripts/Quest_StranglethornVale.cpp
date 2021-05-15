@@ -81,7 +81,7 @@ class Beka : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(Beka);
 		Beka(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -109,7 +109,7 @@ class Beka1 : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(Beka1);
 		Beka1(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -137,7 +137,7 @@ class Beka2 : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(Beka2);
 		Beka2(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			float SSX = mKiller->GetPositionX();
 			float SSY = mKiller->GetPositionY();
@@ -296,7 +296,7 @@ class NegolashAI : public CreatureAIScript
 		NegolashAI(Creature* pCreature) : CreatureAIScript(pCreature)
 		{
 		}
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->Despawn(180000, 0);
 			RemoveAIUpdateEvent();

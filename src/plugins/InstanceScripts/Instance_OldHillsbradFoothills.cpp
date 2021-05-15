@@ -290,12 +290,12 @@ class LieutenantDrakeAI : public AICreatureScript
 			pInstance = dynamic_cast<OldHilsbradInstance*>(GetInstanceScript());
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			if(pInstance)
 				pInstance->SetData(OHF_PHASE_2, OHF_DATA_IN_PROGRESS);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 		void OnCombatStop(Unit* pTarget)

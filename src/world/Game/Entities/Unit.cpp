@@ -137,6 +137,7 @@ Unit::Unit()
 	m_ObjectSlots[2] = 0;
 	m_ObjectSlots[3] = 0;
 	m_silenced = 0;
+	m_countHelper = 0;
 	disarmed   = false;
 
 	//DK:modifiers
@@ -2818,6 +2819,30 @@ void Unit::CalculateResistanceReduction(Unit* pVictim, dealdamage* dmg, SpellEnt
 		else
 			(*dmg).resisted_damage = 0;
 	}
+}
+
+void Unit::DoCast(Unit* victim, uint32 spellId, bool triggered)
+{
+	if (!victim || IsCasting() && !triggered)
+		return;
+
+	CastSpell(victim, spellId, triggered);
+}
+
+void Unit::DoCastAOE(uint32 spellId, bool triggered)
+{
+	if (!triggered && IsCasting())
+		return;
+
+	CastSpell((Unit*)NULL, spellId, triggered);
+}
+
+void Unit::DoCastVictim(uint32 spellId, bool triggered)
+{
+	if (!GetVictim() || IsCasting() && !triggered)
+		return;
+
+	CastSpell(GetVictim(), spellId, triggered);
 }
 
 uint32 Unit::GetSpellDidHitResult(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability)

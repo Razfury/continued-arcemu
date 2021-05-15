@@ -25,7 +25,7 @@ class ArmyOfTheDeadGhoulAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->CastSpell(_unit->GetGUID(), 20480, false);
 			RemoveAIUpdateEvent();
@@ -196,10 +196,10 @@ class DancingRuneWeaponAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller) { RemoveAIUpdateEvent(); }
+		void JustDied(Unit* mKiller) { RemoveAIUpdateEvent(); }
 
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			dpsCycle = 0;
@@ -211,7 +211,7 @@ class DancingRuneWeaponAI : public CreatureAIScript
 			dpsCycle = 0;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Unit* curtarget = _unit->GetAIInterface()->getNextTarget();
 			if(_unit->GetCurrentSpell() == NULL && curtarget)

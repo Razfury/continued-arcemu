@@ -309,7 +309,7 @@ class SERVER_DECL CreatureAIScript
 		CreatureAIScript(Creature* creature);
 		virtual ~CreatureAIScript();
 
-		virtual void OnCombatStart(Unit* mTarget) {}
+		virtual void EnterCombat(Unit* mTarget) {}
 		virtual void OnCombatStop(Unit* mTarget) {}
 		virtual void OnDamageTaken(Unit* mAttacker, uint32 fAmount) {}
 		virtual void OnCastSpell(uint32 iSpellId) {}
@@ -317,13 +317,13 @@ class SERVER_DECL CreatureAIScript
 		virtual void OnTargetDodged(Unit* mTarget) {}
 		virtual void OnTargetBlocked(Unit* mTarget, int32 iAmount) {}
 		virtual void OnTargetCritHit(Unit* mTarget, int32 fAmount) {}
-		virtual void OnTargetDied(Unit* mTarget) {}
+		virtual void KilledUnit(Unit* mTarget) {}
 		virtual void OnParried(Unit* mTarget) {}
 		virtual void OnDodged(Unit* mTarget) {}
 		virtual void OnBlocked(Unit* mTarget, int32 iAmount) {}
 		virtual void OnCritHit(Unit* mTarget, int32 fAmount) {}
 		virtual void OnHit(Unit* mTarget, float fAmount) {}
-		virtual void OnDied(Unit* mKiller) {}
+		virtual void JustDied(Unit* mKiller) {}
 		virtual void OnAssistTargetDied(Unit* mAssistTarget) {}
 		virtual void OnFear(Unit* mFeared, uint32 iSpellId) {}
 		virtual void OnFlee(Unit* mFlee) {}
@@ -332,9 +332,10 @@ class SERVER_DECL CreatureAIScript
 		virtual void OnDespawn() {}
 		virtual void OnReachWP(uint32 iWaypointId, bool bForwards) {}
 		virtual void OnLootTaken(Player* pPlayer, ItemPrototype* pItemPrototype) {}
-		virtual void AIUpdate() {}
+		virtual void UpdateAI() {}
 		virtual void OnEmote(Player* pPlayer, EmoteType Emote) {}
 		virtual void StringFunctionCall(int) {}
+		virtual void DoAction(int32 param) {}
 
 		void RegisterAIUpdateEvent(uint32 frequency);
 		void ModifyAIUpdateEvent(uint32 newfrequency);
@@ -447,7 +448,7 @@ class SERVER_DECL GameObjectAIScript
 		virtual void OnActivate(Player* pPlayer) {}
 		virtual void OnDamaged( uint32 damage ){}
 		virtual void OnDestroyed(){}
-		virtual void AIUpdate() {}
+		virtual void UpdateAI() {}
 		virtual void Destroy() { delete this; }
 
 		void RegisterAIUpdateEvent(uint32 frequency);

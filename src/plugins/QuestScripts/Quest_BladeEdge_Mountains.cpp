@@ -32,7 +32,7 @@ class WyrmcultBlackwhelp : public CreatureAIScript
 			RegisterAIUpdateEvent(1000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Let's see if we are netted
 			Aura* a = _unit->FindAura(38177);
@@ -61,7 +61,7 @@ class BladespireQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(BladespireQAI);
 		BladespireQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -166,7 +166,7 @@ class FunnyDragon : public CreatureAIScript
 			i = 1;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(i)
 			{
@@ -233,7 +233,7 @@ class BloodmaulQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(BloodmaulQAI);
 		BloodmaulQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(!mKiller->IsPlayer())
 				return;
@@ -271,11 +271,11 @@ class Thuk_the_DefiantAI : public CreatureAIScript
 		{
 			_unit->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.4f);
 		}
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			_unit->SetFaction(35);
 			_unit->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.4f);
@@ -352,7 +352,7 @@ class BrutebaneStoutTriggerAI : public AICreatureScript
 			RegisterAIUpdateEvent(1000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(Ogre == NULL)
 				return;
@@ -380,7 +380,7 @@ class BrutebaneStoutTriggerAI : public AICreatureScript
 				Despawn(0, 0);
 				return;
 			}
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		Player*					plr;

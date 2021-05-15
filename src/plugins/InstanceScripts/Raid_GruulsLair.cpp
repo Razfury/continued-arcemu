@@ -115,10 +115,10 @@ class HighKingMaulgarAI : public MoonScriptBossAI
 			mAliveAdds = 0;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			SetDisplayWeapon(true, true);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 
 			mAliveAdds = 0;
 			mLastYell = -1;
@@ -150,9 +150,9 @@ class HighKingMaulgarAI : public MoonScriptBossAI
 			SetCanEnterCombat(true);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 
 			GameObject* pDoor = mKiller->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(95.26f, 251.836f, 0.47f, 183817);
 			if(pDoor != NULL)
@@ -161,7 +161,7 @@ class HighKingMaulgarAI : public MoonScriptBossAI
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(mAliveAdds > 1)
 				return;
@@ -171,7 +171,7 @@ class HighKingMaulgarAI : public MoonScriptBossAI
 				SetPhase(2, mEnrage);
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		void OnAddDied()
@@ -241,9 +241,9 @@ class KigglerTheCrazedAI : public AICreatureScript
 			AddSpell(KIGGLER_THE_CRAZED_ARCANE_SHOCK, Target_RandomPlayer, 10, 0, 15, 0, 30);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 
 			if(GetRangeToUnit(pTarget) <= 40.0f)
 			{
@@ -252,9 +252,9 @@ class KigglerTheCrazedAI : public AICreatureScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			Creature* pMaulgar = TO_CREATURE(ForceCreatureFind(CN_HIGH_KING_MAULGAR, 143.048996f, 192.725998f, -11.114700f));
 			if(pMaulgar != NULL && pMaulgar->isAlive() && pMaulgar->GetScript())
 			{
@@ -263,9 +263,9 @@ class KigglerTheCrazedAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
@@ -294,9 +294,9 @@ class BlindeyeTheSeerAI : public AICreatureScript
 			AddSpell(BLINDEYE_THE_SEER_HEAL, Target_WoundedFriendly, 8, 1.5, 25);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			Creature* pMaulgar = TO_CREATURE(ForceCreatureFind(CN_HIGH_KING_MAULGAR, 143.048996f, 192.725998f, -11.114700f));
 			if(pMaulgar != NULL && pMaulgar->isAlive() && pMaulgar->GetScript())
 			{
@@ -321,9 +321,9 @@ class OlmTheSummonerAI : public AICreatureScript
 			AddSpell(OLM_THE_SUMMONER_DARK_DECAY, Target_RandomPlayer, 10, 0, 6);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			Creature* pMaulgar = TO_CREATURE(ForceCreatureFind(CN_HIGH_KING_MAULGAR, 143.048996f, 192.725998f, -11.114700f));
 			if(pMaulgar != NULL && pMaulgar->isAlive() && pMaulgar->GetScript())
 			{
@@ -372,14 +372,14 @@ class KroshFirehandAI : public AICreatureScript
 			SetAIUpdateFreq(250);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			CastSpellNowNoScheduling(mSpellShield);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!IsCasting())
 			{
@@ -393,7 +393,7 @@ class KroshFirehandAI : public AICreatureScript
 							mBlastWaveTimer = AddTimer(6000);
 						else
 							ResetTimer(mBlastWaveTimer, 6000);
-						ParentClass::AIUpdate();
+						ParentClass::UpdateAI();
 						return;
 					}
 				}
@@ -405,12 +405,12 @@ class KroshFirehandAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			Creature* pMaulgar = TO_CREATURE(ForceCreatureFind(CN_HIGH_KING_MAULGAR, 143.048996f, 192.725998f, -11.114700f));
 			if(pMaulgar != NULL && pMaulgar->isAlive() && pMaulgar->GetScript())
 			{
@@ -468,9 +468,9 @@ class GruulTheDragonkillerAI : public AICreatureScript
 			mGrowthStacks = 0;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 
 			mGrowthTimer = AddTimer(30000);
 			mHurtfulTimer = AddTimer(8000);
@@ -490,16 +490,16 @@ class GruulTheDragonkillerAI : public AICreatureScript
 				pGate->SetState(0);
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 
 			GameObject* pGate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(166.897f, 368.226f, 16.9209f, 184662);
 			if(pGate != NULL)
 				pGate->SetState(0);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!IsCasting())
 			{
@@ -555,7 +555,7 @@ class GruulTheDragonkillerAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		UnitArray GetInRangePlayers()

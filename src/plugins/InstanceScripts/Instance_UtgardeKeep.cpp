@@ -237,12 +237,12 @@ class DragonflayerForgeMasterAI : public AICreatureScript
 			AddSpell(DRAGONFLAYER_FORGE_MASTER_BURNING_BRAND, Target_Current, 8, 0, 40, 0, 30);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_UnspecifiedType, UTGARDE_FORGE_MASTER, 0);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 		MoonInstanceScript* mInstance;
@@ -303,7 +303,7 @@ class DragonflayerMetalworkerAI : public AICreatureScript
 			Enrage = true;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 20 && Enrage)
 			{
@@ -311,7 +311,7 @@ class DragonflayerMetalworkerAI : public AICreatureScript
 				Enrage = false;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		bool Enrage;
@@ -373,7 +373,7 @@ class DragonflayerSpiritualistAI : public AICreatureScript
 			Heal = true;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetHealthPercent() <= 42 && Heal)
 			{
@@ -381,7 +381,7 @@ class DragonflayerSpiritualistAI : public AICreatureScript
 				Heal = false;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		bool Heal;
@@ -470,15 +470,15 @@ class SkarvaldTheConstructorAI : public AICreatureScript
 			pDalronnGhost = NULL;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			pDalronn = GetNearestCreature(CN_DALRONN);
 			mReplyTimer = AddTimer(2500);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mReplyTimer) && pDalronn != NULL)
 			{
@@ -486,10 +486,10 @@ class SkarvaldTheConstructorAI : public AICreatureScript
 				RemoveTimer(mReplyTimer);
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(pDalronn != NULL && pDalronn->IsAlive())
 			{
@@ -512,7 +512,7 @@ class SkarvaldTheConstructorAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -559,14 +559,14 @@ class DalronnTheControllerAI : public AICreatureScript
 			pSkarvaldGhost = NULL;
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			pSkarvald = GetNearestCreature(CN_SKARVALD);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mSummonTimer))
 			{
@@ -575,10 +575,10 @@ class DalronnTheControllerAI : public AICreatureScript
 				ResetTimer(mSummonTimer, 15000);
 			};
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(pSkarvald != NULL && pSkarvald->IsAlive())
 			{
@@ -600,7 +600,7 @@ class DalronnTheControllerAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 		void OnCombatStop(Unit* pTarget)
@@ -728,12 +728,12 @@ class PrinceKelesethAI : public AICreatureScript
 			AddEmote(Event_OnDied, "I join... the night.", Text_Yell, 13225);
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			CastSpellNowNoScheduling(mAddSummon);
 			Emote("Your blood is mine!", Text_Yell, 13221);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 		SpellDesc*			mAddSummon;
@@ -756,19 +756,19 @@ class FrostTombAI : public AICreatureScript
 			ParentClass::OnLoad();
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			if(plr == NULL || plr->IsDead() || !plr->HasAura(FROST_TOMB_SPELL))
 				Despawn();
 		};
 
-		void OnDied(Unit* pKilled)
+		void JustDied(Unit* pKilled)
 		{
 			if(plr != NULL && plr->HasAura(FROST_TOMB_SPELL))
 				plr->RemoveAura(FROST_TOMB_SPELL);
 
-			ParentClass::OnDied(pKilled);
+			ParentClass::JustDied(pKilled);
 
 			Despawn(1);
 		};
@@ -802,7 +802,7 @@ class SkeletonAddAI : public AICreatureScript
 			Despawn(1);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			Despawn(1);
 		};
@@ -877,7 +877,7 @@ class IngvarThePlundererAI : public AICreatureScript
 			SetAIUpdateFreq(1000);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			//Ressurect event
 			SpawnCreature(CN_INGVAR_UNDEAD, true);
@@ -912,12 +912,12 @@ class IngvarUndeadAI : public AICreatureScript
 				_unit->GetAIInterface()->AttackReaction(pTarget, 50, 0);
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			if(mInstance)
 				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_Finished);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		};
 
 		MoonInstanceScript* mInstance;

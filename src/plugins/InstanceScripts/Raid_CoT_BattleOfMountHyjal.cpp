@@ -261,7 +261,7 @@ class RageWinterchillAI : public CreatureAIScript
 			spells[3].cooldown = 10;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Legion's final conquest has begun! Once again the subjugation of this world is within our grasp. Let none survive!");
 			_unit->PlaySoundToSet(11022);
@@ -272,7 +272,7 @@ class RageWinterchillAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -313,7 +313,7 @@ class RageWinterchillAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You have won this battle, but not... the...war");
 			_unit->PlaySoundToSet(11026);
@@ -321,7 +321,7 @@ class RageWinterchillAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -498,7 +498,7 @@ class AnetheronAI : public CreatureAIScript
 			spells[4].cooldown = 600;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are defenders of a doomed world. Flee here and perhaps you will prolong your pathetic lives!");
 			_unit->PlaySoundToSet(10977);
@@ -512,7 +512,7 @@ class AnetheronAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -542,7 +542,7 @@ class AnetheronAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The clock... is still...ticking.");
 			_unit->PlaySoundToSet(10982);
@@ -550,7 +550,7 @@ class AnetheronAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[4].casttime)
@@ -731,7 +731,7 @@ class KazrogalAI : public CreatureAIScript
 			MarkDeto = 0;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Cry for mercy! Your meaningless lives will soon be forfeit.");
 			_unit->PlaySoundToSet(11015);
@@ -742,7 +742,7 @@ class KazrogalAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -777,7 +777,7 @@ class KazrogalAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "hahahahaa aahaah");
 			_unit->PlaySoundToSet(11018);
@@ -785,7 +785,7 @@ class KazrogalAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(MarkDeto)
 				MarkCast();
@@ -979,7 +979,7 @@ class AzgalorAI : public CreatureAIScript
 			spells[3].maxdist2cast = 50.0f;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 			_unit->PlaySoundToSet(10999);
@@ -993,7 +993,7 @@ class AzgalorAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -1026,7 +1026,7 @@ class AzgalorAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your time is almost... up!");
 			_unit->PlaySoundToSet(11002);
@@ -1034,7 +1034,7 @@ class AzgalorAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[3].casttime)
@@ -1210,7 +1210,7 @@ class DoomfireAI : public CreatureAIScript
 			DirChange = 0;
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			DespawnTimer++;
 			if(DespawnTimer >= 27)
@@ -1414,7 +1414,7 @@ class ArchimondeAI : public CreatureAIScript
 			}
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your resistance is insignificant.");
 			_unit->PlaySoundToSet(10987);
@@ -1439,9 +1439,9 @@ class ArchimondeAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
-			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+			if(_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (JustDied and KilledUnit when creature is dying)
 			{
 				int RandomSpeach = rand() % 3;
 				switch(RandomSpeach)
@@ -1495,7 +1495,7 @@ class ArchimondeAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "No, it cannot be! Nooo!");
 			_unit->PlaySoundToSet(10992);
@@ -1503,7 +1503,7 @@ class ArchimondeAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			//_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 

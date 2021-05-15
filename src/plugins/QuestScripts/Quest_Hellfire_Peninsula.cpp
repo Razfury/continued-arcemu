@@ -30,7 +30,7 @@ class FelOrcScavengersQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(FelOrcScavengersQAI);
 		FelOrcScavengersQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -50,7 +50,7 @@ class Dreadtusk : public CreatureAIScript
 	public:
 		ADD_CREATURE_FACTORY_FUNCTION(Dreadtusk);
 		Dreadtusk(Creature* pCreature) : CreatureAIScript(pCreature) { }
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(!mKiller->IsPlayer())
 				return;

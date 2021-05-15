@@ -19,9 +19,138 @@
 
 #include "Setup.h"
 
-//////////////////////////////////////////
-// BOSSES AI
-//////////////////////////////////////////
+class DrakTharonKeepScript : public MoonInstanceScript
+{
+public:
+	uint32		mTrollgoreGUID;
+	uint32		mNovosGUID;
+	uint32		mKingDredGUID;
+	uint32		mTharonjaGUID;
+
+	enum CreatureEntries
+	{
+		CN_TROLLGORE = 26630,
+		CN_NOVOS_THE_SUMMONER = 26631,
+		CN_KING_DRED = 27483,
+		CN_THARONJA = 26632
+	};
+
+	MOONSCRIPT_INSTANCE_FACTORY_FUNCTION(DrakTharonKeepScript, MoonInstanceScript);
+	DrakTharonKeepScript(MapMgr* pMapMgr) : MoonInstanceScript(pMapMgr)
+	{
+		mTrollgoreGUID = 0;
+		mNovosGUID = 0;
+		mKingDredGUID = 0;
+		mTharonjaGUID = 0;
+
+		GetInstance()->m_BossGUID1 = 0;
+		GetInstance()->m_BossGUID2 = 0;
+		GetInstance()->m_BossGUID3 = 0;
+		GetInstance()->m_BossGUID4 = 0;
+	};
+
+	void OnCreaturePushToWorld(Creature* pCreature)
+	{
+		switch (pCreature->GetEntry())
+		{
+		case CN_TROLLGORE:
+		{
+			mTrollgoreGUID = pCreature->GetLowGUID();
+			GetInstance()->m_BossGUID1 = mTrollgoreGUID;
+			mEncounters.insert(EncounterMap::value_type(CN_TROLLGORE, BossData(0, mTrollgoreGUID)));
+		}
+		break;
+		case CN_NOVOS_THE_SUMMONER:
+		{
+			mNovosGUID = pCreature->GetLowGUID();
+			GetInstance()->m_BossGUID2 = mNovosGUID;
+			mEncounters.insert(EncounterMap::value_type(CN_NOVOS_THE_SUMMONER, BossData(0, mNovosGUID)));
+		}
+		break;
+		case CN_KING_DRED:
+		{
+			mKingDredGUID = pCreature->GetLowGUID();
+			GetInstance()->m_BossGUID3 = mKingDredGUID;
+			mEncounters.insert(EncounterMap::value_type(CN_KING_DRED, BossData(0, mKingDredGUID)));
+		}
+		break;
+		case CN_THARONJA:
+		{
+			mTharonjaGUID = pCreature->GetLowGUID();
+			GetInstance()->m_BossGUID4 = mTharonjaGUID;
+			mEncounters.insert(EncounterMap::value_type(CN_THARONJA, BossData(0, mTharonjaGUID)));
+		}
+		break;
+		};
+	};
+
+	/*void OnGameObjectPushToWorld(GameObject* pGameObject)
+	{
+		switch (pGameObject->GetEntry())
+		{
+		default:
+			break;
+		}
+
+		ParentClass::OnGameObjectPushToWorld(pGameObject);
+	};*/
+
+	void SetInstanceData(uint32 pType, uint32 pIndex, uint32 pData)
+	{
+		EncounterMap::iterator Iter = mEncounters.find(pIndex);
+		if (Iter == mEncounters.end())
+			return;
+
+		(*Iter).second.mState = (EncounterState)pData;
+	};
+
+	uint32 GetInstanceData(uint32 pType, uint32 pIndex)
+	{
+		if (pType != Data_EncounterState || pIndex == 0)
+			return 0;
+
+		EncounterMap::iterator Iter = mEncounters.find(pIndex);
+		if (Iter == mEncounters.end())
+			return 0;
+
+		return (*Iter).second.mState;
+	};
+
+	void OnCreatureDeath(Creature* pVictim, Unit* pKiller)
+	{
+		EncounterMap::iterator Iter = mEncounters.find(pVictim->GetEntry());
+		if (Iter == mEncounters.end())
+			return;
+
+		(*Iter).second.mState = State_Finished;
+
+		GameObject* pDoors = NULL;
+		switch (pVictim->GetEntry())
+		{
+		case CN_TROLLGORE:
+		{
+			SetInstanceData(Data_EncounterState, CN_TROLLGORE, State_Finished);
+		}
+		break;
+		case CN_NOVOS_THE_SUMMONER:
+		{
+			SetInstanceData(Data_EncounterState, CN_NOVOS_THE_SUMMONER, State_Finished);
+		}
+		break;
+		case CN_KING_DRED:
+		{
+			SetInstanceData(Data_EncounterState, CN_KING_DRED, State_Finished);
+		}
+		break;
+		case CN_THARONJA:
+		{
+			SetInstanceData(Data_EncounterState, CN_THARONJA, State_Finished);
+		}
+		break;
+		};
+	};
+
+};
 
 /*
  Trollgore - TOO EASY!!
@@ -31,549 +160,304 @@
  Core doesn't support auras on corpses, we are currently unable to script this blizzlike
 */
 
-#define TROLLGORE_ENTRY 26630
-#define DRAKKARI_INVADER_ENTRY 27709
-#define INVASION_INTERVAL 20000
-#define INVADERS_PER_INVASION 1
-//two mobs per 10s
-
-class TROLLGORE_AI : public CreatureAIScript
+enum TrollgoreSpells
 {
-	public:
-		ADD_CREATURE_FACTORY_FUNCTION(TROLLGORE_AI);
+	SPELL_INFECTED_WOUND = 49637,
+	SPELL_CRUSH = 49639,
+	SPELL_CORPSE_EXPLODE = 49555,
+	SPELL_CORPSE_EXPLODE_DAMAGE = 49618,
+	SPELL_CONSUME = 49380,
+	SPELL_CONSUME_BUFF = 49381,
+	SPELL_CONSUME_BUFF_H = 59805,
 
-		TROLLGORE_AI(Creature* pCreature) : CreatureAIScript(pCreature)
-		{
-			heroic = (_unit->GetMapMgr()->iInstanceMode == MODE_HEROIC);
-			invastion_timer = 0;
-			spells.clear();
-			/* SPELLS INIT */
-			ScriptSpell* Crush = new ScriptSpell;
-			Crush->normal_spellid = 49639;
-			Crush->heroic_spellid = 49639;
-			Crush->chance = 20;
-			Crush->timer = 1000;
-			Crush->time = 0;
-			Crush->target = SPELL_TARGET_CURRENT_ENEMY;
-			spells.push_back(Crush);
+	SPELL_SUMMON_INVADER_A = 49456,
+	SPELL_SUMMON_INVADER_B = 49457,
+	SPELL_SUMMON_INVADER_C = 49458, // can't find any sniffs
 
-			ScriptSpell* Infected_Wound = new ScriptSpell;
-			Infected_Wound->normal_spellid = 49637;
-			Infected_Wound->heroic_spellid = 49637;
-			Infected_Wound->chance = 50;
-			Infected_Wound->timer = 8000;
-			Infected_Wound->time = 0;
-			Infected_Wound->target = SPELL_TARGET_CURRENT_ENEMY;
-			spells.push_back(Infected_Wound);
-
-			ScriptSpell* Consume = new ScriptSpell;
-			Consume->normal_spellid = 49381;
-			Consume->heroic_spellid = 59805;
-			Consume->chance = 100;
-			Consume->timer = 10000;
-			Consume->time = 0;
-			Consume->target = SPELL_TARGET_SELF;
-			spells.push_back(Consume);
-		}
-
-		void OnCombatStart(Unit* mTarget)
-		{
-			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
-		}
-
-		void OnCombatStop(Unit* mTarget)
-		{
-			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-			RemoveAIUpdateEvent();
-		}
-
-		void OnDied(Unit*  mKiller)
-		{
-			RemoveAIUpdateEvent();
-		}
-
-		void OnDamageTaken(Unit* mAttacker, uint32 fAmount)
-		{
-			/*if( mAttacker->IsCreature() && TO_CREATURE( mAttacker )->GetProto()->Id == DRAKKARI_INVADER_ENTRY )
-			{
-				uint32 spellid = heroic ? 59809 : 49618;
-				//corpse cannot have aura, cannot cast spell, so we have to change this
-				//also if he cast that spells, no players are being affected, target any player
-				_unit->CastSpell( GetRandomPlayerTarget(), spellid, true );
-			}*/
-		}
-
-		void AIUpdate()
-		{
-			if(spells.size() > 0)
-			{
-				for(uint8 i = 0; i < spells.size(); i++)
-				{
-					if(spells[i]->time < Arcemu::Shared::Util::getMSTime())
-					{
-						if(Rand(spells[i]->chance))
-						{
-							CastScriptSpell(spells[i]);
-							spells[i]->time = Arcemu::Shared::Util::getMSTime() + spells[i]->timer;
-						}
-					}
-				}
-			}
-			if(invastion_timer < Arcemu::Shared::Util::getMSTime())
-			{
-				invastion_timer = Arcemu::Shared::Util::getMSTime() + INVASION_INTERVAL;
-				//spawn invaders ;)
-				for(uint8 i = 0; i < INVADERS_PER_INVASION; i++)
-				{
-					CreatureProto* cp = CreatureProtoStorage.LookupEntry(DRAKKARI_INVADER_ENTRY);
-					CreatureInfo* ci = CreatureNameStorage.LookupEntry(DRAKKARI_INVADER_ENTRY);
-					Creature* c = NULL;
-					if(cp && ci)
-					{
-						c = _unit->GetMapMgr()->CreateCreature(DRAKKARI_INVADER_ENTRY);
-						if(c)
-						{
-							//position is guessed
-							c->Load(cp, -259.532f, -618.976f, 26.669f, 0.0f);
-							c->PushToWorld(_unit->GetMapMgr());
-							//path finding would be usefull :)
-							//c->GetAIInterface()->SetRun();
-							c->GetAIInterface()->MoveTo(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation());
-						}
-					}
-				}
-			}
-		}
-
-		Player* GetRandomPlayerTarget()
-		{
-			vector< uint32 > possible_targets;
-			for(set< Object* >::iterator iter = _unit->GetInRangePlayerSetBegin(); iter != _unit->GetInRangePlayerSetEnd(); ++iter)
-			{
-				if((*iter) && (TO< Player* >(*iter))->isAlive())
-					possible_targets.push_back((uint32)(*iter)->GetGUID());
-			}
-			if(possible_targets.size() > 0)
-			{
-				uint32 random_player = possible_targets[ Rand(uint32(possible_targets.size() - 1)) ];
-				return _unit->GetMapMgr()->GetPlayer(random_player);
-			}
-			return NULL;
-		}
-
-		void CastScriptSpell(ScriptSpell* spell)
-		{
-			_unit->Root();
-			uint32 spellid = heroic ? spell->heroic_spellid : spell->normal_spellid;
-			Unit* spelltarget = NULL;
-			switch(spell->target)
-			{
-				case SPELL_TARGET_SELF:
-					{
-						spelltarget = _unit;
-					}
-					break;
-				case SPELL_TARGET_GENERATE:
-					{
-						spelltarget = NULL;
-					}
-					break;
-				case SPELL_TARGET_CURRENT_ENEMY:
-					{
-						spelltarget = _unit->GetAIInterface()->getNextTarget();
-					}
-					break;
-				case SPELL_TARGET_RANDOM_PLAYER:
-					{
-						spelltarget = GetRandomPlayerTarget();
-					}
-					break;
-			}
-			_unit->CastSpell(spelltarget , spellid, false);
-			_unit->Unroot();
-		}
-
-		void Destroy()
-		{
-			for(uint32 i = 0; i < spells.size(); ++i)
-			{
-				if(spells[ i ] != NULL)
-					delete spells[ i ];
-			};
-
-			spells.clear();
-
-			delete this;
-		};
-
-	protected:
-		bool heroic;
-		uint32 invastion_timer;
-		vector< ScriptSpell* > spells;
+	SPELL_INVADER_TAUNT = 49405
 };
 
-/*
- Novos the Summoner
- TODO:
-  - Crystal should be actived/deactived instead of created/deleted, minor
-  - Create waypoints for summons, we need them coz Core doesn't not have path finding
-*/
-
-#define NOVOS_THE_SUMMONER_ENTRY 26631
-#define SPELL_ARCANE_FIELD 47346
-#define RITUAL_CRYSTAL_ENTRY_1 189299
-#define RITUAL_CRYSTAL_ENTRY_2 189300
-#define RITUAL_CRYSTAL_ENTRY_3 189301
-#define RITUAL_CRYSTAL_ENTRY_4 189302//make sure that you doesn't have these on the map
-#define INVADE_INTERVAL 30000//4 mobs per 30s
-#define INVADERS_COUNT 3
-#define HANDLER_INTERVAL 60000//one handler per 60s
-#define ELITE_CHANCE 20//how much chance for elite we've got each invasion?
-
-// Novos the Summoner
-class NOVOS_THE_SUMMONER_AI : public CreatureAIScript
+enum TrollgoreMisc
 {
-	public:
-		ADD_CREATURE_FACTORY_FUNCTION(NOVOS_THE_SUMMONER_AI);
+	NPC_TROLLGORE = 26630,
 
-		NOVOS_THE_SUMMONER_AI(Creature* pCreature) : CreatureAIScript(pCreature)
+	DATA_CONSUMPTION_JUNCTION = 1,
+	POINT_LANDING = 1
+};
+
+enum TrollgoreEvents
+{
+	EVENT_CONSUME = 1,
+	EVENT_CRUSH,
+	EVENT_INFECTED_WOUND,
+	EVENT_CORPSE_EXPLODE,
+	EVENT_SPAWN
+};
+
+
+Location const Landing = { -263.0534f, -660.8658f, 26.50903f, 0.0f };
+
+class TrollgoreAI : public AICreatureScript
+{
+	AI_CREATURE_SCRIPT_FUNCTION(TrollgoreAI, AICreatureScript);
+	TrollgoreAI(Creature* pCreature) : AICreatureScript(pCreature)
+	{
+		Initialize();
+	};
+
+	void Initialize()
+	{
+		_consumptionJunction = true;
+	}
+
+	void EnterCombat(Unit* pTarget)
+	{
+		Emote("Mo' guts! Mo' blood! Mo' food!", Text_Yell, 13181);
+		events.ScheduleEvent(EVENT_CONSUME, 15000);
+		events.ScheduleEvent(EVENT_CRUSH, urand(1000, 5000));
+		events.ScheduleEvent(EVENT_INFECTED_WOUND, urand(10000, 60000));
+		events.ScheduleEvent(EVENT_CORPSE_EXPLODE, 3000);
+		events.ScheduleEvent(EVENT_SPAWN, urand(30000, 40000));
+		ParentClass::EnterCombat(pTarget);
+	};
+
+	void KilledUnit(Unit* pVictim)
+	{
+		Emote("Me gonna carve you and eat you!", Text_Yell, 13185);
+		ParentClass::KilledUnit(pVictim);
+	}
+
+	void JustDied(Unit* pKiller)
+	{
+		Emote("Braaaagh!", Text_Yell, 13183);
+		ParentClass::JustDied(pKiller);
+	}
+
+	void OnCombatStop(Unit* pTarget)
+	{
+		if (mInstance)
+			mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_Performed);
+
+		ParentClass::OnCombatStop(pTarget);
+	};
+
+	void UpdateAI()
+	{
+		events.Update(1000);
+
+		if (_unit->IsCasting())
+			return;
+
+		while (uint32 eventId = events.ExecuteEvent())
 		{
-			heroic = (_unit->GetMapMgr()->iInstanceMode == MODE_HEROIC);
-			phase = 0;
-			invasion_timer = 0;
-			handler_timer = 0;
-			spells.clear();
-			/* SPELLS INIT */
-			ScriptSpell* ArcaneBlast = new ScriptSpell;
-			ArcaneBlast->normal_spellid = 49198;
-			ArcaneBlast->heroic_spellid = 59909;
-			ArcaneBlast->chance = 70;
-			ArcaneBlast->timer = 4000;
-			ArcaneBlast->time = 0;
-			ArcaneBlast->target = SPELL_TARGET_CURRENT_ENEMY;
-			spells.push_back(ArcaneBlast);
-
-			ScriptSpell* Blizzard = new ScriptSpell;
-			Blizzard->normal_spellid = 49034;
-			Blizzard->heroic_spellid = 59854;
-			Blizzard->chance = 50;
-			Blizzard->timer = 6000;
-			Blizzard->time = 0;
-			Blizzard->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(Blizzard);
-
-			ScriptSpell* Frostbolt = new ScriptSpell;
-			Frostbolt->normal_spellid = 49037;
-			Frostbolt->heroic_spellid = 59855;
-			Frostbolt->chance = 40;
-			Frostbolt->timer = 2000;
-			Frostbolt->time = 0;
-			Frostbolt->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(Frostbolt);
-
-			ScriptSpell* WrathOfMisery = new ScriptSpell;
-			WrathOfMisery->normal_spellid = 50089;
-			WrathOfMisery->heroic_spellid = 59856;
-			WrathOfMisery->chance = 10;
-			WrathOfMisery->timer = 5000;
-			WrathOfMisery->time = 0;
-			WrathOfMisery->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(WrathOfMisery);
-		}
-
-		void OnCombatStart(Unit* mTarget)
-		{
-			//these texts shouldn't be like this
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The chill that you feel is the herald of your doom!");
-			_unit->CastSpell(_unit, 47346, false);
-			//spawn 4 Ritual Crystal
-			for(uint8 i = 0; i < 4; i++)
-				SpawnCrystal(i);
-			handler_timer = Arcemu::Shared::Util::getMSTime() + HANDLER_INTERVAL;
-			_unit->GetAIInterface()->disable_melee = true;
-			phase = 1;
-			for(uint8 i = 0; i < 7; i++)
-				_unit->SchoolImmunityList[i] = 1;
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Surely you can see the futility of it all!");
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Just give up and die already! ");
-			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
-		}
-
-		void OnLoad()
-		{
-			//root him and disable melee for him ;)
-			_unit->GetAIInterface()->disable_melee = true;
-			_unit->Root();
-		}
-
-		void OnCombatStop(Unit* mTarget)
-		{
-			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-			RemoveAIUpdateEvent();
-			for(uint8 i = 0; i < 4; i++)
+			switch (eventId)
 			{
-				if(_unit->m_ObjectSlots[i])
-				{
-					GameObject* Crystal = _unit->GetMapMgr()->GetGameObject(_unit->m_ObjectSlots[i]);
-					if(Crystal && Crystal->IsInWorld())
-						Crystal->Despawn(0, 0);
-				}
-			}
-			_unit->Root();
-			_unit->InterruptSpell();
-			_unit->RemoveAllAuras();
-		}
+			case EVENT_CONSUME:
+				Emote("So hungry! Must feed!", Text_Yell, 13182);
+				_unit->DoCastAOE(SPELL_CONSUME);
+				events.ScheduleEvent(EVENT_CONSUME, 15000);
+				break;
+			case EVENT_CRUSH:
+				_unit->DoCastVictim(SPELL_CRUSH);
+				events.ScheduleEvent(EVENT_CRUSH, urand(10000, 15000));
+				break;
+			case EVENT_INFECTED_WOUND:
+				_unit->DoCastVictim(SPELL_INFECTED_WOUND);
+				events.ScheduleEvent(EVENT_INFECTED_WOUND, urand(25000, 35000));
+				break;
+			/*case EVENT_CORPSE_EXPLODE:
+				Talk(SAY_EXPLODE);
+				DoCastAOE(SPELL_CORPSE_EXPLODE);
+				events.ScheduleEvent(EVENT_CORPSE_EXPLODE, urand(15000, 19000));
+				break;*/
+			/*case EVENT_SPAWN:
+				for (uint8 i = 0; i < 3; ++i)
+					if (Creature* trigger = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TROLLGORE_INVADER_SUMMONER_1 + i)))
+						trigger->CastSpell(trigger, RAND(SPELL_SUMMON_INVADER_A, SPELL_SUMMON_INVADER_B, SPELL_SUMMON_INVADER_C), true, NULL, NULL, me->GetGUID());
 
-		void OnDied(Unit*  mKiller)
-		{
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your efforts... are in vain.");
-			RemoveAIUpdateEvent();
-		}
-
-		void OnTargetDied(Unit* mTarget)
-		{
-			//BUAHAHAHAH
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Such is the fate of all who oppose the Lich King.");
-		}
-
-		void AIUpdate()
-		{
-			//we are not using any abilities in first phase
-			if(phase == 2 && spells.size() > 0)
-			{
-				for(uint8 i = 0; i < spells.size(); i++)
-				{
-					if(spells[i]->time < Arcemu::Shared::Util::getMSTime())
-					{
-						if(Rand(spells[i]->chance))
-						{
-							CastScriptSpell(spells[i]);
-							spells[i]->time = Arcemu::Shared::Util::getMSTime() + spells[i]->timer;
-						}
-					}
-				}
-			}
-			if(phase == 1)
-			{
-				if(invasion_timer < Arcemu::Shared::Util::getMSTime())
-				{
-					invasion_timer = Arcemu::Shared::Util::getMSTime() + INVADE_INTERVAL;
-					SpawnInvader(0);
-				}
-				if(handler_timer < Arcemu::Shared::Util::getMSTime())
-				{
-					handler_timer = Arcemu::Shared::Util::getMSTime() + HANDLER_INTERVAL;
-					SpawnInvader(1);
-				}
-				bool new_phase = true;
-				for(uint8 i = 0; i < 4; i++)
-				{
-					if(_unit->m_ObjectSlots[i])
-					{
-						GameObject* Crystal = _unit->GetMapMgr()->GetGameObject(_unit->m_ObjectSlots[i]);
-						if(Crystal && Crystal->IsInWorld())
-							new_phase = false;
-					}
-				}
-				if(new_phase)
-				{
-					_unit->InterruptSpell();
-					_unit->RemoveAllAuras();
-					_unit->Unroot();
-					_unit->GetAIInterface()->disable_melee = false;
-					phase = 2;
-					for(uint8 i = 0; i < 7; i++)
-						_unit->SchoolImmunityList[i] = 0;
-				}
+				events.ScheduleEvent(EVENT_SPAWN, urand(30000, 40000));
+				break;*/
+			default:
+				break;
 			}
 		}
 
-		Player* GetRandomPlayerTarget()
+		if (_consumptionJunction)
 		{
-
-			vector< uint32 > possible_targets;
-			for(set< Object* >::iterator iter = _unit->GetInRangePlayerSetBegin(); iter != _unit->GetInRangePlayerSetEnd(); ++iter)
+			if (_unit->GetAuraStackCount(SPELL_CONSUME_BUFF) > 9 || _unit->GetAuraStackCount(SPELL_CONSUME_BUFF_H) > 9)
 			{
-				if((*iter) && (TO< Player* >(*iter))->isAlive())
-					possible_targets.push_back((uint32)(*iter)->GetGUID());
+				_consumptionJunction = false;
 			}
-			if(possible_targets.size() > 0)
-			{
-				uint32 random_player = possible_targets[ Rand(uint32(possible_targets.size() - 1)) ];
-				return _unit->GetMapMgr()->GetPlayer(random_player);
-			}
-			return NULL;
 		}
 
-		void CastScriptSpell(ScriptSpell* spell)
+		ParentClass::UpdateAI();
+	}
+
+
+private:
+	MoonInstanceScript* mInstance = GetInstanceScript();
+	bool _consumptionJunction;
+};
+
+enum Spells_Novos
+{
+	SPELL_BEAM_CHANNEL = 52106,
+	SPELL_ARCANE_BLAST = 49198,
+	//SPELL_ARCANE_FIELD = 47346,
+	SPELL_SUMMON_FETID_TROLL_CORPSE = 49103,
+	SPELL_SUMMON_HULKING_CORPSE = 49104,
+	SPELL_SUMMON_RISEN_SHADOWCASTER = 49105,
+	SPELL_SUMMON_CRYSTAL_HANDLER = 49179,
+	SPELL_DESPAWN_CRYSTAL_HANDLER = 51403,
+
+	SPELL_SUMMON_MINIONS = 59910,
+	SPELL_COPY_OF_SUMMON_MINIONS = 59933,
+	SPELL_BLIZZARD = 49034,
+	SPELL_FROSTBOLT = 49037,
+	SPELL_TOUCH_OF_MISERY = 50090
+};
+
+enum Misc_Novos
+{
+	NPC_NOVOS_THE_SUMMONER = 26631,
+	NPC_CRYSTAL_CHANNEL_TARGET = 26712,
+	NPC_CRYSTAL_HANDLER = 26627,
+
+	EVENT_SUMMON_FETID_TROLL = 1,
+	EVENT_SUMMON_SHADOWCASTER = 2,
+	EVENT_SUMMON_HULKING_CORPSE = 3,
+	EVENT_SUMMON_CRYSTAL_HANDLER = 4,
+	EVENT_CAST_OFFENSIVE_SPELL = 5,
+	//	EVENT_KILL_TALK = 6,
+	EVENT_CHECK_PHASE = 7,
+	EVENT_SPELL_SUMMON_MINIONS = 8
+};
+
+class NovosTheSummonerAI : public AICreatureScript
+{
+	AI_CREATURE_SCRIPT_FUNCTION(NovosTheSummonerAI, AICreatureScript);
+	NovosTheSummonerAI(Creature* pCreature) : AICreatureScript(pCreature)
+	{
+	}
+
+	void OnLoad()
+	{
+		_unit->m_countHelper = 0;
+		_unit->Root();
+		ParentClass::OnLoad();
+	}
+
+	void EnterCombat(Unit* mAttacker)
+	{
+		RegisterAIUpdateEvent(1000);
+		Emote("The chill that you feel is the herald of your doom! ", Text_Yell, 13173);
+		events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3000);
+		events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 9000);
+		events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30000);
+		events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20000);
+		events.ScheduleEvent(EVENT_CHECK_PHASE, 80000);
+
+		_unit->CastSpell(_unit, SPELL_ARCANE_BLAST, true);
+		_unit->CastSpell(_unit, SPELL_DESPAWN_CRYSTAL_HANDLER, true);
+		_unit->CastSpell(_unit, SPELL_BEAM_CHANNEL, true);
+		_unit->CastSpell(_unit, 47346, false);
+		SpawnCreature(NPC_CRYSTAL_CHANNEL_TARGET, -378.40f, -813.13f, 59.74f, 0.0f);
+
+		_unit->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+		//_unit->RemoveAllAuras();
+		_unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		ParentClass::EnterCombat(mAttacker);
+	}
+
+	void JustDied(Unit* mKiller)
+	{
+		Emote("Your efforts... are in vain.", Text_Yell, 13174);
+		ParentClass::JustDied(mKiller);
+	}
+
+	void KilledUnit(Unit* pTarget)
+	{
+		Emote("Such is the fate of all who oppose the Lich King.", Text_Yell, 13175);
+		ParentClass::KilledUnit(pTarget);
+	}
+
+	void OnCombatStop(Unit* mAttacker)
+	{
+		_unit->m_countHelper = 0;
+		_unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		ParentClass::OnCombatStop(mAttacker);
+	}
+
+	void AIUpdate()
+	{
+		if (_unit->m_countHelper == 4)
 		{
-			_unit->Root();
-			uint32 spellid = heroic ? spell->heroic_spellid : spell->normal_spellid;
-			Unit* spelltarget = NULL;
-			switch(spell->target)
-			{
-				case SPELL_TARGET_SELF:
-					{
-						spelltarget = _unit;
-					}
-					break;
-				case SPELL_TARGET_GENERATE:
-					{
-						spelltarget = NULL;
-					}
-					break;
-				case SPELL_TARGET_CURRENT_ENEMY:
-					{
-						spelltarget = _unit->GetAIInterface()->getNextTarget();
-					}
-					break;
-				case SPELL_TARGET_RANDOM_PLAYER:
-					{
-						spelltarget = GetRandomPlayerTarget();
-					}
-					break;
-			}
-			_unit->CastSpell(spelltarget , spellid, false);
-			if(phase == 2)
-				_unit->Unroot();
+			_unit->RemoveAura(SPELL_BEAM_CHANNEL);
+			_unit->m_countHelper = 5;
 		}
-		//type: 1 - normal, 0 - handler
-		void SpawnInvader(uint32 type)
+		events.Update(1000);
+		switch (events.ExecuteEvent())
 		{
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Bolster my defenses! Hurry, curse you!");
-			//x				y				z
-			//-379.101227f	-824.835449f	60.0f
-			uint32 mob_entry = 0;
-			if(type)
+		case EVENT_SUMMON_FETID_TROLL:
+			if (Creature* trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-378.40f, -813.13f, 59.74f, NPC_CRYSTAL_CHANNEL_TARGET))
+				trigger->CastSpell(trigger, SPELL_SUMMON_FETID_TROLL_CORPSE, true);
+			events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3000);
+			break;
+		case EVENT_SUMMON_HULKING_CORPSE:
+			if (Creature* trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-378.40f, -813.13f, 59.74f, NPC_CRYSTAL_CHANNEL_TARGET))
+				trigger->CastSpell(trigger, SPELL_SUMMON_HULKING_CORPSE, true);
+			events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30000);
+			break;
+		case EVENT_SUMMON_SHADOWCASTER:
+			if (Creature* trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-378.40f, -813.13f, 59.74f, NPC_CRYSTAL_CHANNEL_TARGET))
+				trigger->CastSpell(trigger, SPELL_SUMMON_RISEN_SHADOWCASTER, true);
+			events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 10000);
+			break;
+		case EVENT_SUMMON_CRYSTAL_HANDLER:
+			if (_unit->m_countHelper < 4)
 			{
-				mob_entry = 26627;
-				CreatureProto* cp = CreatureProtoStorage.LookupEntry(mob_entry);
-				CreatureInfo* ci = CreatureNameStorage.LookupEntry(mob_entry);
-				Creature* c = NULL;
-				if(cp && ci)
-				{
-					c = _unit->GetMapMgr()->CreateCreature(mob_entry);
-					if(c)
-					{
-						//position is guessed
-						c->Load(cp, -379.101227f, -824.835449f, 60.0f, 0.0f);
-						c->PushToWorld(_unit->GetMapMgr());
-						c->SetSummonedByGUID(_unit->GetGUID());
-						//path finding would be usefull :)
-						Player* p_target = GetRandomPlayerTarget();
-						if(p_target)
-						{
-							c->GetAIInterface()->SetRun();
-							c->GetAIInterface()->MoveTo(p_target->GetPositionX(), p_target->GetPositionY(), p_target->GetPositionZ(), p_target->GetOrientation());
-						}
-					}
-				}
+				Emote("Bolster my defenses! Hurry, curse you!", Text_Yell, 13176);
+				Announce("Novos the Summoner calls for assistance!");
+				if (Creature* trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-378.40f, -813.13f, 59.74f, NPC_CRYSTAL_CHANNEL_TARGET))
+					trigger->CastSpell(trigger, SPELL_SUMMON_CRYSTAL_HANDLER, true);
+				events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 30000);
 			}
-			else
+			break;
+		case EVENT_CHECK_PHASE:
+			if (_unit->HasAura(SPELL_BEAM_CHANNEL))
 			{
-				for(uint8 i = 0; i < INVADERS_COUNT; i++)
-				{
-					mob_entry = 0;
-					if(Rand(ELITE_CHANCE))
-						mob_entry = 27597;
-					else
-					{
-						uint32 mobs[2] = {27598, 27600};
-						mob_entry = mobs[Rand(1)];
-					}
-					CreatureProto* cp = CreatureProtoStorage.LookupEntry(mob_entry);
-					CreatureInfo* ci = CreatureNameStorage.LookupEntry(mob_entry);
-					Creature* c = NULL;
-					if(cp && ci)
-					{
-						c = _unit->GetMapMgr()->CreateCreature(mob_entry);
-						if(c)
-						{
-							//position is guessed
-							c->Load(cp, -379.101227f, -824.835449f, 60.0f, 0.0f);
-							c->PushToWorld(_unit->GetMapMgr());
-							//path finding would be usefull :)
-							Player* p_target = GetRandomPlayerTarget();
-							if(p_target)
-							{
-								c->GetAIInterface()->SetRun();
-								c->GetAIInterface()->MoveTo(p_target->GetPositionX(), p_target->GetPositionY(), p_target->GetPositionZ(), p_target->GetOrientation());
-							}
-						}
-					}
-				}
+				events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
+				break;
 			}
+			events.Reset();
+			events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 3000);
+			events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 10000);
+			_unit->Unroot();
+			_unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+			_unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
+			break;
+		case EVENT_CAST_OFFENSIVE_SPELL:
+			if (!_unit->IsCasting())
+				if (Unit* target = GetRandomPlayerTarget()) // Needs a random Selection
+					_unit->CastSpell(target, SPELL_BLIZZARD, false);
+
+			events.ScheduleEvent(EVENT_CAST_OFFENSIVE_SPELL, 500);
+			break;
+		case EVENT_SPELL_SUMMON_MINIONS:
+			if (_unit->hasStateFlag(0x00008000))
+			{
+				_unit->CastSpell(_unit, SPELL_SUMMON_MINIONS, false);
+				events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 15000);
+				break;
+			}
+			events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 500);
+			break;
 		}
-		void SpawnCrystal(uint32 id)
-		{
-			uint32 entry = 0;
-			float x = 0.0f, y = 0.0f, z = 0.0f, o = 0.0f;
-			switch(id)
-			{
-				case 0:
-					{
-						entry = RITUAL_CRYSTAL_ENTRY_1;
-						x = -392.416f;
-						y = -724.865f;
-						z = 29.4156f;
-						o = M_PI_FLOAT;
-					}
-					break;
-				case 1:
-					{
-						entry = RITUAL_CRYSTAL_ENTRY_2;
-						x = -365.279f;
-						y = -751.087f;
-						z = 29.4156f;
-						o = M_PI_FLOAT;
-					}
-					break;
-				case 2:
-					{
-						entry = RITUAL_CRYSTAL_ENTRY_3;
-						x = -365.41f;
-						y = -724.865f;
-						z = 29.4156f;
-						o = M_PI_FLOAT;
-					}
-					break;
-				case 3:
-					{
-						entry = RITUAL_CRYSTAL_ENTRY_4;
-						x = -392.286f;
-						y = -751.087f;
-						z = 29.4156f;
-						o = M_PI_FLOAT;
-					}
-					break;
-			}
-			GameObject* go = _unit->GetMapMgr()->CreateGameObject(entry);
-			go->CreateFromProto(entry, _unit->GetMapMgr()->GetMapId(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f);
-			go->PushToWorld(_unit->GetMapMgr());
-			_unit->m_ObjectSlots[id] = go->GetUIdFromGUID();
-		}
-
-		void Destroy()
-		{
-			for(uint32 i = 0; i < spells.size(); ++i)
-			{
-				if(spells[ i ] != NULL)
-					delete spells[ i ];
-			};
-
-			spells.clear();
-
-			delete this;
-		};
-
-	protected:
-		bool heroic;
-		vector< ScriptSpell* > spells;
-		uint32 invasion_timer;
-		uint32 handler_timer;
-		uint32 phase;
+		ParentClass::UpdateAI();
+	}
 };
 
 #define CRYSTAL_HANDLER_ENTRY 26627
@@ -598,7 +482,7 @@ class CRYSTAL_HANDLER_AI : public CreatureAIScript
 			spells.push_back(FlashofDarkness);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -610,24 +494,17 @@ class CRYSTAL_HANDLER_AI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit*  mKiller)
+		void JustDied(Unit*  mKiller)
 		{
 			RemoveAIUpdateEvent();
 			Unit* Novos = _unit->GetMapMgr()->GetUnit(_unit->GetSummonedByGUID());
-			if(Novos)
-				for(uint8 i = 0; i < 4; i++)
-					if(Novos->m_ObjectSlots[i])
-					{
-						GameObject* Crystal = Novos->GetMapMgr()->GetGameObject(Novos->m_ObjectSlots[i]);
-						if(Crystal && Crystal->IsInWorld())
-						{
-							Crystal->Despawn(0, 0);
-							return;
-						}
-					}
+			if (Novos)
+			{
+				++Novos->m_countHelper;
+			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(spells.size() > 0)
 			{
@@ -645,23 +522,6 @@ class CRYSTAL_HANDLER_AI : public CreatureAIScript
 			}
 		}
 
-		Player* GetRandomPlayerTarget()
-		{
-
-			vector< uint32 > possible_targets;
-			for(set< Object* >::iterator iter = _unit->GetInRangePlayerSetBegin(); iter != _unit->GetInRangePlayerSetEnd(); ++iter)
-			{
-				if((*iter) && (TO< Player* >(*iter))->isAlive())
-					possible_targets.push_back((uint32)(*iter)->GetGUID());
-			}
-			if(possible_targets.size() > 0)
-			{
-				uint32 random_player = possible_targets[ Rand(uint32(possible_targets.size() - 1)) ];
-				return _unit->GetMapMgr()->GetPlayer(random_player);
-			}
-			return NULL;
-		}
-
 		void CastScriptSpell(ScriptSpell* spell)
 		{
 			_unit->Root();
@@ -686,7 +546,7 @@ class CRYSTAL_HANDLER_AI : public CreatureAIScript
 					break;
 				case SPELL_TARGET_RANDOM_PLAYER:
 					{
-						spelltarget = GetRandomPlayerTarget();
+						//spelltarget = _unit->GetRandomPlayerTarget();
 					}
 					break;
 			}
@@ -710,391 +570,384 @@ class CRYSTAL_HANDLER_AI : public CreatureAIScript
 	protected:
 		bool heroic;
 		vector< ScriptSpell* > spells;
+};
+
+enum KingDredSpells
+{
+	SPELL_BELLOWING_ROAR = 22686, // fears the group, can be resisted/dispelled
+	SPELL_GRIEVOUS_BITE = 48920,
+	SPELL_MANGLING_SLASH = 48873, // cast on the current tank, adds debuf
+	SPELL_FEARSOME_ROAR = 48849,
+	SPELL_PIERCING_SLASH = 48878, // debuff --> Armor reduced by 75%
+	SPELL_RAPTOR_CALL = 59416, // dummy
+	SPELL_GUT_RIP = 49710,
+	SPELL_REND = 13738
+};
+
+enum DredCreatureInfo
+{
+	// King Dred
+	NPC_DRAKKARI_GUTRIPPER = 26641,
+	NPC_DRAKKARI_SCYTHECLAW = 26628,
+	NPC_KING_DRED = 27483
+};
+
+enum KingDredMisc
+{
+	ACTION_RAPTOR_KILLED = 1,
+	DATA_RAPTORS_KILLED = 2
+};
+
+enum KingDredEvents
+{
+	EVENT_BELLOWING_ROAR = 1,
+	EVENT_GRIEVOUS_BITE,
+	EVENT_MANGLING_SLASH,
+	EVENT_FEARSOME_ROAR,
+	EVENT_PIERCING_SLASH,
+	EVENT_RAPTOR_CALL
+};
+
+class KING_DRED_AI : public AICreatureScript
+{
+	public:
+		AI_CREATURE_SCRIPT_FUNCTION(KING_DRED_AI, AICreatureScript);
+		KING_DRED_AI(Creature* pCreature) : AICreatureScript(pCreature)
+		{
+			Initialize();
+		}
+
+		void Initialize()
+		{
+			raptorsKilled = 0;
+		}
+
+		void EnterCombat(Unit* mTarget)
+		{
+			RegisterAIUpdateEvent(1000);
+
+			events.ScheduleEvent(EVENT_BELLOWING_ROAR, 33000);
+			events.ScheduleEvent(EVENT_GRIEVOUS_BITE, 20000);
+			events.ScheduleEvent(EVENT_MANGLING_SLASH, 18500);
+			events.ScheduleEvent(EVENT_FEARSOME_ROAR, urand(10000, 20000));
+			events.ScheduleEvent(EVENT_PIERCING_SLASH, 17000);
+			events.ScheduleEvent(EVENT_RAPTOR_CALL, urand(20000, 25000));
+		}
+
+		void DoAction(int32 action)
+		{
+			if (action == ACTION_RAPTOR_KILLED)
+				++raptorsKilled;
+		}
+
+		void JustDied(Unit*  mKiller)
+		{
+		}
+
+		void UpdateAI()
+		{
+			events.Update(1000);
+
+			if (_unit->IsCasting())
+				return;
+
+			while (uint32 eventId = events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case EVENT_BELLOWING_ROAR:
+					_unit->DoCastAOE(SPELL_BELLOWING_ROAR);
+					events.ScheduleEvent(EVENT_BELLOWING_ROAR, 33000);
+					break;
+				case EVENT_GRIEVOUS_BITE:
+					_unit->DoCastVictim(SPELL_GRIEVOUS_BITE);
+					events.ScheduleEvent(EVENT_GRIEVOUS_BITE, 20000);
+					break;
+				case EVENT_MANGLING_SLASH:
+					_unit->DoCastVictim(SPELL_MANGLING_SLASH);
+					events.ScheduleEvent(EVENT_MANGLING_SLASH, 18500);
+					break;
+				case EVENT_FEARSOME_ROAR:
+					_unit->DoCastAOE(SPELL_FEARSOME_ROAR);
+					events.ScheduleEvent(EVENT_FEARSOME_ROAR, urand(10000, 20000));
+					break;
+				case EVENT_PIERCING_SLASH:
+					_unit->DoCastVictim(SPELL_PIERCING_SLASH);
+					events.ScheduleEvent(EVENT_PIERCING_SLASH, 17000);
+					break;
+				case EVENT_RAPTOR_CALL:
+					_unit->DoCastVictim(SPELL_RAPTOR_CALL);
+					if (RandomUInt(1) == 1)
+					{
+						SpawnCreature(NPC_DRAKKARI_GUTRIPPER, _unit->GetPositionX(), _unit->GetPositionY() - 3, _unit->GetPositionZ(), _unit->GetOrientation(), true, 1);
+					}
+					else
+					{
+						SpawnCreature(NPC_DRAKKARI_SCYTHECLAW, _unit->GetPositionX(), _unit->GetPositionY() - 5, _unit->GetPositionZ(), _unit->GetOrientation(), true, 1);
+					}
+					events.ScheduleEvent(EVENT_RAPTOR_CALL, urand(20000, 25000));
+					break;
+				default:
+					break;
+				}
+			}
+			ParentClass::UpdateAI();
+		}
+private:
+	uint8 raptorsKilled;
+};
+
+class npc_drakkari_gutripper : public AICreatureScript
+{
+    public:
+	    AI_CREATURE_SCRIPT_FUNCTION(npc_drakkari_gutripper, AICreatureScript);
+	    npc_drakkari_gutripper(Creature* pCreature) : AICreatureScript(pCreature)
+	    {
+	    }
+
+	    void EnterCombat(Unit* mTarget)
+	    {
+		    events.ScheduleEvent(1, urand(10000, 15000));
+		    ParentClass::EnterCombat(mTarget);
+	    }
+		void UpdateAI() override
+		{
+			events.Update(1000);
+
+			if (_unit->IsCasting())
+				return;
+
+			while (uint32 eventId = events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+				case 1:
+					_unit->DoCastVictim(SPELL_GUT_RIP, false);
+					break;
+				}
+			}
+			ParentClass::UpdateAI();
+		}
+
+		void JustDied(Unit* killer) override
+		{
+			if (Creature* Dred = _unit->GetMapMgr()->GetCreature(instance->GetInstance()->m_BossGUID3))
+				Dred->GetAIInterface()->DoAction(ACTION_RAPTOR_KILLED);
+			ParentClass::JustDied(killer);
+		}
+private:
+	InstanceScript* instance;
+};
+
+class npc_drakkari_scytheclaw : public AICreatureScript
+{
+public:
+	AI_CREATURE_SCRIPT_FUNCTION(npc_drakkari_scytheclaw, AICreatureScript);
+	npc_drakkari_scytheclaw(Creature* pCreature) : AICreatureScript(pCreature)
+	{
+	}
+
+	void EnterCombat(Unit* mTarget)
+	{
+		events.ScheduleEvent(1, urand(10000, 15000));
+		ParentClass::EnterCombat(mTarget);
+	}
+	void UpdateAI() override
+	{
+		events.Update(1000);
+
+		if (_unit->IsCasting())
+			return;
+
+		while (uint32 eventId = events.ExecuteEvent())
+		{
+			switch (eventId)
+			{
+			case 1:
+				_unit->DoCastVictim(SPELL_REND, false);
+				break;
+			}
+		}
+		ParentClass::UpdateAI();
+	}
+
+	void JustDied(Unit* killer) override
+	{
+		if (Creature* Dred = _unit->GetMapMgr()->GetCreature(instance->GetInstance()->m_BossGUID3))
+			Dred->GetAIInterface()->DoAction(ACTION_RAPTOR_KILLED);
+		ParentClass::JustDied(killer);
+	}
+private:
+	InstanceScript* instance;
 };
 
 /*
- King Dred
- TODO:
-  - Call nearby friends
-*/
+ * Known Issues: Spell 49356 and 53463 will be interrupted for an unknown reason
+ */
 
-#define KING_DRED_ENTRY 27483
-
-class KING_DRED_AI : public CreatureAIScript
+enum TharonjaSpells
 {
-	public:
-		ADD_CREATURE_FACTORY_FUNCTION(KING_DRED_AI);
-
-		KING_DRED_AI(Creature* pCreature) : CreatureAIScript(pCreature)
-		{
-			heroic = (_unit->GetMapMgr()->iInstanceMode == MODE_HEROIC);
-			spells.clear();
-			/* SPELLS INIT */
-			ScriptSpell* BellowingRoar = new ScriptSpell;
-			BellowingRoar->normal_spellid = 22686;
-			BellowingRoar->heroic_spellid = 22686;
-			BellowingRoar->chance = 30;
-			BellowingRoar->timer = 5000;
-			BellowingRoar->time = 0;
-			BellowingRoar->target = SPELL_TARGET_CURRENT_ENEMY;
-			spells.push_back(BellowingRoar);
-
-			ScriptSpell* GrievousBite = new ScriptSpell;
-			GrievousBite->normal_spellid = 48849;
-			GrievousBite->heroic_spellid = 59422;
-			GrievousBite->chance = 80;
-			GrievousBite->timer = 3000;
-			GrievousBite->time = 0;
-			GrievousBite->target = SPELL_TARGET_CURRENT_ENEMY;
-			spells.push_back(GrievousBite);
-
-			ScriptSpell* ManglingSlash = new ScriptSpell;
-			ManglingSlash->normal_spellid = 48873;
-			ManglingSlash->heroic_spellid = 48873;
-			ManglingSlash->chance = 40;
-			ManglingSlash->timer = 2000;
-			ManglingSlash->time = 0;
-			ManglingSlash->target = SPELL_TARGET_CURRENT_ENEMY;
-			spells.push_back(ManglingSlash);
-
-			ScriptSpell* PiercingSlash = new ScriptSpell;
-			PiercingSlash->normal_spellid = 48878;
-			PiercingSlash->heroic_spellid = 48878;
-			PiercingSlash->chance = 40;
-			PiercingSlash->timer = 5000;
-			PiercingSlash->time = 0;
-			PiercingSlash->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(PiercingSlash);
-		}
-
-		void OnCombatStart(Unit* mTarget)
-		{
-			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
-		}
-
-		void OnCombatStop(Unit* mTarget)
-		{
-			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-			RemoveAIUpdateEvent();
-		}
-
-		void OnDied(Unit*  mKiller)
-		{
-			RemoveAIUpdateEvent();
-		}
-
-		void AIUpdate()
-		{
-			if(spells.size() > 0)
-			{
-				for(uint8 i = 0; i < spells.size(); i++)
-				{
-					if(spells[i]->time < Arcemu::Shared::Util::getMSTime())
-					{
-						if(Rand(spells[i]->chance))
-						{
-							CastScriptSpell(spells[i]);
-							spells[i]->time = Arcemu::Shared::Util::getMSTime() + spells[i]->timer;
-						}
-					}
-				}
-			}
-		}
-
-		Player* GetRandomPlayerTarget()
-		{
-
-			vector< uint32 > possible_targets;
-			for(set< Object* >::iterator iter = _unit->GetInRangePlayerSetBegin(); iter != _unit->GetInRangePlayerSetEnd(); ++iter)
-			{
-				if((*iter) && (TO< Player* >(*iter))->isAlive())
-					possible_targets.push_back((uint32)(*iter)->GetGUID());
-			}
-			if(possible_targets.size() > 0)
-			{
-				uint32 random_player = possible_targets[ Rand(uint32(possible_targets.size() - 1)) ];
-				return _unit->GetMapMgr()->GetPlayer(random_player);
-			}
-			return NULL;
-		}
-
-		void CastScriptSpell(ScriptSpell* spell)
-		{
-			_unit->Root();
-			uint32 spellid = heroic ? spell->heroic_spellid : spell->normal_spellid;
-			Unit* spelltarget = NULL;
-			switch(spell->target)
-			{
-				case SPELL_TARGET_SELF:
-					{
-						spelltarget = _unit;
-					}
-					break;
-				case SPELL_TARGET_GENERATE:
-					{
-						spelltarget = NULL;
-					}
-					break;
-				case SPELL_TARGET_CURRENT_ENEMY:
-					{
-						spelltarget = _unit->GetAIInterface()->getNextTarget();
-					}
-					break;
-				case SPELL_TARGET_RANDOM_PLAYER:
-					{
-						spelltarget = GetRandomPlayerTarget();
-					}
-					break;
-			}
-			_unit->CastSpell(spelltarget , spellid, false);
-			_unit->Unroot();
-		}
-
-		void Destroy()
-		{
-			for(uint32 i = 0; i < spells.size(); ++i)
-			{
-				if(spells[ i ] != NULL)
-					delete spells[ i ];
-			};
-
-			spells.clear();
-
-			delete this;
-		};
-
-	protected:
-		bool heroic;
-		vector< ScriptSpell* > spells;
+	// Skeletal Spells (phase 1)
+	SPELL_CURSE_OF_LIFE = 49527,
+	SPELL_RAIN_OF_FIRE = 49518,
+	SPELL_SHADOW_VOLLEY = 49528,
+	SPELL_DECAY_FLESH = 49356, // cast at end of phase 1, starts phase 2
+	// Flesh Spells (phase 2)
+	SPELL_GIFT_OF_THARON_JA = 52509,
+	SPELL_CLEAR_GIFT_OF_THARON_JA = 53242,
+	SPELL_EYE_BEAM = 49544,
+	SPELL_LIGHTNING_BREATH = 49537,
+	SPELL_POISON_CLOUD = 49548,
+	SPELL_RETURN_FLESH = 53463, // Channeled spell ending phase two and returning to phase 1. This ability will stun the party for 6 seconds.
+	SPELL_ACHIEVEMENT_CHECK = 61863,
+	SPELL_FLESH_VISUAL = 52582,
+	SPELL_DUMMY = 49551
 };
 
-/*
- The Prophet Tharon'ja
- TODO:
-  - Skeleton/Normal phases should be based on boss health instead of time
-  - Figure out why players are not always changed to skeletons while chaning phases
-*/
-
-//The Prophet Tharon'ja
-#define THE_PROPHET_THARONJA_ENTRY 26632
-#define WINDSERPENT_PHASE_INTERVAL 60000//change phase each 60s
-#define WINDSERPENT_PHASE_LENGTH 30000//30s
-#define PHASES_COUNT 2
-
-class THE_PROPHET_THARONJA : public CreatureAIScript
+enum TharonjaEvents
 {
-	public:
-		ADD_CREATURE_FACTORY_FUNCTION(THE_PROPHET_THARONJA);
+	EVENT_CURSE_OF_LIFE = 1,
+	EVENT_RAIN_OF_FIRE,
+	EVENT_SHADOW_VOLLEY,
 
-		THE_PROPHET_THARONJA(Creature* pCreature) : CreatureAIScript(pCreature)
-		{
-			heroic = (_unit->GetMapMgr()->iInstanceMode == MODE_HEROIC);
-			spells.clear();
-			phase_timer = 0;
-			phase_length = 0;
-			phase = 0;
-			/* SPELLS INIT */
-			ScriptSpell* CurseOfLife = new ScriptSpell;
-			CurseOfLife->normal_spellid = 49527;
-			CurseOfLife->heroic_spellid = 59972;
-			CurseOfLife->chance = 80;
-			CurseOfLife->timer = 7000;
-			CurseOfLife->time = 0;
-			CurseOfLife->phase = PHASES_COUNT + 1; //all phases
-			CurseOfLife->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(CurseOfLife);
+	EVENT_EYE_BEAM,
+	EVENT_LIGHTNING_BREATH,
+	EVENT_POISON_CLOUD,
 
-			ScriptSpell* LightningBreath = new ScriptSpell;
-			LightningBreath->normal_spellid = 49537;
-			LightningBreath->heroic_spellid = 59963;
-			LightningBreath->chance = 60;
-			LightningBreath->timer = 4000;
-			LightningBreath->time = 0;
-			LightningBreath->phase = PHASES_COUNT + 1; //all phases
-			LightningBreath->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(LightningBreath);
-
-			ScriptSpell* PoisonCloud = new ScriptSpell;
-			PoisonCloud->normal_spellid = 49548;
-			PoisonCloud->heroic_spellid = 59969;
-			PoisonCloud->chance = 30;
-			PoisonCloud->timer = 6000;
-			PoisonCloud->time = 0;
-			PoisonCloud->phase = PHASES_COUNT + 1; //all phases
-			PoisonCloud->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(PoisonCloud);
-
-			ScriptSpell* RainofFire = new ScriptSpell;
-			RainofFire->normal_spellid = 49518;
-			RainofFire->heroic_spellid = 59971;
-			RainofFire->chance = 70;
-			RainofFire->timer = 10000;
-			RainofFire->time = 0;
-			RainofFire->phase = PHASES_COUNT + 1; //all phases
-			RainofFire->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(RainofFire);
-
-			ScriptSpell* ShadowVolley = new ScriptSpell;
-			ShadowVolley->normal_spellid = 49528;
-			ShadowVolley->heroic_spellid = 59973;
-			ShadowVolley->chance = 60;
-			ShadowVolley->timer = 5000;
-			ShadowVolley->time = 0;
-			ShadowVolley->phase = PHASES_COUNT + 1; //all phases
-			ShadowVolley->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(ShadowVolley);
-
-			ScriptSpell* EyeBeam = new ScriptSpell;
-			EyeBeam->normal_spellid = 49544;
-			EyeBeam->heroic_spellid = 59965;
-			EyeBeam->chance = 50;
-			EyeBeam->timer = 3000;
-			EyeBeam->time = 0;
-			EyeBeam->phase = 2;
-			EyeBeam->target = SPELL_TARGET_RANDOM_PLAYER;
-			spells.push_back(EyeBeam);
-		}
-
-		void OnCombatStart(Unit* mTarget)
-		{
-			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
-			phase = 1;
-			phase_length = 0;
-			phase_timer = Arcemu::Shared::Util::getMSTime() + WINDSERPENT_PHASE_INTERVAL;
-		}
-
-		void OnCombatStop(Unit* mTarget)
-		{
-			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-			RemoveAIUpdateEvent();
-			phase = 1;
-			phase_timer = 0;
-			phase_length = 0;
-			_unit->SetDisplayId(_unit->GetNativeDisplayId());
-		}
-
-		void OnDied(Unit*  mKiller)
-		{
-			RemoveAIUpdateEvent();
-		}
-
-		void OnDamageTaken(Unit* mAttacker, uint32 fAmount)
-		{
-			if(_unit->GetHealthPct() < 2 && phase == 2)
-			{
-				phase = 1;
-				phase_timer = Arcemu::Shared::Util::getMSTime() + WINDSERPENT_PHASE_INTERVAL;
-				_unit->SetDisplayId(_unit->GetNativeDisplayId());
-				_unit->CastSpell(_unit, 53463, false);
-			}
-		}
-
-		void AIUpdate()
-		{
-			if(phase == 1 && phase_timer < Arcemu::Shared::Util::getMSTime())
-			{
-				phase = 2;
-				phase_length = Arcemu::Shared::Util::getMSTime() + WINDSERPENT_PHASE_LENGTH;
-				_unit->SetDisplayId(27073);
-				_unit->RemoveAllAuras();
-				_unit->CastSpell(_unit, 49356, false);
-			}
-			if(phase == 2 && phase_length < Arcemu::Shared::Util::getMSTime())
-			{
-				phase = 1;
-				phase_timer = Arcemu::Shared::Util::getMSTime() + WINDSERPENT_PHASE_INTERVAL;
-				_unit->SetDisplayId(_unit->GetNativeDisplayId());
-				_unit->RemoveAllAuras();
-				_unit->CastSpell(_unit, 53463, false);
-			}
-			if(spells.size() > 0)
-			{
-				for(uint8 i = 0; i < spells.size(); i++)
-				{
-					if(spells[i]->time < Arcemu::Shared::Util::getMSTime() && (spells[i]->phase == phase || spells[i]->phase > PHASES_COUNT))
-					{
-						if(Rand(spells[i]->chance))
-						{
-							CastScriptSpell(spells[i]);
-							spells[i]->time = Arcemu::Shared::Util::getMSTime() + spells[i]->timer;
-						}
-					}
-				}
-			}
-		}
-
-		Player* GetRandomPlayerTarget()
-		{
-
-			vector< uint32 > possible_targets;
-			for(set< Object* >::iterator iter = _unit->GetInRangePlayerSetBegin(); iter != _unit->GetInRangePlayerSetEnd(); ++iter)
-			{
-				if((*iter) && (TO< Player* >(*iter))->isAlive())
-					possible_targets.push_back((uint32)(*iter)->GetGUID());
-			}
-			if(possible_targets.size() > 0)
-			{
-				uint32 random_player = possible_targets[ Rand(uint32(possible_targets.size() - 1)) ];
-				return _unit->GetMapMgr()->GetPlayer(random_player);
-			}
-			return NULL;
-		}
-
-		void CastScriptSpell(ScriptSpell* spell)
-		{
-			_unit->Root();
-			uint32 spellid = heroic ? spell->heroic_spellid : spell->normal_spellid;
-			Unit* spelltarget = NULL;
-			switch(spell->target)
-			{
-				case SPELL_TARGET_SELF:
-					{
-						spelltarget = _unit;
-					}
-					break;
-				case SPELL_TARGET_GENERATE:
-					{
-						spelltarget = NULL;
-					}
-					break;
-				case SPELL_TARGET_CURRENT_ENEMY:
-					{
-						spelltarget = _unit->GetAIInterface()->getNextTarget();
-					}
-					break;
-				case SPELL_TARGET_RANDOM_PLAYER:
-					{
-						spelltarget = GetRandomPlayerTarget();
-					}
-					break;
-			}
-			_unit->CastSpell(spelltarget , spellid, false);
-			_unit->Unroot();
-		}
-
-		void Destroy()
-		{
-			for(uint32 i = 0; i < spells.size(); ++i)
-			{
-				if(spells[ i ] != NULL)
-					delete spells[ i ];
-			};
-
-			spells.clear();
-
-			delete this;
-		};
-
-	protected:
-		bool heroic;
-		vector< ScriptSpell* > spells;
-		uint32 phase_timer;
-		uint32 phase_length;
-		uint32 phase;
+	EVENT_DECAY_FLESH,
+	EVENT_GOING_FLESH,
+	EVENT_RETURN_FLESH,
+	EVENT_GOING_SKELETAL
 };
 
+enum TharonjaModels
+{
+	MODEL_FLESH = 27073,
+	NPC_PROPHET_THARONJA = 26632
+};
+
+
+class THE_PROPHET_THARONJA : public AICreatureScript
+{
+public:
+	AI_CREATURE_SCRIPT_FUNCTION(THE_PROPHET_THARONJA, AICreatureScript);
+	THE_PROPHET_THARONJA(Creature* pCreature) : AICreatureScript(pCreature)
+	{}
+
+	void EnterCombat(Unit* who)
+	{
+		RegisterAIUpdateEvent(1000);
+		Emote("Tharon'ja sees all! The work of mortals shall not end the eternal dynasty!", Text_Yell, 13862);
+		orginalmodelid = _unit->GetDisplayId();
+
+		events.ScheduleEvent(EVENT_DECAY_FLESH, 20000);
+		events.ScheduleEvent(EVENT_CURSE_OF_LIFE, 1000);
+		events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(14000, 18000));
+		events.ScheduleEvent(EVENT_SHADOW_VOLLEY, urand(8000, 10000));
+		ParentClass::EnterCombat(who);
+	}
+
+	void KilledUnit(Unit* who)
+	{
+		switch (urand(0, 1))
+		{
+		case 0:
+			Emote("As Tharon'ja predicted!", Text_Yell, 13863);
+			break;
+		case 1:
+			Emote("As it was written!", Text_Yell, 13864);
+			break;
+		}
+		ParentClass::KilledUnit(who);
+	}
+
+	void JustDied(Unit* killer)
+	{
+		Emote("Im...impossible! Tharon'ja is eternal! Tharon'ja...is...", Text_Yell, 13869);
+		_unit->DoCastAOE(SPELL_CLEAR_GIFT_OF_THARON_JA, true);
+		_unit->DoCastAOE(SPELL_ACHIEVEMENT_CHECK, true);
+		ParentClass::JustDied(killer);
+	}
+
+	void UpdateAI()
+	{
+		events.Update(1000);
+
+		if (_unit->IsCasting())
+			return;
+
+		while (uint32 eventId = events.ExecuteEvent())
+		{
+			switch (eventId)
+			{
+			case EVENT_CURSE_OF_LIFE:
+				if (Unit* target = GetRandomPlayerTarget())
+					_unit->DoCast(target, SPELL_CURSE_OF_LIFE);
+				events.ScheduleEvent(EVENT_CURSE_OF_LIFE, urand(10000, 15000));
+				return;
+			case EVENT_SHADOW_VOLLEY:
+				_unit->DoCastVictim(SPELL_SHADOW_VOLLEY);
+				events.ScheduleEvent(EVENT_SHADOW_VOLLEY, urand(8000, 10000));
+				return;
+			case EVENT_RAIN_OF_FIRE:
+				if (Unit* target = GetRandomPlayerTarget())
+					_unit->DoCast(target, SPELL_RAIN_OF_FIRE);
+				events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(14000, 18000));
+				return;
+			case EVENT_LIGHTNING_BREATH:
+				if (Unit* target = GetRandomPlayerTarget())
+					_unit->DoCast(target, SPELL_LIGHTNING_BREATH);
+				events.ScheduleEvent(EVENT_LIGHTNING_BREATH, urand(6000, 7000));
+				return;
+			case EVENT_EYE_BEAM:
+				if (Unit* target = GetRandomPlayerTarget())
+					_unit->DoCast(target, SPELL_EYE_BEAM);
+				events.ScheduleEvent(EVENT_EYE_BEAM, urand(4000, 6000));
+				return;
+			case EVENT_POISON_CLOUD:
+				_unit->DoCastAOE(SPELL_POISON_CLOUD);
+				events.ScheduleEvent(EVENT_POISON_CLOUD, urand(10000, 12000));
+				return;
+			case EVENT_DECAY_FLESH:
+				_unit->DoCastAOE(SPELL_DECAY_FLESH);
+				events.ScheduleEvent(EVENT_GOING_FLESH, 6000);
+				return;
+			case EVENT_GOING_FLESH:
+				Emote("No! A taste...all too brief!", Text_Yell, 13867);
+				_unit->SetDisplayId(MODEL_FLESH);
+				_unit->DoCastAOE(SPELL_GIFT_OF_THARON_JA, true);
+				_unit->DoCast(_unit, SPELL_FLESH_VISUAL, true);
+				_unit->DoCast(_unit, SPELL_DUMMY, true);
+
+				events.Reset();
+				events.ScheduleEvent(EVENT_RETURN_FLESH, 20000);
+				events.ScheduleEvent(EVENT_LIGHTNING_BREATH, urand(3000, 4000));
+				events.ScheduleEvent(EVENT_EYE_BEAM, urand(4000, 8000));
+				events.ScheduleEvent(EVENT_POISON_CLOUD, urand(6000, 7000));
+				break;
+			case EVENT_RETURN_FLESH:
+				_unit->DoCastAOE(SPELL_RETURN_FLESH);
+				events.ScheduleEvent(EVENT_GOING_SKELETAL, 6000);
+				return;
+			case EVENT_GOING_SKELETAL:
+				Emote("Your flesh serves Tharon'ja now!", Text_Yell, 13865);
+				_unit->SetDisplayId(orginalmodelid);
+				_unit->DoCastAOE(SPELL_CLEAR_GIFT_OF_THARON_JA, true);
+
+				events.Reset();
+				events.ScheduleEvent(EVENT_DECAY_FLESH, 20000);
+				events.ScheduleEvent(EVENT_CURSE_OF_LIFE, 1000);
+				events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(14000, 18000));
+				events.ScheduleEvent(EVENT_SHADOW_VOLLEY, urand(8000, 10000));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	protected:
+		uint32 orginalmodelid = 0;
+};
 
 
 void SetupDrakTharonKeep(ScriptMgr* mgr)
@@ -1102,15 +955,15 @@ void SetupDrakTharonKeep(ScriptMgr* mgr)
 	//////////////////////////////////////////
 	// TRASH MOBS
 	//////////////////////////////////////////
-
+	mgr->register_creature_script(NPC_DRAKKARI_GUTRIPPER, &npc_drakkari_gutripper::Create);
+	mgr->register_creature_script(NPC_DRAKKARI_SCYTHECLAW, &npc_drakkari_scytheclaw::Create);
 	//////////////////////////////////////////
 	// BOSSES
 	//////////////////////////////////////////
-	mgr->register_creature_script(TROLLGORE_ENTRY, &TROLLGORE_AI::Create);
-	mgr->register_creature_script(NOVOS_THE_SUMMONER_ENTRY, &NOVOS_THE_SUMMONER_AI::Create);
+	mgr->register_creature_script(NPC_TROLLGORE, &TrollgoreAI::Create);
+	mgr->register_creature_script(NPC_NOVOS_THE_SUMMONER, &NovosTheSummonerAI::Create);
 	mgr->register_creature_script(CRYSTAL_HANDLER_ENTRY, &CRYSTAL_HANDLER_AI::Create);
-	mgr->register_creature_script(KING_DRED_ENTRY, &KING_DRED_AI::Create);
-
-	mgr->register_creature_script(THE_PROPHET_THARONJA_ENTRY, &THE_PROPHET_THARONJA::Create);
+	mgr->register_creature_script(NPC_KING_DRED, &KING_DRED_AI::Create);
+	mgr->register_creature_script(NPC_PROPHET_THARONJA, &THE_PROPHET_THARONJA::Create);
 
 }

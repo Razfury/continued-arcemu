@@ -234,7 +234,7 @@ class HighChiefBristlelimb : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(HighChiefBristlelimb);
 		HighChiefBristlelimb(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			fulborgskilled++;
 			if(mKiller->IsPlayer())
@@ -260,7 +260,7 @@ class WebbedCreature : public CreatureAIScript
 		{
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			_unit->GetAIInterface()->disable_melee = true;
 			_unit->Root();
@@ -273,7 +273,7 @@ class WebbedCreature : public CreatureAIScript
 			_unit->Unroot();
 		};
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			Player* QuestHolder = NULL;
 			if(pKiller->IsPlayer())

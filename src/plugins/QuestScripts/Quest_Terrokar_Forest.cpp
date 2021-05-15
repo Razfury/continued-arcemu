@@ -31,7 +31,7 @@ class ThreatFromAboveQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(ThreatFromAboveQAI);
 		ThreatFromAboveQAI(Creature* pCreature) : CreatureAIScript(pCreature)	{}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -56,7 +56,7 @@ class TheInfestedProtectorsQAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(TheInfestedProtectorsQAI);
 		TheInfestedProtectorsQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -109,7 +109,7 @@ class TakenInTheNight : public CreatureAIScript
 			_unit->GetAIInterface()->disable_combat = true;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(!mKiller->IsPlayer())
 				return;

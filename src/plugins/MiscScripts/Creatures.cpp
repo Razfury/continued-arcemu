@@ -26,7 +26,7 @@ class CrimsonHammersmith : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(CrimsonHammersmith);
 		CrimsonHammersmith(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Who Dares Disturb Me");
 		}
@@ -39,7 +39,7 @@ class Corrupt_Minor_Manifestation_Water_Dead : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(Corrupt_Minor_Manifestation_Water_Dead);
 		Corrupt_Minor_Manifestation_Water_Dead(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			float SSX = _unit->GetPositionX();
 			float SSY = _unit->GetPositionY();
@@ -65,7 +65,7 @@ class SavannahProwler : public CreatureAIScript
 				_unit->SetStandState(STANDSTATE_SLEEP);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			if(_unit->GetStandState() == STANDSTATE_SLEEP)
 				_unit->SetStandState(0);
@@ -84,7 +84,7 @@ class PeonSleepingAI : public CreatureAIScript
 			RegisterAIUpdateEvent(3000 + RandomUInt(180000));
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->CastSpell(_unit, 17743, true);
 			RemoveAIUpdateEvent();
@@ -97,7 +97,7 @@ class KirithAI : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(KirithAI);
 		KirithAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			if(mKiller->IsPlayer())
 			{
@@ -115,7 +115,7 @@ class AllianceGryphon : public CreatureAIScript
 
 		AllianceGryphon(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			if(!mTarget->IsPlayer())
 				return;
@@ -137,7 +137,7 @@ class AllianceHippogryph : public CreatureAIScript
 
 		AllianceHippogryph(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			if(!mTarget->IsPlayer())
 				return;
@@ -158,7 +158,7 @@ class HordeWyvern : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(HordeWyvern);
 		HordeWyvern(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			if(!mTarget->IsPlayer())
 				return;
@@ -179,7 +179,7 @@ class HordeBat : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(HordeBat);
 		HordeBat(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			if(!mTarget->IsPlayer())
 				return;
@@ -200,7 +200,7 @@ class TyrandeWhisperwind : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(TyrandeWhisperwind);
 		TyrandeWhisperwind(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(5885);
 		}
@@ -214,7 +214,7 @@ class ProphetVelen : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(ProphetVelen);
 		ProphetVelen(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(10155);
 		}
@@ -228,7 +228,7 @@ class KingMagniBronzebeard : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(KingMagniBronzebeard);
 		KingMagniBronzebeard(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(5896);
 		}
@@ -242,7 +242,7 @@ class Thrall : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(Thrall);
 		Thrall(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(5880);
 		}
@@ -256,7 +256,7 @@ class CairneBloodhoof : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(CairneBloodhoof);
 		CairneBloodhoof(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(5884);
 		}
@@ -270,7 +270,7 @@ class LadySylvanasWindrunner : public CreatureAIScript
 		ADD_CREATURE_FACTORY_FUNCTION(LadySylvanasWindrunner);
 		LadySylvanasWindrunner(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->PlaySoundToSet(5886);
 		}

@@ -60,12 +60,12 @@ class NalorakkAI : public MoonScriptBossAI
 			Morph = AddSpell(42377, Target_Self, 0, 0, 0, 0, 0, false, "You call on da beast, you gonna get more dan you bargain for!", Text_Yell, 12072);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			// 45 Seconds until switch to Bear Form
 			MorphTimer = AddTimer(45000);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
 		void OnCombatStop(Unit* pTarget)
@@ -76,17 +76,17 @@ class NalorakkAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			// On death he changes back to a troll
 			SetDisplayId(21631);
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			// Bear Form
 			if(IsTimerFinished(MorphTimer) && GetPhase() == 1)
@@ -142,17 +142,17 @@ class AkilzonAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "You can't... kill... me spirit!", Text_Yell, 12019);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			// 2 Minute timer till Soaring Eagles are spawned
 			mSummonTime = AddTimer(120000);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			if(IsTimerFinished(mSummonTime))
 			{
@@ -230,14 +230,14 @@ class HalazziAI : public MoonScriptBossAI
 			mLynx = NULL;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mTotemTimer = AddTimer(5000); // Just to make the Timer ID
 			SplitCount = 1;
 			MaxHealth = _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 			mLynx = NULL;
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 
 		void OnCombatStop(Unit* pTarget)
@@ -247,7 +247,7 @@ class HalazziAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Every 25% Halazzi calls on the lynx
 			if(!mLynx && GetHealthPercent() <= (100 - SplitCount * 25))

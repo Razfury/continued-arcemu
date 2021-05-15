@@ -44,7 +44,7 @@ class BalosJackenQAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(friendlyTimer == BALOS_FRIENDLY_TIMER)
 			{
@@ -78,7 +78,7 @@ class BalosJackenQAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
@@ -157,7 +157,7 @@ class OverlordMokMorokk : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->RemoveNegativeAuras();
 			_unit->SetFaction(29);
@@ -224,7 +224,7 @@ class PrivateHendel : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->Emote(EMOTE_STATE_KNEEL);
 			_unit->RemoveNegativeAuras();

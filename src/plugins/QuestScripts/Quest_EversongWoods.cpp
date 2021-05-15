@@ -130,7 +130,7 @@ class ProspectorAnvilwardAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!_unit->CombatStatus.IsInCombat())
 			{
@@ -139,7 +139,7 @@ class ProspectorAnvilwardAI : public CreatureAIScript
 			}
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 			if(_unit->GetAIInterface()->GetWaypointMap() != NULL)

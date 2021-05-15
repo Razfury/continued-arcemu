@@ -36,7 +36,7 @@ class ChickenEscapee : public CreatureAIScript
 			RegisterAIUpdateEvent(1000);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Let's see if we are netted
 			Aura* a = _unit->FindAura(51959);

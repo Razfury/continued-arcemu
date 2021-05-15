@@ -135,9 +135,9 @@ class MutantWarHoundAI : public AICreatureScript
 		AI_CREATURE_SCRIPT_FUNCTION(MutantWarHoundAI, AICreatureScript);
 		MutantWarHoundAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 
 			Aura* pAura = sSpellFactoryMgr.NewAura(dbcSpell.LookupEntry(MUTANT_WAR_HOUND_CLOUD_OF_DISEASE), (uint32)20000, _unit, _unit);
 			_unit->AddAura(pAura);
@@ -287,9 +287,9 @@ class IllidariHeartseekerAI : public AICreatureScript
 			AddSpellFunc(&SpellFunc_RapidShot, Target_Current, 7, 8, 40, 0, 30);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			if(GetRangeToUnit(pTarget) <= 30.0f)
 			{
 				SetBehavior(Behavior_Spell);
@@ -297,9 +297,9 @@ class IllidariHeartseekerAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
@@ -499,9 +499,9 @@ class AshtonguePrimalistAI : public AICreatureScript
 			AddSpell(ASHTONGUE_PRIMALIST_WYVERN_STRING, Target_RandomPlayer, 7, 0, 25, 0, 30);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			if(GetRangeToUnit(pTarget) <= 30.0f)
 			{
 				SetBehavior(Behavior_Spell);
@@ -509,9 +509,9 @@ class AshtonguePrimalistAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
@@ -576,9 +576,9 @@ class AshtongueStalkerAI : public AICreatureScript
 			ApplyAura(ASHTONGUE_STALKER_STEATH);
 		}
 
-		void OnCombatStart(Unit*  pTarget)
+		void EnterCombat(Unit*  pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SpellDesc* pSpell = FindSpellById(ASHTONGUE_STALKER_BLIND);
 			if(pSpell != NULL)
 			{
@@ -631,9 +631,9 @@ class BonechewerBehemothAI : public AICreatureScript
 			AddSpell(BONECHEWER_BEHEMOTH_METEOR, Target_RandomPlayerDestination, 5, 2, 40);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SpellDesc* pCharge = FindSpellById(BONECHEWER_BEHEMOTH_BEHEMOTH_CHARGE);
 			if(pCharge != NULL)
 			{
@@ -718,9 +718,9 @@ class BonechewerShieldDiscipleAI : public AICreatureScript
 			AddSpell(BONECHEWER_SHIELD_DISCIPLE_THROW_SHIELD, Target_RandomPlayer, 7, 0, 30);	// Current?
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SpellDesc* pIntervene = FindSpellById(BONECHEWER_SHIELD_DISCIPLE_INTERVENE);
 			if(pIntervene != NULL)
 			{
@@ -748,9 +748,9 @@ class BonechewerSpectatorAI : public AICreatureScript
 			AddSpell(BONECHEWER_SPECTATOR_SUNDER_ARMOR, Target_Current, 7, 0, 20, 0, 10);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SpellDesc* pCharge = FindSpellById(BONECHEWER_SPECTATOR_CHARGE);
 			if(pCharge != NULL)
 			{
@@ -828,9 +828,9 @@ class CoilskarHarpoonerAI : public AICreatureScript
 			AddSpell(COILSKAR_HARPOONER_SPEAR_THROW, Target_Current, 8, 0, 15, 0, 40);			// Random? Also isn't it typical ranged unit? (using Spear Throw instead of Shoot/Shot spell?)
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SpellDesc* pMark = FindSpellById(COILSKAR_HARPOONER_HARPOONERS_MARK);
 			if(pMark != NULL)
 			{
@@ -898,9 +898,9 @@ class DragonmawSkyStalkerAI : public AICreatureScript
 			AddSpell(DRAGONMAW_SKY_STALKER_SHOOT, Target_Current, 75, 0, 1, 0, 40);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			if(GetRangeToUnit(pTarget) <= 40.0f)
 			{
 				SetBehavior(Behavior_Spell);
@@ -908,9 +908,9 @@ class DragonmawSkyStalkerAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
@@ -939,9 +939,9 @@ class DragonmawWindReaverAI : public AICreatureScript
 			AddSpell(DRAGONMAW_WIND_REAVER_FREEZE, Target_RandomPlayer, 10, 2, 15);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			if(GetRangeToUnit(pTarget) <= 40.0f)
 			{
 				SetBehavior(Behavior_Spell);
@@ -949,9 +949,9 @@ class DragonmawWindReaverAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
@@ -996,13 +996,13 @@ class EnslavedServantAI : public AICreatureScript
 			mHealthResetTimer = -1;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			mHealthResetTimer = AddTimer(45000);	// to check
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mHealthResetTimer))
 			{
@@ -1010,7 +1010,7 @@ class EnslavedServantAI : public AICreatureScript
 				ResetTimer(mHealthResetTimer, 45000);
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		int32	mHealthResetTimer;
@@ -1067,7 +1067,7 @@ class IllidariArchonAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SpellDesc* pDeath = FindSpellById(ILLIDARI_ARCHON_SHADOW_WORD_DEATH);
 			if(mIsShadowPriest && _unit->GetUInt32Value(UNIT_FIELD_HEALTH) <= 2500 && pDeath->mEnabled)
@@ -1093,7 +1093,7 @@ class IllidariArchonAI : public AICreatureScript
 				pDeath->mEnabled = false;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		bool	mIsShadowPriest;
@@ -1112,14 +1112,14 @@ class IllidariAssassinAI : public AICreatureScript
 			AddSpell(ILLIDARI_ASSASSIN_VANISH, Target_Self, 7, 1, 30);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->HasAura(ILLIDARI_ASSASSIN_VANISH))
 			{
 				DelayNextAttack(1500);
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 };
 // I've parted it on frost and fire mage - correct me if it's wrong (also slap me if it's typical caster)
@@ -1242,9 +1242,9 @@ class ShadowmoonDeathshaperAI : public AICreatureScript
 			_unit->SetUInt32Value(UNIT_FIELD_POWER1, 100000);	// temporary way to set up mana of this unit
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			if(GetRangeToUnit(pTarget) <= 40.0f)
 			{
 				SetBehavior(Behavior_Spell);
@@ -1252,9 +1252,9 @@ class ShadowmoonDeathshaperAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
@@ -1321,9 +1321,9 @@ class ShadowmoonHoundmasterAI : public AICreatureScript
 			AddSpell(SHADOWMOON_HOUNDMASTER_WING_CLIP, Target_Current, 5, 0, 20, 0, 10, true);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			if(GetRangeToUnit(pTarget) <= 30.0f)
 			{
 				SetBehavior(Behavior_Spell);
@@ -1331,9 +1331,9 @@ class ShadowmoonHoundmasterAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
 			if(pTarget != NULL)
 			{
@@ -1419,7 +1419,7 @@ class ShadowmoonWeaponMasterAI : public MoonScriptBossAI
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(GetPhase() == 1 && GetHealthPercent() <= 85)
 			{
@@ -1432,7 +1432,7 @@ class ShadowmoonWeaponMasterAI : public MoonScriptBossAI
 				return;
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*	mDefensiveStance;
@@ -1509,14 +1509,14 @@ class StormFuryAI : public AICreatureScript
 			AddSpellFunc(&SpellFunc_StormBlink, Target_RandomPlayerNotCurrent, 8, 0, 35);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->HasAura(STORM_FURY_STORM_BLINK))
 			{
 				DelayNextAttack(2000);
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*	mStormBlink;
@@ -1652,11 +1652,11 @@ class EnslavedSoulAI : public AICreatureScript
 		AI_CREATURE_SCRIPT_FUNCTION(EnslavedSoulAI, AICreatureScript);
 		EnslavedSoulAI(Creature* pCreature) : AICreatureScript(pCreature) {}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ApplyAura(ENSLAVED_SOUL_SOUL_RELEASE);			// beg core to support OnDied casts
+			ApplyAura(ENSLAVED_SOUL_SOUL_RELEASE);			// beg core to support JustDied casts
 			Despawn(120000, 0);
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 		}
 };
 
@@ -1800,7 +1800,7 @@ class NajentusAI : public CreatureAIScript
 			spells[3].maxdist2cast = 60.0f;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < nrspells; i++)
 				spells[i].casttime = 0;
@@ -1823,7 +1823,7 @@ class NajentusAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Lord Illidan will... crush you.");
 			_unit->PlaySoundToSet(11459);
@@ -1831,7 +1831,7 @@ class NajentusAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(RandomUInt(2))
 			{
@@ -1847,7 +1847,7 @@ class NajentusAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Disabled till I find way to make it dispellable like on blizz
 			uint32 t = (uint32)time(NULL);
@@ -2025,7 +2025,7 @@ class SupremusAI : public CreatureAIScript
 			infoVolcanicGazer =  dbcSpell.LookupEntry(VOLCANIC_GAZER);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Bear witness to the agent of your demise!");	// used when he kills Warden Mellichar
@@ -2040,14 +2040,14 @@ class SupremusAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I am merely one of... infinite multitudes.");
 			_unit->PlaySoundToSet(11126);
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -2067,7 +2067,7 @@ class SupremusAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(m_phase)
 			{
@@ -2316,7 +2316,7 @@ class GurtoggAI : public CreatureAIScript
 			Phase = 1;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			for(int i = 0; i < 9; i++)
 			{
@@ -2353,14 +2353,14 @@ class GurtoggAI : public CreatureAIScript
 			Phase = 1;
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->PlaySoundToSet(11439);
 
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(RandomUInt(2))
 			{
@@ -2376,7 +2376,7 @@ class GurtoggAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(Phase == 1 && t > PhaseTimer)
@@ -2696,15 +2696,15 @@ class EssenceOfSufferingAI : public AICreatureScript
 			Emote("Pain and suffering are all that await you.", Text_Yell, 11415);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			CastSpellNowNoScheduling(mAuraOfSuffering);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			if(GetHealthPercent() <= 1)
 			{
 				_unit->SetHealthPct(1);
@@ -2751,15 +2751,15 @@ class EssenceOfDesireAI : public AICreatureScript
 			Emote("You can have anything you desire... for a price.", Text_Yell, 11408);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			CastSpellNowNoScheduling(mAuraOfDesire);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			if(GetHealthPercent() <= 1)
 			{
 				_unit->SetHealthPct(1);
@@ -2808,20 +2808,20 @@ class EssenceOfAngerAI : public AICreatureScript
 			Emote("Beware - I live!", Text_Yell, 11399);
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
-			ParentClass::OnCombatStart(mTarget);
+			ParentClass::EnterCombat(mTarget);
 			CastSpellNowNoScheduling(mAuraOfAnger);
 		}
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
-			ParentClass::OnDied(mKiller);
+			ParentClass::JustDied(mKiller);
 			RemoveAuraOnPlayers(EOD_AURA_OF_DESIRE);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 
 			if(_unit->GetAIInterface()->GetIsTaunted())
 			{
@@ -2857,7 +2857,7 @@ class ReliquaryOfSoulsAI : public AICreatureScript
 			SpawnedEnsalvedSoul = false;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			SetAllowMelee(false);
@@ -2870,12 +2870,12 @@ class ReliquaryOfSoulsAI : public AICreatureScript
 				Phase = 1;
 			}
 			RegisterAIUpdateEvent(1000);
-			ParentClass:: OnCombatStart(mTarget);
+			ParentClass:: EnterCombat(mTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 			switch(Phase)
 			{
 				case 1:
@@ -3096,7 +3096,7 @@ class ShahrazAI : public CreatureAIScript
 			SoundTimer = 0;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "So, business... or pleasure?");
 			_unit->PlaySoundToSet(11504);
@@ -3119,7 +3119,7 @@ class ShahrazAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I wasn't finished.");
 			_unit->PlaySoundToSet(11511);
@@ -3127,7 +3127,7 @@ class ShahrazAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			switch(RandomUInt(2))
 			{
@@ -3143,7 +3143,7 @@ class ShahrazAI : public CreatureAIScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			SoundTimer++;
 			if(_unit->GetAIInterface()->GetIsTaunted() && SoundTimer > 10)
@@ -3377,10 +3377,10 @@ class GathiosAI : public AICreatureScript
 			AddEmote(Event_OnDied, "Lord Illidan... I...", Text_Yell, 11425);
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			ApplyAura(DEVOTION_AURA);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 		void OnDamageTaken(Unit* mAttacker, uint32 fAmount)
@@ -3588,7 +3588,7 @@ class TeronGorefiendAI : public CreatureAIScript
 			spells[3].maxdist2cast = 60.0f;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Vengeance is mine!");
 			_unit->PlaySoundToSet(11513);
@@ -3603,7 +3603,7 @@ class TeronGorefiendAI : public CreatureAIScript
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -3630,7 +3630,7 @@ class TeronGorefiendAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The wheel...spins...again....");
 			_unit->PlaySoundToSet(11521);
@@ -3638,7 +3638,7 @@ class TeronGorefiendAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			uint32 t = (uint32)time(NULL);
 			if(t > spells[2].casttime)
@@ -3795,13 +3795,13 @@ class ShadeofakamaAI : public CreatureAIScript
 
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			hm = 100;
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
 
-		void OnTargetDied(Unit* mTarget)
+		void KilledUnit(Unit* mTarget)
 		{
 			if(_unit->GetHealthPct() > 0)
 			{
@@ -3831,7 +3831,7 @@ class ShadeofakamaAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			Creature* cre = NULL;
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I don't want to go back!");
@@ -3844,7 +3844,7 @@ class ShadeofakamaAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 85 && hm == 100)
 			{
@@ -4341,7 +4341,7 @@ class GenericTriggerAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 			ApplyAura(mSpellId);
@@ -4385,7 +4385,7 @@ class EyeBeamTriggerAI : public AICreatureScript
 			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(mPosition == -1)
 			{
@@ -4441,7 +4441,7 @@ class ShadowDemonAI : public AICreatureScript
 			}
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			if(GetTargetToChannel() != NULL)
 			{
@@ -4449,16 +4449,16 @@ class ShadowDemonAI : public AICreatureScript
 				pUnit->RemoveAura(SHADOW_DEMON_PARALYZE);
 			}
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
-		void OnTargetDied(Unit*  pTarget)
+		void KilledUnit(Unit*  pTarget)
 		{
 			Despawn(2000, 0);
-			ParentClass::OnDied(pTarget);
+			ParentClass::JustDied(pTarget);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Ugly code :P
 			Unit* pTarget = _unit->GetAIInterface()->getNextTarget();
@@ -4479,7 +4479,7 @@ class ShadowDemonAI : public AICreatureScript
 				Despawn(500, 0);
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		SpellDesc*	mParalyze;
@@ -4530,7 +4530,7 @@ class ParasiticShadowfiendAI : public AICreatureScript
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetUInt64Value(UNIT_FIELD_FLAGS) == UNIT_FLAG_NOT_SELECTABLE)
 			{
@@ -4676,9 +4676,9 @@ class AkamaAI : public MoonScriptBossAI
 			mTimeLeft = mScenePart = 0;
 		}
 
-		void OnCombatStart(Unit*  pTarget)
+		void EnterCombat(Unit*  pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			SetWieldWeapon(true);
 			CancelAllCooldowns();
 		}
@@ -4690,12 +4690,12 @@ class AkamaAI : public MoonScriptBossAI
 			SetWieldWeapon(false);
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(GetPhase())
 			{
@@ -5014,7 +5014,7 @@ class AkamaAI : public MoonScriptBossAI
 				else
 				{
 					_unit->SetEmoteState(EMOTE_ONESHOT_READY1H);
-					ParentClass::AIUpdate();
+					ParentClass::UpdateAI();
 				}
 			}
 			if(mScenePart == 0 && mIllidanAI != NULL && mIllidanAI->GetHealthPercent() <= 85)
@@ -5243,7 +5243,7 @@ class MaievAI : public MoonScriptBossAI
 			mIllidanAI = NULL;
 		}
 
-		void OnCombatStart(Unit*  pTarget)
+		void EnterCombat(Unit*  pTarget)
 		{
 			SetWieldWeapon(true);
 			CancelAllCooldowns();
@@ -5279,7 +5279,7 @@ class MaievAI : public MoonScriptBossAI
 			_unit->SetHealth(_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			switch(GetPhase())
 			{
@@ -5352,7 +5352,7 @@ class MaievAI : public MoonScriptBossAI
 					ResetTimer(mYellTimer, (RandomUInt(20) + 20) * 1000);
 				}
 
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 			}
 			else
 			{
@@ -5409,7 +5409,7 @@ class MaievAI : public MoonScriptBossAI
 			SetDisplayWeapon(false, false);
 			if(mIllidanAI->GetUnit()->GetEmoteState() == 0)		// dunno if it's really needed
 			{
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 			}
 
 			// Ugly -.-'
@@ -5674,7 +5674,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 			mAllow = true;
 		}
 
-		void OnCombatStart(Unit*  pTarget)
+		void EnterCombat(Unit*  pTarget)
 		{
 			GameObject* pRightGate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(745.07f, 241.802f, 354.292f, 200000);
 			GameObject* pLeftGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(744.829f, 369.276f, 354.324f, 200001);
@@ -5689,7 +5689,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 
 			_unit->SetEmoteState(EMOTE_ONESHOT_READY1H);
 
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			CancelAllCooldowns();
 
 			mParasitic->mEnabled = false;
@@ -5765,7 +5765,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 			ParentClass::OnCombatStop(pTarget);
 		}
 
-		void OnDied(Unit*  pKiller)
+		void JustDied(Unit*  pKiller)
 		{
 			Creature* pMaiev = TO_CREATURE(ForceCreatureFind(CN_MAIEV));
 			if(pMaiev != NULL && pMaiev->isAlive())
@@ -5794,7 +5794,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 				}
 			}
 
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 
 		// Does not work until it's hooked
@@ -5843,7 +5843,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 			}
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(!mAllow)
 				return;
@@ -5946,7 +5946,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 			}
 
 			_unit->SetEmoteState(EMOTE_ONESHOT_READY1H);
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		void PhaseTwo()
@@ -6205,7 +6205,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 					return;
 				}
 
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 			}
 		}
 
@@ -6525,7 +6525,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 				}
 
 				_unit->SetEmoteState(EMOTE_ONESHOT_READY1H);
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 			}
 		}
 
@@ -6683,7 +6683,7 @@ class IllidanStormrageAI : public MoonScriptBossAI
 				}
 
 				_unit->SetEmoteState(EMOTE_ONESHOT_READY1H);
-				ParentClass::AIUpdate();
+				ParentClass::UpdateAI();
 			}
 		}
 
@@ -6845,7 +6845,7 @@ class CageTrapTriggerAI : public AICreatureScript
 			mHasTrapped = false;
 		}
 
-		void OnCombatStart(Unit*  pTarget) {}
+		void EnterCombat(Unit*  pTarget) {}
 
 		void OnCombatStop(Unit*  pTarget)
 		{
@@ -6853,7 +6853,7 @@ class CageTrapTriggerAI : public AICreatureScript
 			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			Unit* pIllidan = ForceCreatureFind(22917);
 			if(pIllidan != NULL)
@@ -7060,17 +7060,17 @@ class FlameOfAzzinothAI : public AICreatureScript
 			if(pTarget != NULL)
 			{
 				_unit->GetAIInterface()->AttackReaction(pTarget, 200);
-				OnCombatStart(pTarget);
+				EnterCombat(pTarget);
 			}
 		}
 
-		void OnCombatStart(Unit*  pTarget)
+		void EnterCombat(Unit*  pTarget)
 		{
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 			CancelAllCooldowns();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			// Uh... so ugly, but that's what Wiki says
 			Unit* pBlade1 = ForceCreatureFind(22996, UnitPos[0].x, UnitPos[0].y, UnitPos[0].z);
@@ -7092,7 +7092,7 @@ class FlameOfAzzinothAI : public AICreatureScript
 				}
 			}
 
-			ParentClass::AIUpdate();
+			ParentClass::UpdateAI();
 		}
 
 		void Destroy()

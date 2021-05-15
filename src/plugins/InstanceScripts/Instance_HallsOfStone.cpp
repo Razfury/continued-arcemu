@@ -261,10 +261,10 @@ class MaidenOfGriefAI : public AICreatureScript
 			AddEmote(Event_OnDied, "I hope you all rot! I never...wanted...this.", Text_Yell, 13493);
 		};
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mShock->TriggerCooldown();
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
 	protected:
@@ -301,13 +301,13 @@ class KrystallusAI : public AICreatureScript
 			mShatterTimer = INVALIDATE_TIMER;
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			mStompTimer = AddTimer(STOMP_TIMER);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		};
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(IsTimerFinished(mStompTimer))
 			{

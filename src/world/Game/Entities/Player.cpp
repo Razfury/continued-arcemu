@@ -12542,7 +12542,7 @@ void Player::Die(Unit* pAttacker, uint32 damage, uint32 spellid)
 	// Wipe our attacker set on death
 	CombatStatus.Vanished();
 
-	CALL_SCRIPT_EVENT(pAttacker, OnTargetDied)(this);
+	CALL_SCRIPT_EVENT(pAttacker, KilledUnit)(this);
 	pAttacker->stopAttack(this);
 
 	/* Tell Unit that it's target has Died */

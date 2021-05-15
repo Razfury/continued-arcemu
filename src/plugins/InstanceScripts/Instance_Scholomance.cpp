@@ -74,7 +74,7 @@ class DoctorTheolenKrastinovAI : public CreatureAIScript
 			spells[2].perctrigger = 0.0f;
 			spells[2].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			FRENZY_LIMITER = 0;
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -88,13 +88,13 @@ class DoctorTheolenKrastinovAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			FRENZY_LIMITER = 0;
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 50 && FRENZY_LIMITER == 0)
 			{
@@ -210,7 +210,7 @@ class InstructorMaliciaAI : public CreatureAIScript
 			spells[4].perctrigger = 5.0f;
 			spells[4].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -222,12 +222,12 @@ class InstructorMaliciaAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -325,7 +325,7 @@ class TheRavenianAI : public CreatureAIScript
 			spells[3].perctrigger = 11.0f;
 			spells[3].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -337,12 +337,12 @@ class TheRavenianAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -447,7 +447,7 @@ class LadyIlluciaBarovAI : public CreatureAIScript
 			spells[4].perctrigger = 4.0f;
 			spells[4].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -459,12 +459,12 @@ class LadyIlluciaBarovAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -576,7 +576,7 @@ class RasForstwhisperAI : public CreatureAIScript
 			spells[5].perctrigger = 13.0f;
 			spells[5].attackstoptimer = 2000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
@@ -589,12 +589,12 @@ class RasForstwhisperAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -684,7 +684,7 @@ class JandiceBarovAI : public CreatureAIScript
 			spells[2].perctrigger = 5.0f;
 			spells[2].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -696,12 +696,12 @@ class JandiceBarovAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -792,7 +792,7 @@ class KormokAI : public CreatureAIScript
 			spells[2].perctrigger = 4.0f;
 			spells[2].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
@@ -805,12 +805,12 @@ class KormokAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -902,7 +902,7 @@ class VectusAI : public CreatureAIScript
 			spells[2].perctrigger = 0.0f;
 			spells[2].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			FRENZY_LIMITER = 0;
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
@@ -917,13 +917,13 @@ class VectusAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			FRENZY_LIMITER = 0;
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			if(_unit->GetHealthPct() <= 25 && !FRENZY_LIMITER)
 			{
@@ -1019,7 +1019,7 @@ class LordAlexeiBarovAI : public CreatureAIScript
 			spells[2].perctrigger = 8.0f;
 			spells[2].attackstoptimer = 2000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
@@ -1032,12 +1032,12 @@ class LordAlexeiBarovAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1136,7 +1136,7 @@ class LorekeeperPolkeltAI : public CreatureAIScript
 			spells[3].attackstoptimer = 1000;
 		}
 
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 		}
@@ -1148,12 +1148,12 @@ class LorekeeperPolkeltAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);
@@ -1245,7 +1245,7 @@ class DarkmasterGandlingAI : public CreatureAIScript
 			spells[2].perctrigger = 0.0f;
 			spells[2].attackstoptimer = 1000;
 		}
-		void OnCombatStart(Unit* mTarget)
+		void EnterCombat(Unit* mTarget)
 		{
 			RegisterAIUpdateEvent(_unit->GetBaseAttackTime(MELEE));
 			_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
@@ -1258,12 +1258,12 @@ class DarkmasterGandlingAI : public CreatureAIScript
 			RemoveAIUpdateEvent();
 		}
 
-		void OnDied(Unit* mKiller)
+		void JustDied(Unit* mKiller)
 		{
 			RemoveAIUpdateEvent();
 		}
 
-		void AIUpdate()
+		void UpdateAI()
 		{
 			float val = RandomFloat(100.0f);
 			SpellCast(val);

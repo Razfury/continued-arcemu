@@ -227,10 +227,10 @@ class FelmystAI : public MoonScriptBossAI
 			AddEmote(Event_OnTaunt, "I am stronger than ever before!", Text_Yell, 12479);
 		}
 
-		void OnCombatStart(Unit* pTarget)
+		void EnterCombat(Unit* pTarget)
 		{
 			ApplyAura(FELMYST_NOXIOUS_FUME);
-			ParentClass::OnCombatStart(pTarget);
+			ParentClass::EnterCombat(pTarget);
 		}
 };
 
@@ -260,14 +260,14 @@ class LadySacrolashAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "I... fade.", Text_Yell, 0); // Wasn't able to find sound for this text
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			AICreatureScript* mGrandWarlockAlythess = GetNearestCreature(CN_GRAND_WARLOCK_ALYTHESS);
 			if(mGrandWarlockAlythess != NULL && mGrandWarlockAlythess->IsAlive())
 			{
 				mGrandWarlockAlythess->Emote("Sacrolash!", Text_Yell, 12492);
 			}
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 
@@ -297,14 +297,14 @@ class GrandWarlockAlythessAI : public MoonScriptBossAI
 			AddEmote(Event_OnDied, "I... fade.", Text_Yell, 0); // Wasn't able to find sound for this text
 		}
 
-		void OnDied(Unit* pKiller)
+		void JustDied(Unit* pKiller)
 		{
 			AICreatureScript* mLadySacrolash = GetNearestCreature(CN_LADY_SACROLASH);
 			if(mLadySacrolash != NULL && mLadySacrolash->IsAlive())
 			{
 				mLadySacrolash->Emote("Alythess! Your fire burns within me!", Text_Yell, 12488);
 			}
-			ParentClass::OnDied(pKiller);
+			ParentClass::JustDied(pKiller);
 		}
 };
 
