@@ -2139,6 +2139,32 @@ void ApplyNormalFixes()
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	}
 
+	//Righteous Vengeance
+	sp = dbcSpell.LookupEntryForced(53380);
+	if (sp != NULL)
+	{
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 61840;
+		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+		sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
+	}
+	sp = dbcSpell.LookupEntryForced(53381);
+	if (sp != NULL)
+	{
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 61840;
+		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+		sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
+	}
+	sp = dbcSpell.LookupEntryForced(53382);
+	if (sp != NULL)
+	{
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 61840;
+		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+		sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
+	}
+
 	/**********************************************************
 	 *	Blessing of Light
 	 **********************************************************
