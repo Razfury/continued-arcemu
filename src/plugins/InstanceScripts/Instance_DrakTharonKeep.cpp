@@ -294,7 +294,6 @@ class TrollgoreAI : public AICreatureScript
 
 
 private:
-	MoonInstanceScript* mInstance = GetInstanceScript();
 	bool _consumptionJunction;
 };
 
@@ -366,6 +365,10 @@ class NovosTheSummonerAI : public AICreatureScript
 		//_unit->RemoveAllAuras();
 		_unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+		if (mInstance)
+			mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
+
 		ParentClass::EnterCombat(mAttacker);
 	}
 
@@ -386,6 +389,8 @@ class NovosTheSummonerAI : public AICreatureScript
 		_unit->m_countHelper = 0;
 		_unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		if (mInstance)
+			mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_Performed);
 		ParentClass::OnCombatStop(mAttacker);
 	}
 
@@ -571,6 +576,51 @@ class CRYSTAL_HANDLER_AI : public CreatureAIScript
 		vector< ScriptSpell* > spells;
 };
 
+class FetidTrollAI : public AICreatureScript
+{
+public:
+	AI_CREATURE_SCRIPT_FUNCTION(FetidTrollAI, AICreatureScript);
+	FetidTrollAI(Creature* pCreature) : AICreatureScript(pCreature)
+	{
+	}
+
+	void OnLoad()
+	{
+		_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
+		ParentClass::OnLoad();
+	}
+};
+
+class HulkingCorpseAI : public AICreatureScript
+{
+public:
+	AI_CREATURE_SCRIPT_FUNCTION(HulkingCorpseAI, AICreatureScript);
+	HulkingCorpseAI(Creature* pCreature) : AICreatureScript(pCreature)
+	{
+	}
+
+	void OnLoad()
+	{
+		_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
+		ParentClass::OnLoad();
+	}
+};
+
+class RisenShadowcasterAI : public AICreatureScript
+{
+public:
+	AI_CREATURE_SCRIPT_FUNCTION(RisenShadowcasterAI, AICreatureScript);
+	RisenShadowcasterAI(Creature* pCreature) : AICreatureScript(pCreature)
+	{
+	}
+
+	void OnLoad()
+	{
+		_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
+		ParentClass::OnLoad();
+	}
+};
+
 enum KingDredSpells
 {
 	SPELL_BELLOWING_ROAR = 22686, // fears the group, can be resisted/dispelled
@@ -613,7 +663,6 @@ class KING_DRED_AI : public AICreatureScript
 		AI_CREATURE_SCRIPT_FUNCTION(KING_DRED_AI, AICreatureScript);
 		KING_DRED_AI(Creature* pCreature) : AICreatureScript(pCreature)
 		{
-			Initialize();
 		}
 
 		void Initialize()
@@ -631,6 +680,18 @@ class KING_DRED_AI : public AICreatureScript
 			events.ScheduleEvent(EVENT_FEARSOME_ROAR, urand(10000, 20000));
 			events.ScheduleEvent(EVENT_PIERCING_SLASH, 17000);
 			events.ScheduleEvent(EVENT_RAPTOR_CALL, urand(20000, 25000));
+
+			if (mInstance)
+				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
+		}
+
+		void OnCombatStop(Unit* mAttacker)
+		{
+			Initialize();
+
+			if (mInstance)
+				mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_Performed);
+			ParentClass::OnCombatStop(mAttacker);
 		}
 
 		void DoAction(int32 action)
@@ -678,11 +739,25 @@ class KING_DRED_AI : public AICreatureScript
 					_unit->DoCastVictim(SPELL_RAPTOR_CALL);
 					if (RandomUInt(1) == 1)
 					{
-						SpawnCreature(NPC_DRAKKARI_GUTRIPPER, _unit->GetPositionX(), _unit->GetPositionY() - 3, _unit->GetPositionZ(), _unit->GetOrientation(), true, 1);
+						Unit* Gutripper = _unit->GetMapMgr()->GetInterface()->SpawnCreature(NPC_DRAKKARI_GUTRIPPER, -522.02f, -718.89f, 30.26f, 2.41f, true, false, 0, 0);
+						if (Gutripper)
+						{
+							if (GetRandomPlayerTarget())
+							{
+								Gutripper->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
+							}
+						}
 					}
 					else
 					{
-						SpawnCreature(NPC_DRAKKARI_SCYTHECLAW, _unit->GetPositionX(), _unit->GetPositionY() - 5, _unit->GetPositionZ(), _unit->GetOrientation(), true, 1);
+						Unit* Scytheclaw = _unit->GetMapMgr()->GetInterface()->SpawnCreature(NPC_DRAKKARI_SCYTHECLAW, -522.02f, -718.89f, 30.26f, 2.41f, true, false, 0, 0);
+						if (Scytheclaw)
+						{
+							if (GetRandomPlayerTarget())
+							{
+								Scytheclaw->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
+							}
+						}
 					}
 					events.ScheduleEvent(EVENT_RAPTOR_CALL, urand(20000, 25000));
 					break;
@@ -843,7 +918,17 @@ public:
 		events.ScheduleEvent(EVENT_CURSE_OF_LIFE, 1000);
 		events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(14000, 18000));
 		events.ScheduleEvent(EVENT_SHADOW_VOLLEY, urand(8000, 10000));
+
+		if (mInstance)
+			mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_InProgress);
 		ParentClass::EnterCombat(who);
+	}
+
+	void OnCombatStop(Unit* mAttacker)
+	{
+		if (mInstance)
+			mInstance->SetInstanceData(Data_EncounterState, _unit->GetEntry(), State_Performed);
+		ParentClass::OnCombatStop(mAttacker);
 	}
 
 	void KilledUnit(Unit* who)
@@ -956,6 +1041,13 @@ void SetupDrakTharonKeep(ScriptMgr* mgr)
 	//////////////////////////////////////////
 	mgr->register_creature_script(NPC_DRAKKARI_GUTRIPPER, &npc_drakkari_gutripper::Create);
 	mgr->register_creature_script(NPC_DRAKKARI_SCYTHECLAW, &npc_drakkari_scytheclaw::Create);
+	mgr->register_creature_script(27597, &HulkingCorpseAI::Create);
+	mgr->register_creature_script(27600, &RisenShadowcasterAI::Create);
+	mgr->register_creature_script(27598, &FetidTrollAI::Create);
+
+	//Instance
+	mgr->register_instance_script(MAP_DRAK_THARON_KEEP, &DrakTharonKeepScript::Create);
+
 	//////////////////////////////////////////
 	// BOSSES
 	//////////////////////////////////////////

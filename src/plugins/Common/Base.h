@@ -671,6 +671,8 @@ class AICreatureScript : public CreatureAIScript
 			return NULL;
 		}
 
+		MoonInstanceScript* mInstance = GetInstanceScript();
+
 		//Movement
 		bool					GetCanMove();
 		void					SetCanMove(bool pCanMove);
