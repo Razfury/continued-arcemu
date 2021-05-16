@@ -586,6 +586,7 @@ public:
 
 	void OnLoad()
 	{
+		if (GetRandomPlayerTarget())
 		_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
 		ParentClass::OnLoad();
 	}
@@ -601,6 +602,7 @@ public:
 
 	void OnLoad()
 	{
+		if (GetRandomPlayerTarget())
 		_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
 		ParentClass::OnLoad();
 	}
@@ -616,6 +618,7 @@ public:
 
 	void OnLoad()
 	{
+		if (GetRandomPlayerTarget())
 		_unit->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1, 0);
 		ParentClass::OnLoad();
 	}
@@ -910,7 +913,6 @@ public:
 
 	void EnterCombat(Unit* who)
 	{
-		RegisterAIUpdateEvent(1000);
 		Emote("Tharon'ja sees all! The work of mortals shall not end the eternal dynasty!", Text_Yell, 13862);
 		orginalmodelid = _unit->GetDisplayId();
 
@@ -1028,6 +1030,7 @@ public:
 				break;
 			}
 		}
+		ParentClass::UpdateAI();
 	}
 	protected:
 		uint32 orginalmodelid = 0;
