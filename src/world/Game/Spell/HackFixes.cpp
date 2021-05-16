@@ -751,7 +751,7 @@ void ApplyNormalFixes()
 				startofid += strlen("for $");
 				sp->EffectTriggerSpell[0] = atoi(startofid);   //get new lightning shield trigger id
 			}
-			sp->proc_interval = 3000; //few seconds
+			sp->proc_interval = urand(2500, 5000); //few seconds
 		}
 		//mage ignite talent should proc only on some chances
 		else if(strstr(sp->Name, "Ignite") && sp->Id >= 11119 && sp->Id <= 12848 && sp->EffectApplyAuraName[0] == SPELL_AURA_DUMMY)
