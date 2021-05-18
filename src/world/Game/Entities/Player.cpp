@@ -860,6 +860,13 @@ bool Player::Create(WorldPacket & data)
 	return true;
 }
 
+void Player::CheckAuraUpdates()
+{
+	if (HasAura(AURA_ID_JUGGERNAUT))
+	{
+		SendAuraUpdate(FindAura(AURA_ID_JUGGERNAUT)->m_auraSlot, false);
+	}
+}
 
 void Player::Update(uint32 p_time)
 {
@@ -870,6 +877,8 @@ void Player::Update(uint32 p_time)
 	uint32 mstime = Arcemu::Shared::Util::getMSTime();
 
 	RemoveGarbageItems();
+
+	CheckAuraUpdates();
 
 	if(m_attacking)
 	{

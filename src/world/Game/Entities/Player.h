@@ -709,6 +709,11 @@ enum DUEL_WINNER
 #define PLAYER_ATTACK_TIMEOUT_INTERVAL	5000
 #define PLAYER_FORCED_RESURRECT_INTERVAL	360000 // 1000*60*6= 6 minutes
 
+enum AuraUpdateIds
+{
+	AURA_ID_JUGGERNAUT = 64976
+};
+
 struct PlayerSkill
 {
 	skilllineentry* Skill;
@@ -873,6 +878,8 @@ class SERVER_DECL Player : public Unit
 
 
 		void RecalculateHonor();
+
+		void CheckAuraUpdates();
 
 		// Summon and Appear Blocking
 		void DisableSummon(bool disable) { disableSummon = disable; }
