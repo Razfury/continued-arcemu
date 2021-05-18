@@ -2971,7 +2971,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 			{
 				if(GetProto()->DispelType == DISPEL_ALL)
 				{
-					unitTarget->HandleProc(PROC_ON_PRE_DISPELL_AURA_VICTIM, u_caster , GetProto(), m_triggeredSpell, aursp->Id);
+					unitTarget->HandleProc(PROC_ON_PRE_DISPELL_AURA_RECEIVED, u_caster , GetProto(), m_triggeredSpell, aursp->Id);
 
 					dispelledSpells.push_back(aursp->Id);
 
@@ -2983,7 +2983,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 				}
 				else if(aursp->DispelType == GetProto()->EffectMiscValue[i])
 				{
-					unitTarget->HandleProc(PROC_ON_PRE_DISPELL_AURA_VICTIM, u_caster , GetProto(), m_triggeredSpell, aursp->Id);
+					unitTarget->HandleProc(PROC_ON_PRE_DISPELL_AURA_RECEIVED, u_caster , GetProto(), m_triggeredSpell, aursp->Id);
 
 					dispelledSpells.push_back(aursp->Id);
 

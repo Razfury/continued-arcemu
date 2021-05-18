@@ -24,7 +24,7 @@ class TwinBladesOfAzzinothSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(TwinBladesOfAzzinothSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			if(! mTarget->IsPlayer())
 				return;

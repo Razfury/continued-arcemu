@@ -82,13 +82,13 @@ class SpellProc
 		// Called after proc chance is rolled
 		// Return false so Unit::HandleProc execute subsequent statements
 		// Return true if this handle everything, so Unit::HandleProc skips to next iteration
-		virtual bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		virtual bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			return false;
 		}
 
 		// Called just after this object is created. Usefull for initialize object members
-		virtual void Init(Object* obj)
+		virtual void InitializeProc(Object* obj)
 		{
 		}
 

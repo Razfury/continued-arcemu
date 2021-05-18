@@ -1151,7 +1151,7 @@ uint32 Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell, boo
 		int dmg_overwrite[3] = { 0, 0, 0 };
 
 		// give spell_proc a chance to handle the effect
-		if(spell_proc->DoEffect(victim, CastingSpell, flag, dmg, abs, dmg_overwrite, weapon_damage_type))
+		if(spell_proc->ProcEffectOverride(victim, CastingSpell, flag, dmg, abs, dmg_overwrite, weapon_damage_type))
 			continue;
 
 		//these are player talents. Fuckem they pull the emu speed down
@@ -1455,7 +1455,7 @@ uint32 Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell, boo
 					{
 						bool can_proc_now = false;
 						//if we proced on spell tick
-						if(flag & PROC_ON_SPELL_HIT_VICTIM)
+						if(flag & PROC_ON_SPELL_HIT_RECEIVED)
 						{
 							if(!CastingSpell)
 								continue;
@@ -3517,7 +3517,7 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 			CALL_SCRIPT_EVENT(this, OnDodged)(this);
 			targetEvent = 1;
 			vstate = DODGE;
-			vproc |= PROC_ON_DODGE_VICTIM;
+			vproc |= PROC_ON_DODGE_RECEIVED;
 			pVictim->Emote(EMOTE_ONESHOT_PARRYUNARMED);			// Animation
 			if(this->IsPlayer() && this->getClass() == WARRIOR)
 			{
@@ -3579,16 +3579,16 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 			else
 			{
 //--------------------------------state proc initialization---------------------------------
-				vproc |= PROC_ON_ANY_DAMAGE_VICTIM;
+				vproc |= PROC_ON_ANY_DAMAGE_RECEIVED;
 				if(weapon_damage_type != RANGED)
 				{
 					aproc |= PROC_ON_MELEE_ATTACK;
-					vproc |= PROC_ON_MELEE_ATTACK_VICTIM;
+					vproc |= PROC_ON_MELEE_ATTACK_RECEIVED;
 				}
 				else
 				{
 					aproc |= PROC_ON_RANGED_ATTACK;
-					vproc |= PROC_ON_RANGED_ATTACK_VICTIM;
+					vproc |= PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(ability && ability->Id == 3018 && IsPlayer() && getClass() == HUNTER)
 						aproc |= PROC_ON_AUTO_SHOT_HIT;
 				}
@@ -3701,7 +3701,7 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 								{
 									CALL_SCRIPT_EVENT(pVictim, OnTargetBlocked)(this, blocked_damage);
 									CALL_SCRIPT_EVENT(this, OnBlocked)(pVictim, blocked_damage);
-									vproc |= PROC_ON_BLOCK_VICTIM;
+									vproc |= PROC_ON_BLOCK_RECEIVED;
 								}
 								if(pVictim->IsPlayer())  //not necessary now but we'll have blocking mobs in future
 								{
@@ -3759,12 +3759,12 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 							if(pVictim->IsCreature() && TO< Creature* >(pVictim)->GetCreatureInfo()->Rank != ELITE_WORLDBOSS)
 								pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
 
-							vproc |= PROC_ON_CRIT_HIT_VICTIM;
+							vproc |= PROC_ON_CRIT_HIT_RECEIVED;
 							aproc |= PROC_ON_CRIT_ATTACK;
 
 							if(weapon_damage_type == RANGED)
 							{
-								vproc |= PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+								vproc |= PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 								aproc |= PROC_ON_RANGED_CRIT_ATTACK;
 							}
 
@@ -3870,7 +3870,7 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 	uint32 resisted_dmg;
 
 	//damage shield must come before handleproc to not loose 1 charge : spell gets removed before last charge
-	if((realdamage > 0 || vproc & PROC_ON_BLOCK_VICTIM) && weapon_damage_type != OFFHAND)
+	if((realdamage > 0 || vproc & PROC_ON_BLOCK_RECEIVED) && weapon_damage_type != OFFHAND)
 	{
 		pVictim->HandleProcDmgShield(vproc, this);
 		HandleProcDmgShield(aproc, pVictim);
@@ -4015,8 +4015,8 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 		if(realdamage)
 		{
 			DealDamage(pVictim, realdamage, 0, targetEvent, 0);
-			//pVictim->HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,this);
-			//		HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,pVictim);
+			//pVictim->HandleProcDmgShield(PROC_ON_MELEE_ATTACK_RECEIVED,this);
+			//		HandleProcDmgShield(PROC_ON_MELEE_ATTACK_RECEIVED,pVictim);
 
 			if(pVictim->GetCurrentSpell())
 				pVictim->GetCurrentSpell()->AddTime(0);

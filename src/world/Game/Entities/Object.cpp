@@ -967,7 +967,7 @@ void Object::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellID, uint32 damage
 	bool critical = false;
 
 	uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION; /*| PROC_ON_SPELL_HIT;*/
-	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_VICTIM; /*| PROC_ON_SPELL_HIT_VICTIM;*/
+	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_RECEIVED; /*| PROC_ON_SPELL_HIT_RECEIVED;*/
 
 	//A school damage is not necessarily magic
 	switch(spellInfo->Spell_Dmg_Type)
@@ -975,21 +975,21 @@ void Object::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellID, uint32 damage
 		case SPELL_DMG_TYPE_RANGED:
 			{
 				aproc |= PROC_ON_RANGED_ATTACK;
-				vproc |= PROC_ON_RANGED_ATTACK_VICTIM;
+				vproc |= PROC_ON_RANGED_ATTACK_RECEIVED;
 			}
 			break;
 
 		case SPELL_DMG_TYPE_MELEE:
 			{
 				aproc |= PROC_ON_MELEE_ATTACK;
-				vproc |= PROC_ON_MELEE_ATTACK_VICTIM;
+				vproc |= PROC_ON_MELEE_ATTACK_RECEIVED;
 			}
 			break;
 
 		case SPELL_DMG_TYPE_MAGIC:
 			{
 				aproc |= PROC_ON_SPELL_HIT;
-				vproc |= PROC_ON_SPELL_HIT_VICTIM;
+				vproc |= PROC_ON_SPELL_HIT_RECEIVED;
 			}
 			break;
 	}
@@ -1028,21 +1028,21 @@ void Object::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellID, uint32 damage
 				case SPELL_DMG_TYPE_RANGED:
 					{
 						aproc |= PROC_ON_RANGED_CRIT_ATTACK;
-						vproc |= PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+						vproc |= PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 					}
 					break;
 
 				case SPELL_DMG_TYPE_MELEE:
 					{
 						aproc |= PROC_ON_CRIT_ATTACK;
-						vproc |= PROC_ON_CRIT_HIT_VICTIM;
+						vproc |= PROC_ON_CRIT_HIT_RECEIVED;
 					}
 					break;
 
 				case SPELL_DMG_TYPE_MAGIC:
 					{
 						aproc |= PROC_ON_SPELL_CRIT_HIT;
-						vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+						vproc |= PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 					}
 					break;
 			}

@@ -70,7 +70,7 @@ bool DamageShield(uint32 i, Aura* pAura, bool apply)
 	Unit* target = pAura->GetTarget();
 
 	if(apply)
-		target->AddProcTriggerSpell(59653, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_BLOCK_VICTIM, 0, NULL, NULL);
+		target->AddProcTriggerSpell(59653, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_BLOCK_RECEIVED, 0, NULL, NULL);
 	else
 		target->RemoveProcTriggerSpell(59653, pAura->m_casterGuid);
 

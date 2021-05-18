@@ -481,13 +481,13 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "chance on hit"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "takes damage"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "attackers when hit"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "character strikes an enemy"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "strike you with a melee attack"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "target casts a spell"))
 						pr |= PROC_ON_CAST_SPELL;
 					if(strstr(sp->Description, "your harmful spells land"))
@@ -499,9 +499,9 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "being able to resurrect"))
 						pr |= PROC_ON_DIE;
 					if(strstr(sp->Description, "any damage caused"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "the next melee attack against the caster"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "when successfully hit"))
 						pr |= PROC_ON_MELEE_ATTACK ;
 					if(strstr(sp->Description, "an enemy on hit"))
@@ -513,17 +513,17 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "on a successful hit"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "damage to attacker on hit"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "on a hit"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "strikes you with a melee attack"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "when caster takes damage"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "when the caster is using melee attacks"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "when struck in combat") || strstr(sp->Description, "When struck in combat"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "successful melee attack"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "chance per attack"))
@@ -531,9 +531,9 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "chance per hit"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "that strikes a party member"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "when hit by a melee attack"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "landing a melee critical strike"))
 						pr |= PROC_ON_CRIT_ATTACK;
 					if(strstr(sp->Description, "your critical strikes"))
@@ -547,25 +547,25 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "damage with your Sword"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "when struck in melee combat"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "any successful spell cast against the priest"))
-						pr |= PROC_ON_SPELL_HIT_VICTIM;
+						pr |= PROC_ON_SPELL_HIT_RECEIVED;
 					if(strstr(sp->Description, "the next melee attack on the caster"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "striking melee or ranged attackers"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "when damaging an enemy in melee"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "victim of a critical strike"))
-						pr |= PROC_ON_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "on successful melee or ranged attack"))
 						pr |= PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
 					if(strstr(sp->Description, "enemy that strikes you in melee"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "after getting a critical strike"))
 						pr |= PROC_ON_CRIT_ATTACK;
 					if(strstr(sp->Description, "whenever damage is dealt to you"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "when ranged or melee damage is dealt"))
 						pr |= PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
 					if(strstr(sp->Description, "damaging melee attacks"))
@@ -577,20 +577,20 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "Chance on melee"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "spell criticals against you"))
-						pr |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "after being struck by a melee or ranged critical hit"))
-						pr |= PROC_ON_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "on a critical hit"))
 						if(strstr(sp->Description, "critical hit"))
 							pr |= PROC_ON_CRIT_ATTACK;
 					if(strstr(sp->Description, "strikes the caster"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "a spell, melee or ranged attack hits the caster"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "after dealing a critical strike"))
 						pr |= PROC_ON_CRIT_ATTACK;
 					if(strstr(sp->Description, "each melee or ranged damage hit against the priest"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "a chance to deal additional"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "chance to get an extra attack"))
@@ -602,7 +602,7 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "giving each melee attack a chance"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "damage when hit"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM; //maybe melee damage ?
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED; //maybe melee damage ?
 					if(strstr(sp->Description, "gives your"))
 					{
 						if(strstr(sp->Description, "finishing moves"))
@@ -620,13 +620,13 @@ void ApplyNormalFixes()
 					else if(strstr(sp->Description, "chance to add an additional combo"))
 						pr |= PROC_ON_CAST_SPELL;
 					if(strstr(sp->Description, "victim of a melee or ranged critical strike"))
-						pr |= PROC_ON_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "getting a critical effect from"))
-						pr |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "damaging attack is taken"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "struck by a Stun or Immobilize"))
-						pr |= PROC_ON_SPELL_HIT_VICTIM;
+						pr |= PROC_ON_SPELL_HIT_RECEIVED;
 					if(strstr(sp->Description, "melee critical strike"))
 						pr |= PROC_ON_CRIT_ATTACK;
 					if(strstr(sp->Name, "Bloodthirst"))
@@ -634,13 +634,13 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "experience or honor"))
 						pr |= PROC_ON_GAIN_EXPIERIENCE;
 					if(strstr(sp->Description, "hit by a melee or ranged attack"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "enemy strikes the caster"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "melee and ranged attacks against you"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "when a block occurs"))
-						pr |= PROC_ON_BLOCK_VICTIM;
+						pr |= PROC_ON_BLOCK_RECEIVED;
 					if(strstr(sp->Description, "dealing a critical strike from a weapon swing, spell, or ability"))
 						pr |= PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
 					if(strstr(sp->Description, "dealing a critical strike from a weapon swing, spell, or ability"))
@@ -648,7 +648,7 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "shadow bolt critical strikes increase shadow damage"))
 						pr |= PROC_ON_SPELL_CRIT_HIT;
 					if(strstr(sp->Description, "after being hit with a shadow or fire spell"))
-						pr |= PROC_ON_SPELL_LAND_VICTIM;
+						pr |= PROC_ON_SPELL_LAND_RECEIVED;
 					if(strstr(sp->Description, "giving each melee attack"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "each strike has"))
@@ -664,15 +664,15 @@ void ApplyNormalFixes()
 					if(strstr(sp->Description, "on successful spellcast"))
 						pr |= PROC_ON_CAST_SPELL;
 					if(strstr(sp->Description, "your spell criticals have"))
-						pr |= PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "after dodging their attack"))
 					{
-						pr |= PROC_ON_DODGE_VICTIM;
+						pr |= PROC_ON_DODGE_RECEIVED;
 						if(strstr(sp->Description, "add a combo point"))
 							pr |= PROC_TARGET_SELF;
 					}
 					if(strstr(sp->Description, "fully resisting"))
-						pr |= PROC_ON_RESIST_VICTIM;
+						pr |= PROC_ON_RESIST_RECEIVED;
 					if(strstr(sp->Description, "Your Shadow Word: Pain, Mind Flay and Vampiric Touch spells also cause the target"))
 						pr |= PROC_ON_CAST_SPELL;
 					if(strstr(sp->Description, "chance on spell hit"))
@@ -683,35 +683,35 @@ void ApplyNormalFixes()
 					//proc dmg flags
 					//////////////////////////////////////////////////
 					if(strstr(sp->Description, "each attack blocked"))
-						pr |= PROC_ON_BLOCK_VICTIM;
+						pr |= PROC_ON_BLOCK_RECEIVED;
 					if(strstr(sp->Description, "into flame, causing an additional"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "victim of a critical melee strike"))
-						pr |= PROC_ON_CRIT_HIT_VICTIM;
+						pr |= PROC_ON_CRIT_HIT_RECEIVED;
 					if(strstr(sp->Description, "damage to melee attackers"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "target blocks a melee attack"))
-						pr |= PROC_ON_BLOCK_VICTIM;
+						pr |= PROC_ON_BLOCK_RECEIVED;
 					if(strstr(sp->Description, "ranged and melee attacks to deal"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "damage on hit"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "chance on hit"))
 						pr |= PROC_ON_MELEE_ATTACK;
 					if(strstr(sp->Description, "after being hit by any damaging attack"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "striking melee or ranged attackers"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "damage to attackers when hit"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "striking melee attackers"))
-						pr |= PROC_ON_MELEE_ATTACK_VICTIM;
+						pr |= PROC_ON_MELEE_ATTACK_RECEIVED;
 					if(strstr(sp->Description, "whenever the caster takes damage"))
-						pr |= PROC_ON_ANY_DAMAGE_VICTIM;
+						pr |= PROC_ON_ANY_DAMAGE_RECEIVED;
 					if(strstr(sp->Description, "damage on every attack"))
 						pr |= PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
 					if(strstr(sp->Description, "chance to reflect Fire spells"))
-						pr |= PROC_ON_SPELL_HIT_VICTIM;
+						pr |= PROC_ON_SPELL_HIT_RECEIVED;
 					if(strstr(sp->Description, "hunter takes on the aspects of a hawk"))
 						pr |= PROC_TARGET_SELF | PROC_ON_RANGED_ATTACK;
 					if(strstr(sp->Description, "successful auto shot attacks"))
@@ -788,7 +788,7 @@ void ApplyNormalFixes()
 				startofid += strlen("cause $");
 				sp->EffectTriggerSpell[0] = atoi(startofid);
 				sp->EffectTriggerSpell[1] = sp->EffectTriggerSpell[0]; //later versions of this spell changed to eff[1] the aura
-				sp->procFlags = uint32(PROC_ON_MELEE_ATTACK_VICTIM);
+				sp->procFlags = uint32(PROC_ON_MELEE_ATTACK_RECEIVED);
 			}
 		}
 		else if(strstr(sp->Name, "Firestone Passive"))
@@ -1256,8 +1256,8 @@ void ApplyNormalFixes()
 		// Nature's Guardian
 		if(sp->NameHash == SPELL_HASH_NATURE_S_GUARDIAN)
 		{
-			sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM |
-			                PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_ANY_DAMAGE_VICTIM;
+			sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_MELEE_ATTACK_RECEIVED |
+			                PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_ANY_DAMAGE_RECEIVED;
 			sp->proc_interval = 5000;
 			sp->EffectTriggerSpell[0] = 31616;
 		}
@@ -1560,7 +1560,7 @@ void ApplyNormalFixes()
 		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA; //aura
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 22858; //evil , but this is good for us :D
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM; //add procflag here since this was not processed with the others !
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED; //add procflag here since this was not processed with the others !
 	}
 
 	// Warrior - Second Wind should trigger on self
@@ -1736,19 +1736,19 @@ void ApplyNormalFixes()
 	// Warrior - Enrage Procflags
 	sp = CheckAndReturnSpellEntry(12317);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(13045);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(13046);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(13047);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(13048);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
 
 	/* Remove the charges only on melee attacks */
 	sp = CheckAndReturnSpellEntry(12880);
@@ -1770,13 +1770,13 @@ void ApplyNormalFixes()
 	// Warrior - Blood Craze Procflags
 	sp = CheckAndReturnSpellEntry(16487);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(16489);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(16492);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 
 	// Warrior - Bloodthirst new version is ok but old version is wrong from now on :(
 	sp = CheckAndReturnSpellEntry(23881);
@@ -1889,12 +1889,12 @@ void ApplyNormalFixes()
 	// Improved Defensive Stance Rank 1
 	sp = CheckAndReturnSpellEntry(29593);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_VICTIM | PROC_ON_BLOCK_VICTIM;
+		sp->procFlags = PROC_ON_DODGE_RECEIVED | PROC_ON_BLOCK_RECEIVED;
 
 	// Improved Defensive Stance Rank 2
 	sp = CheckAndReturnSpellEntry(29594);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_VICTIM | PROC_ON_BLOCK_VICTIM;
+		sp->procFlags = PROC_ON_DODGE_RECEIVED | PROC_ON_BLOCK_RECEIVED;
 
 	// Improved Revenge Rank 1
 	sp = CheckAndReturnSpellEntry(12797);
@@ -2119,7 +2119,7 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(53601);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 		sp->proc_interval = 6000;
 		sp->EffectTriggerSpell[0] = 58597;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
@@ -2202,23 +2202,23 @@ void ApplyNormalFixes()
 	//Paladin - Reckoning
 	sp = CheckAndReturnSpellEntry(20177);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 
 	sp = CheckAndReturnSpellEntry(20179);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 
 	sp = CheckAndReturnSpellEntry(20180);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 
 	sp = CheckAndReturnSpellEntry(20181);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 
 	sp = CheckAndReturnSpellEntry(20182);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 
 	//Paladin - Reckoning Effect
 	sp = CheckAndReturnSpellEntry(20178);
@@ -2278,15 +2278,15 @@ void ApplyNormalFixes()
 	//Paladin - Blessed Life ranks 1-3
 	sp = CheckAndReturnSpellEntry(31828);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 
 	sp = CheckAndReturnSpellEntry(31829);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 
 	sp = CheckAndReturnSpellEntry(31830);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 
 	//Palarin - Light's Grace
 	sp = CheckAndReturnSpellEntry(31833);
@@ -2305,14 +2305,14 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(31785);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_SPELL_LAND_VICTIM | static_cast<uint32>(PROC_TARGET_SELF) ;
+		sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF) ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	sp = CheckAndReturnSpellEntry(33776);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_SPELL_LAND_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
@@ -2860,12 +2860,12 @@ void ApplyNormalFixes()
 	/* aspect of the pack - change to AA */
 	sp = CheckAndReturnSpellEntry(13159);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 
 	/* aspect of the cheetah - add proc flags */
 	sp = CheckAndReturnSpellEntry(5118);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 
 	// Feed pet
 	sp = CheckAndReturnSpellEntry(6991);
@@ -2915,7 +2915,6 @@ void ApplyNormalFixes()
 	//////////////////////////////////////////
 	// ROGUE								//
 	//////////////////////////////////////////
-
 	// Insert rogue spell fixes here
 
 	//Rogue - Blade Twisting Rank 1
@@ -3105,21 +3104,21 @@ void ApplyNormalFixes()
 	if(sp != NULL)
 	{
 		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
 	}
 	sp = CheckAndReturnSpellEntry(48110);
 	if(sp != NULL)
 	{
 		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
 	}
 	sp = CheckAndReturnSpellEntry(48111);
 	if(sp != NULL)
 	{
 		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
 	}
 	sp = CheckAndReturnSpellEntry(33110);
@@ -3267,50 +3266,50 @@ void ApplyNormalFixes()
 	if(sp != NULL)
 	{
 		sp->EffectTriggerSpell[0] = 27813;
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	}
 	sp = CheckAndReturnSpellEntry(27815);
 	if(sp != NULL)
 	{
 		sp->EffectTriggerSpell[0] = 27817;
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	}
 	sp = CheckAndReturnSpellEntry(27816);
 	if(sp != NULL)
 	{
 		sp->EffectTriggerSpell[0] = 27818;
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	}
 	//priest- Blessed Resilience
 	sp = CheckAndReturnSpellEntry(33142);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 		sp->procChance = 20;
 	}
 	sp = CheckAndReturnSpellEntry(33145);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 		sp->procChance = 40;
 	}
 	sp = CheckAndReturnSpellEntry(33146);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 		sp->procChance = 60;
 	}
 
 	//priest- Focused Will
 	sp = CheckAndReturnSpellEntry(45234);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	sp = CheckAndReturnSpellEntry(45243);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	sp = CheckAndReturnSpellEntry(45244);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 
 	//Priest - Wand Specialization
 	sp = CheckAndReturnSpellEntry(14524);
@@ -3525,7 +3524,7 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(17364);
 	if(sp != NULL && sp->Id == 17364)
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
+		sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED ;
 	}
 
 	/**********************************************************
@@ -3599,13 +3598,13 @@ void ApplyNormalFixes()
 	 **********************************************************/
 	sp = CheckAndReturnSpellEntry(29062);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(29064);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
 	sp = CheckAndReturnSpellEntry(29065);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
 
 	//Shaman - Shamanistic Focus
 	// needs to be fixed (doesn't need to proc, it now just reduces mana cost always by %)
@@ -4187,7 +4186,7 @@ void ApplyNormalFixes()
 	if(sp != NULL)
 	{
 		// passive rank: 11103, 12357, 12358 ,12359,12360 :D
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_HIT;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_HIT;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
 		sp->EffectImplicitTargetB[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
 		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
@@ -4565,19 +4564,19 @@ void ApplyNormalFixes()
 	if(sp != NULL)
 	{
 		sp->proc_interval = 8000;
-		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags |= PROC_ON_MELEE_ATTACK_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 	}
 	sp = CheckAndReturnSpellEntry(34938);
 	if(sp != NULL)
 	{
 		sp->proc_interval = 8000;
-		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags |= PROC_ON_MELEE_ATTACK_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 	}
 	sp = CheckAndReturnSpellEntry(34939);
 	if(sp != NULL)
 	{
 		sp->proc_interval = 8000;
-		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | static_cast<uint32>(PROC_TARGET_SELF);
+		sp->procFlags |= PROC_ON_MELEE_ATTACK_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
 	}
 	sp = CheckAndReturnSpellEntry(34936);
 	if(sp != NULL)
@@ -4644,7 +4643,7 @@ void ApplyNormalFixes()
 	{
 		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[1] = 27285;
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_DIE;
+		sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_DIE;
 		sp->procChance = 100;
 	}
 
@@ -5291,35 +5290,35 @@ void ApplyNormalFixes()
 	// Druid - Nature's Grasp //sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	sp = CheckAndReturnSpellEntry(16689);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(16810);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(16811);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(16812);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(16813);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(17329);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(27009);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	sp = CheckAndReturnSpellEntry(53312);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
 
 	// Druid - Force of Nature
 	sp = CheckAndReturnSpellEntry(33831);
@@ -5337,15 +5336,15 @@ void ApplyNormalFixes()
 	// Druid - Natural Reaction
 	sp = CheckAndReturnSpellEntry(57878);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_VICTIM;
+		sp->procFlags = PROC_ON_DODGE_RECEIVED;
 
 	sp = CheckAndReturnSpellEntry(57880);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_VICTIM;
+		sp->procFlags = PROC_ON_DODGE_RECEIVED;
 
 	sp = CheckAndReturnSpellEntry(57881);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_VICTIM;
+		sp->procFlags = PROC_ON_DODGE_RECEIVED;
 
 	// Druid - Infected Wounds
 	sp = CheckAndReturnSpellEntry(48483);
@@ -5505,13 +5504,13 @@ void ApplyNormalFixes()
 	// Druid - Natural Perfection
 	sp = CheckAndReturnSpellEntry(33881);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	sp = CheckAndReturnSpellEntry(33882);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 	sp = CheckAndReturnSpellEntry(33883);
 	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
 
 	// Druid - Intensity
 	sp = CheckAndReturnSpellEntry(17106);
@@ -6023,7 +6022,7 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(35077);
 	if(sp != NULL)
 	{
-		sp->procFlags  = PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags  = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
 		sp->proc_interval = 60000;
 	}
 
@@ -6173,7 +6172,7 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(37525);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
 		sp->procChance = 7;
 	}
 
@@ -6197,7 +6196,7 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(27787);
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
 		sp->procChance = 7;
 	}
 
@@ -6465,7 +6464,7 @@ void ApplyNormalFixes()
 	sp = CheckAndReturnSpellEntry(32642);		// Sporegarr - Petrified Lichen Guard
 	if(sp != NULL)
 	{
-		sp->procFlags = PROC_ON_BLOCK_VICTIM;
+		sp->procFlags = PROC_ON_BLOCK_RECEIVED;
 		sp->procChance = 100;
 		sp->EffectTriggerSpell[0] = 32643;
 	}

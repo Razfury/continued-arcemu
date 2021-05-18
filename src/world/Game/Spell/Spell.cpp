@@ -1527,7 +1527,7 @@ void Spell::cast(bool check)
 							continue; //we already made this check, so why make it again ?
 
 						p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL, Target, GetProto(), m_triggeredSpell);
-						Target->HandleProc(PROC_ON_SPELL_LAND_VICTIM, u_caster, GetProto(), m_triggeredSpell);
+						Target->HandleProc(PROC_ON_SPELL_LAND_RECEIVED, u_caster, GetProto(), m_triggeredSpell);
 						p_caster->m_procCounter = 0; //this is required for to be able to count the depth of procs (though i have no idea where/why we use proc on proc)
 
 						Target->RemoveFlag(UNIT_FIELD_AURASTATE, GetProto()->TargetAuraState);
@@ -2257,7 +2257,7 @@ void Spell::writeSpellMissedTargets(WorldPacket* data)
 			Unit* target = u_caster->GetMapMgr()->GetUnit((*i).TargetGuid);
 			if(target && target->isAlive())
 			{
-				u_caster->HandleProc(PROC_ON_RESIST_VICTIM, target, GetProto()/*,damage*/);		/** Damage is uninitialized at this point - burlex */
+				u_caster->HandleProc(PROC_ON_RESIST_RECEIVED, target, GetProto()/*,damage*/);		/** Damage is uninitialized at this point - burlex */
 				target->CombatStatusHandler_ResetPvPTimeout(); // aaa
 				u_caster->CombatStatusHandler_ResetPvPTimeout(); // bbb
 			}
@@ -5169,7 +5169,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 				amount += int(amount * b);
 			}
 
-			unitTarget->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, GetProto(), false, amount);
+			unitTarget->HandleProc(PROC_ON_SPELL_CRIT_HIT_RECEIVED, u_caster, GetProto(), false, amount);
 			u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT, unitTarget, GetProto(), false, amount);
 		}
 	}

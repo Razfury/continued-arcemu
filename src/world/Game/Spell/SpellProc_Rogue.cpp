@@ -30,7 +30,7 @@ class PoisonSpellProc : public SpellProc
 			mProcPerMinute = 0;
 		}
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			if(obj == NULL)
 			{
@@ -61,7 +61,7 @@ class PoisonSpellProc : public SpellProc
 		}
 
 		// Allow proc only if proccing hand is the one where poison was applied
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			Item* item;
 
@@ -85,11 +85,11 @@ class WoundPoisonSpellProc : public PoisonSpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(WoundPoisonSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			mProcPerMinute = 21;
 
-			PoisonSpellProc::Init(obj);
+			PoisonSpellProc::InitializeProc(obj);
 		}
 };
 
@@ -97,11 +97,11 @@ class InstantPoisonSpellProc : public PoisonSpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(InstantPoisonSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			mProcPerMinute = 8;
 
-			PoisonSpellProc::Init(obj);
+			PoisonSpellProc::InitializeProc(obj);
 		}
 };
 
@@ -109,7 +109,7 @@ class CutToTheChaseSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(CutToTheChaseSpellProc);
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			Aura* aura = mTarget->FindAuraByNameHash(SPELL_HASH_SLICE_AND_DICE);
 			if(aura)
@@ -134,7 +134,7 @@ class DeadlyBrewSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(DeadlyBrewSpellProc);
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			mTarget->CastSpell(static_cast< Unit* >(NULL), 3409, true);    //Spell Id 3409: Crippling Poison
 
@@ -146,7 +146,7 @@ class WaylaySpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(WaylaySpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			mProcFlags = PROC_ON_CAST_SPELL;
 			mProcClassMask[0] = 0x204;

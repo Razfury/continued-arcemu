@@ -24,12 +24,12 @@ class HotStreakSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(HotStreakSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			mCritsInARow = 0;
 		}
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			// Check for classmask. Should proc only if CastingSpell is one listed in http://www.wowhead.com/spell=44448
 			if(! CheckClassMask(victim, CastingSpell))

@@ -24,7 +24,7 @@ bool EyeForAnEye(uint32 i, Aura* pAura, bool apply)
 	Unit* target = pAura->GetTarget();
 
 	if(apply)
-		target->AddProcTriggerSpell(25997, pAura->GetSpellProto()->Id, pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM, 0, NULL, NULL);
+		target->AddProcTriggerSpell(25997, pAura->GetSpellProto()->Id, pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED, 0, NULL, NULL);
 	else
 		target->RemoveProcTriggerSpell(25997, pAura->m_casterGuid);
 

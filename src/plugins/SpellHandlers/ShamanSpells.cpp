@@ -81,7 +81,7 @@ bool EarthShieldDummyAura(uint32 i, Aura* pAura, bool apply)
 	Unit* m_target = pAura->GetTarget();
 
 	if(apply)
-		m_target->AddProcTriggerSpell(379, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, pAura->GetSpellProto()->procFlags & ~PROC_ON_SPELL_LAND_VICTIM, pAura->GetSpellProto()->procCharges, NULL, NULL);
+		m_target->AddProcTriggerSpell(379, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, pAura->GetSpellProto()->procFlags & ~PROC_ON_SPELL_LAND_RECEIVED, pAura->GetSpellProto()->procCharges, NULL, NULL);
 	else if(m_target->GetAuraStackCount(pAura->GetSpellId()) == 1)
 		m_target->RemoveProcTriggerSpell(379, pAura->m_casterGuid);
 

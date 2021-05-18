@@ -24,7 +24,7 @@ class SealOfCommandSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(SealOfCommandSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			// default chance of proc
 			mProcChance = 25;
@@ -49,7 +49,7 @@ class EyeForAnEyeSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(EyeForAnEyeSpellProc);
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			// If this player died by crit damage, don't do dmg back
 			if(! mTarget->isAlive())
@@ -74,7 +74,7 @@ class GraceOfTheNaaruSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(GraceOfTheNaaruSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			this->mProcClassMask[0] = 0x80000000;
 		}
@@ -97,7 +97,7 @@ class PaladinSealsSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(PaladinSealsSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			this->mProcFlags = PROC_ON_MELEE_ATTACK;
 		}

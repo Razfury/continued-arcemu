@@ -123,7 +123,7 @@ SpellProc* SpellProcMgr::NewSpellProc(Unit* target, SpellEntry* spell, SpellEntr
 		result->mProcClassMask[2] = 0;
 	}
 
-	result->Init(obj);
+	result->InitializeProc(obj);
 
 	return result;
 }

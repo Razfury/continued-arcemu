@@ -125,14 +125,14 @@ bool VampiricTouch(uint32 i, Aura* pAura, bool apply)
 	{
 		case 0:
 			if(apply)
-				target->AddProcTriggerSpell(64085, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_PRE_DISPELL_AURA_VICTIM | PROC_TARGET_SELF, 0, NULL, NULL);
+				target->AddProcTriggerSpell(64085, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_PRE_DISPELL_AURA_RECEIVED | PROC_TARGET_SELF, 0, NULL, NULL);
 			else
 				target->RemoveProcTriggerSpell(64085, pAura->m_casterGuid);
 			break;
 
 		case 2:
 			if(apply)
-				target->AddProcTriggerSpell(34919, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_SPELL_HIT_VICTIM, 0, NULL, NULL);
+				target->AddProcTriggerSpell(34919, pAura->GetSpellId(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_SPELL_HIT_RECEIVED, 0, NULL, NULL);
 			else
 				target->RemoveProcTriggerSpell(34919, pAura->m_casterGuid);
 			break;
@@ -228,7 +228,7 @@ bool PrayerOfMendingAura(uint32 i, Aura* pAura, bool apply)
 	Unit* target = pAura->GetTarget();
 
 	if(apply)
-		target->AddProcTriggerSpell(pAura->GetSpellProto(), pAura->GetSpellProto(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_ANY_DAMAGE_VICTIM, pAura->GetSpellProto()->procCharges, NULL, NULL);
+		target->AddProcTriggerSpell(pAura->GetSpellProto(), pAura->GetSpellProto(), pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_ANY_DAMAGE_RECEIVED, pAura->GetSpellProto()->procCharges, NULL, NULL);
 	else
 	{
 		int32 count = target->GetAuraStackCount(pAura->GetSpellId());

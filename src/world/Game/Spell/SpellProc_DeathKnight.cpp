@@ -24,7 +24,7 @@ class ButcherySpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(ButcherySpellProc);
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			dmg_overwrite[0] = mOrigSpell->EffectBasePoints[0] + 1;
 
@@ -36,7 +36,7 @@ class BladeBarrierSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(BladeBarrierSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			mProcFlags = PROC_ON_CAST_SPELL;
 
@@ -62,7 +62,7 @@ class DeathRuneMasterySpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(DeathRuneMasterySpellProc);
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			DeathKnight* dk = TO_DK(mTarget);
 

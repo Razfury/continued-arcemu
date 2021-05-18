@@ -24,7 +24,7 @@ class FrostBrandAttackSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(FrostBrandAttackSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			if(obj == NULL)
 			{
@@ -40,7 +40,7 @@ class EarthShieldSpellProc : public SpellProc
 {
 	SPELL_PROC_FACTORY_FUNCTION(EarthShieldSpellProc);
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			int32 value = mOrigSpell->EffectBasePoints[0];
 			dmg_overwrite[0] = value;
@@ -65,7 +65,7 @@ class FlametongueWeaponSpellProc : public SpellProc
 {
 		SPELL_PROC_FACTORY_FUNCTION(FlametongueWeaponSpellProc);
 
-		void Init(Object* obj)
+		void InitializeProc(Object* obj)
 		{
 			if(obj == NULL)
 			{
@@ -107,7 +107,7 @@ class FlametongueWeaponSpellProc : public SpellProc
 			return false;
 		}
 
-		bool DoEffect(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
+		bool ProcEffectOverride(Unit* victim, SpellEntry* CastingSpell, uint32 flag, uint32 dmg, uint32 abs, int* dmg_overwrite, uint32 weapon_damage_type)
 		{
 			Item* item;
 

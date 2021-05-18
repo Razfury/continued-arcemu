@@ -1806,7 +1806,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 	uint32 school = GetSpellProto()->School;
 	Unit* c = GetUnitCaster();
 	uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;
-	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_VICTIM;
+	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_RECEIVED;
 	bool is_critical = false;
 
 	if(m_target->GetGUID() != m_casterGuid)	//don't use resist when cast on self-- this is some internal stuff
@@ -1853,7 +1853,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 					res = c->GetCriticalDamageBonusForSpell(m_target, GetSpellProto(), res);
 
 					aproc |= PROC_ON_SPELL_CRIT_HIT;
-					vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+					vproc |= PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 				}
 			}
 		}
@@ -2663,7 +2663,7 @@ void Aura::SpellAuraDamageShield(bool apply)
 		ds.m_damage = mod->m_amount;
 		ds.m_spellId = GetSpellProto()->Id;
 		ds.m_school = GetSpellProto()->School;
-		ds.m_flags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_MISC; //maybe later we might want to add other flags too here
+		ds.m_flags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_MISC; //maybe later we might want to add other flags too here
 		ds.owner = (void*)this;
 		m_target->m_damageShields.push_back(ds);
 	}
@@ -4258,7 +4258,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 
 	bool is_critical = false;
 	uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;
-	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
+	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
 
 	int amp = sp->EffectAmplitude[mod->i];
 	if(!amp)
@@ -4291,7 +4291,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 			amount = int(m_caster->GetCriticalDamageBonusForSpell(m_target, sp, (float) amount));
 
 			aproc |= PROC_ON_SPELL_CRIT_HIT;
-			vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+			vproc |= PROC_ON_SPELL_CRIT_HIT_RECEIVED;
 		}
 	}
 
