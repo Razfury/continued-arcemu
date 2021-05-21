@@ -794,7 +794,7 @@ uint8 Spell::DidHit(uint32 effindex, Unit* target)
 			_type = RANGED;
 		else
 		{
-			if(hasAttributeExC(FLAGS4_TYPE_OFFHAND))
+			if(hasAttributeExC(ATTRIBUTESEX3_TYPE_OFFHAND))
 				_type = OFFHAND;
 			else
 				_type = MELEE;
@@ -1371,7 +1371,7 @@ void Spell::cast(bool check)
 			//******************** SHOOT SPELLS ***********************
 			//* Flags are now 1,4,19,22 (4718610) //0x480012
 
-			if(hasAttributeExC(FLAGS4_PLAYER_RANGED_SPELLS) && m_caster->IsPlayer() && m_caster->IsInWorld())
+			if(hasAttributeExC(ATTRIBUTESEX3_PLAYER_RANGED_SPELLS) && m_caster->IsPlayer() && m_caster->IsInWorld())
 			{
 				// Part of this function contains a hack fix
 				// hack fix for shoot spells, should be some other resource for it
@@ -2041,7 +2041,7 @@ void Spell::SendSpellStart()
 				}
 			}
 		}
-		else if(hasAttributeExC(FLAGS4_PLAYER_RANGED_SPELLS))
+		else if(hasAttributeExC(ATTRIBUTESEX3_PLAYER_RANGED_SPELLS))
 		{
 			if(p_caster != NULL)
 				ip = ItemPrototypeStorage.LookupEntry(p_caster->GetUInt32Value(PLAYER_AMMO_ID));
@@ -3233,12 +3233,12 @@ uint8 Spell::CanCast(bool tolerate)
 		 */
 		if(p_caster->m_bg)
 		{
-			if(IS_ARENA(p_caster->m_bg->GetType()) && hasAttributeExD(FLAGS5_NOT_IN_ARENA))
+			if(IS_ARENA(p_caster->m_bg->GetType()) && hasAttributeExD(ATTRIBUTESEX4_NOT_IN_ARENA))
 				return SPELL_FAILED_NOT_IN_ARENA;
 			if(!p_caster->m_bg->HasStarted() && (m_spellInfo->Id == 1953 || m_spellInfo->Id == 36554))  //Don't allow blink or shadowstep  if in a BG and the BG hasn't started.
 				return SPELL_FAILED_SPELL_UNAVAILABLE;
 		}
-		else if(hasAttributeExC(FLAGS4_BG_ONLY))
+		else if(hasAttributeExC(ATTRIBUTESEX3_BG_ONLY))
 			return SPELL_FAILED_ONLY_BATTLEGROUNDS;
 
 		/**
@@ -3451,7 +3451,7 @@ uint8 Spell::CanCast(bool tolerate)
 		/**
 		 *	Check if we have the required reagents
 		 */
-		if(!(p_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_REAGANT_COST) && hasAttributeExE(FLAGS6_REAGENT_REMOVAL)))
+		if(!(p_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_REAGANT_COST) && hasAttributeExE(ATTRIBUTESEX5_REAGENT_REMOVAL)))
 		{
 			// Skip this with enchanting scrolls
 			if(!i_caster || i_caster->GetProto()->Flags != 268435520)
@@ -3587,7 +3587,7 @@ uint8 Spell::CanCast(bool tolerate)
 				case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
 					{
 						// check for enchants that can only be done on your own items
-						if(hasAttributeExB(ATTRIBUTESEXB_ENCHANT_OWN_ONLY))
+						if(hasAttributeExB(ATTRIBUTESEX2_ENCHANT_OWN_ONLY))
 							return SPELL_FAILED_BAD_TARGETS;
 
 						// get the player we are trading with
@@ -3698,7 +3698,7 @@ uint8 Spell::CanCast(bool tolerate)
 						break;
 
 					// If the spell is castable on our own items only then we can't cast it on someone else's
-					if(hasAttributeExB(ATTRIBUTESEXB_ENCHANT_OWN_ONLY) &&
+					if(hasAttributeExB(ATTRIBUTESEX2_ENCHANT_OWN_ONLY) &&
 					        i_target != NULL &&
 					        u_caster != NULL &&
 					        TO_PLAYER(u_caster) != i_target->GetOwner())
@@ -4336,19 +4336,19 @@ uint8 Spell::CanCast(bool tolerate)
 		/**
 		 *	Stun check
 		 */
-		if(u_caster->IsStunned() && (GetProto()->AttributesExE & FLAGS6_USABLE_WHILE_STUNNED) == 0)
+		if(u_caster->IsStunned() && (GetProto()->AttributesEx5 & ATTRIBUTESEX5_USABLE_WHILE_STUNNED) == 0)
 			return SPELL_FAILED_STUNNED;
 
 		/**
 		 *	Fear check
 		 */
-		if(u_caster->IsFeared()  && (GetProto()->AttributesExE & FLAGS6_USABLE_WHILE_FEARED) == 0)
+		if(u_caster->IsFeared()  && (GetProto()->AttributesEx5 & ATTRIBUTESEX5_USABLE_WHILE_FEARED) == 0)
 			return SPELL_FAILED_FLEEING;
 
 		/**
 		 *	Confuse check
 		 */
-		if(u_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED) && (GetProto()->AttributesExE & FLAGS6_USABLE_WHILE_CONFUSED) == 0)
+		if(u_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED) && (GetProto()->AttributesEx5 & ATTRIBUTESEX5_USABLE_WHILE_CONFUSED) == 0)
 			return SPELL_FAILED_CONFUSED;
 
 
@@ -4373,7 +4373,7 @@ uint8 Spell::CanCast(bool tolerate)
 	/**
 	 * Dead pet check
 	*/
-	if(GetProto()->AttributesExB & ATTRIBUTESEXB_REQ_DEAD_PET && p_caster != NULL)
+	if(GetProto()->ATTRIBUTESEX2 & ATTRIBUTESEX2_REQ_DEAD_PET && p_caster != NULL)
 	{
 		Pet* pPet = p_caster->GetSummon();
 		if(pPet != NULL && !pPet->IsDead())
@@ -4438,14 +4438,14 @@ void Spell::RemoveItems()
 		}
 	}
 	// Ammo Removal
-	if(hasAttributeExB(ATTRIBUTESEXB_REQ_RANGED_WEAPON) || hasAttributeExC(FLAGS4_PLAYER_RANGED_SPELLS))
+	if(hasAttributeExB(ATTRIBUTESEX2_REQ_RANGED_WEAPON) || hasAttributeExC(ATTRIBUTESEX3_PLAYER_RANGED_SPELLS))
 	{
 		if(p_caster && !p_caster->m_requiresNoAmmo)
 			p_caster->GetItemInterface()->RemoveItemAmt_ProtectPointer(p_caster->GetUInt32Value(PLAYER_AMMO_ID), 1, &i_caster);
 	}
 
 	// Reagent Removal
-	if(!(p_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_REAGANT_COST) && hasAttributeExD(FLAGS6_REAGENT_REMOVAL)))
+	if(!(p_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_REAGANT_COST) && hasAttributeExD(ATTRIBUTESEX5_REAGENT_REMOVAL)))
 	{
 		for(uint32 i = 0; i < 8 ; i++)
 		{
@@ -5061,7 +5061,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 	int32 bonus = 0;
 	uint32 school = GetProto()->School;
 
-	if(u_caster != NULL && !(GetProto()->AttributesExC & FLAGS4_NO_HEALING_BONUS))
+	if(u_caster != NULL && !(GetProto()->ATTRIBUTESEX3 & ATTRIBUTESEX3_NO_HEALING_BONUS))
 	{
 		//Basic bonus
 		if(p_caster == NULL ||
@@ -5817,7 +5817,7 @@ uint8 Spell::GetErrorAtShapeshiftedCast(SpellEntry* spellInfo, uint32 form)
 	else
 	{
 		// Check if it even requires a shapeshift....
-		if(!hasAttributeExB(ATTRIBUTESEXB_NOT_NEED_SHAPESHIFT) && spellInfo->RequiredShapeShift != 0)
+		if(!hasAttributeExB(ATTRIBUTESEX2_NOT_NEED_SHAPESHIFT) && spellInfo->RequiredShapeShift != 0)
 			return SPELL_FAILED_ONLY_SHAPESHIFT;
 	}
 

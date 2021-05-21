@@ -824,7 +824,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					_type = RANGED;
 				else
 				{
-					if(GetProto()->AttributesExC & FLAGS4_TYPE_OFFHAND)
+					if(GetProto()->ATTRIBUTESEX3 & ATTRIBUTESEX3_TYPE_OFFHAND)
 						_type =  OFFHAND;
 					else
 						_type = MELEE;
@@ -2462,7 +2462,7 @@ void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
 			_type = RANGED;
 		else
 		{
-			if(GetProto()->AttributesExC & 0x1000000)
+			if(GetProto()->ATTRIBUTESEX3 & 0x1000000)
 				_type =  OFFHAND;
 			else
 				_type = MELEE;
@@ -3152,7 +3152,7 @@ void Spell::SpellEffectAddHonor(uint32 i)
 
 	uint32 val = GetProto()->EffectBasePoints[i];
 
-	if(GetProto()->AttributesExB & ATTRIBUTESEXB_UNK4) val /= 10;
+	if(GetProto()->ATTRIBUTESEX2 & ATTRIBUTESEX2_UNK4) val /= 10;
 
 	val += 1;
 
@@ -3557,7 +3557,7 @@ void Spell::SpellEffectWeapondamage(uint32 i)   // Weapon damage +
 		_type = RANGED;
 	else
 	{
-		if(hasAttributeExC(FLAGS4_TYPE_OFFHAND))
+		if(hasAttributeExC(ATTRIBUTESEX3_TYPE_OFFHAND))
 			_type =  OFFHAND;
 		else
 			_type = MELEE;
@@ -4867,7 +4867,7 @@ void Spell::SpellEffectDummyMelee(uint32 i)   // Normalized Weapon damage +
 		_type = RANGED;
 	else
 	{
-		if(GetProto()->AttributesExC & 0x1000000)
+		if(GetProto()->ATTRIBUTESEX3 & 0x1000000)
 			_type =  OFFHAND;
 		else
 			_type = MELEE;

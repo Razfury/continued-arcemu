@@ -181,11 +181,11 @@ const char* spellentryFormat =
     "u" // MechanicsType
     "u" // Attributes
     "u" // AttributesEx
-    "u" // AttributesExB
-    "u" // AttributesExC
-    "u" // AttributesExD
-    "u" // AttributesExE
-    "u" // AttributesExF
+    "u" // ATTRIBUTESEX2
+    "u" // ATTRIBUTESEX3
+    "u" // AttributesEx4
+    "u" // AttributesEx5
+    "u" // AttributesEx6
     "x" // unk 3.2.0
     "u" // RequiredShapeShift
     "x" // unk 3.2.0

@@ -386,7 +386,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket & recvPacket)
 	if(GetPlayer()->GetOnMeleeSpell() != spellId)
 	{
 		//autoshot 75
-		if((spellInfo->AttributesExB & ATTRIBUTESEXB_ACTIVATE_AUTO_SHOT) /*spellInfo->Attributes == 327698*/)	// auto shot..
+		if((spellInfo->ATTRIBUTESEX2 & ATTRIBUTESEX2_ACTIVATE_AUTO_SHOT) /*spellInfo->Attributes == 327698*/)	// auto shot..
 		{
 			//sLog.outString( "HandleSpellCast: Auto Shot-type spell cast (id %u, name %s)" , spellInfo->Id , spellInfo->Name );
 			Item* weapon = GetPlayer()->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);

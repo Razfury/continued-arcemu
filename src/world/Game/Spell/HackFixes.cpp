@@ -28,7 +28,7 @@ void CreateDummySpell(uint32 id)
 	sp->Id = id;
 	sp->Attributes = 384;
 	sp->AttributesEx = 268435456;
-	sp->AttributesExB = 4;
+	sp->ATTRIBUTESEX2 = 4;
 	sp->CastingTimeIndex = 1;
 	sp->procChance = 75;
 	sp->rangeIndex = 13;
@@ -41,7 +41,6 @@ void CreateDummySpell(uint32 id)
 	dbcSpell.SetRow(id, sp);
 	sWorld.dummyspells.push_back(sp);
 }
-
 void ApplyNormalFixes()
 {
 	//Updating spell.dbc
@@ -3198,10 +3197,10 @@ void ApplyNormalFixes()
 	// Spirit of Redemption - required spells can be casted while dead
 	sp = CheckAndReturnSpellEntry(27795);   // This is casted by shape shift
 	if(sp != NULL)
-		sp->AttributesExC |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
+		sp->ATTRIBUTESEX3 |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
 	sp = CheckAndReturnSpellEntry(27792);   // This is casted by Apply Aura: Spirit of Redemption
 	if(sp != NULL)
-		sp->AttributesExC |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
+		sp->ATTRIBUTESEX3 |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
 
 	/**********************************************************
 	 *	Holy Nova
@@ -3504,12 +3503,12 @@ void ApplyNormalFixes()
 	//summon only 1 elemental totem
 	sp = CheckAndReturnSpellEntry(2894);
 	if(sp != NULL && sp->Id == 2894)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_TOTEM_FIRE; //remove this targeting. it is enough to get 1 target
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_FRONT_LEFT; //remove this targeting. it is enough to get 1 target
 
 	//summon only 1 elemental totem
 	sp = CheckAndReturnSpellEntry(2062);
 	if(sp != NULL && sp->Id == 2062)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_TOTEM_EARTH; //remove this targeting. it is enough to get 1 target
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_FRONT_RIGHT; //remove this targeting. it is enough to get 1 target
 
 	/**********************************************************
 	 *	Elemental Focus
@@ -3955,6 +3954,7 @@ void ApplyNormalFixes()
 	//////////////////////////////////////////
 
 	// Insert mage spell fixes here
+
 
 	//Missile Barrage
 	sp = CheckAndReturnSpellEntry(44404);
@@ -5541,6 +5541,28 @@ void ApplyNormalFixes()
 	//////////////////////////////////////////
 
 	// Insert items spell fixes here
+
+	//Sharpened Twilight Scale (normal)
+	sp = CheckAndReturnSpellEntry(75455);
+	if (sp != NULL)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 75458;
+		sp->procChance = 35;
+		sp->proc_interval = 45000;
+	}
+
+	//Sharpened Twilight Scale (heroic)
+	sp = CheckAndReturnSpellEntry(75457);
+	if (sp != NULL)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 75456;
+		sp->procChance = 35;
+		sp->proc_interval = 45000;
+	}
 
 	//Compact Harvest Reaper
 	sp = CheckAndReturnSpellEntry(4078);

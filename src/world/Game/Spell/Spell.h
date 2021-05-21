@@ -464,175 +464,175 @@ enum AttributesEx
     ATTRIBUTESEX_UNK33								= 0x80000000,	// 31,
 };
 
-enum AttributesExB
+enum ATTRIBUTESEX2
 {
-    ATTRIBUTESEXB_NULL								= 0x00000000,	//
-    ATTRIBUTESEXB_UNK2								= 0x00000001,	// 0
-    ATTRIBUTESEXB_UNK3								= 0x00000002,	// 1, Can be used while stealthed
-    ATTRIBUTESEXB_UNK4								= 0x00000004,	// 2, request pet maybe
-    ATTRIBUTESEXB_UNK5								= 0x00000008,	// 3, something todo with temp enchanted items
-    ATTRIBUTESEXB_PARTY_EFFECTING_AURA				= 0x00000010,	// 4, Party affecting aura's
-    ATTRIBUTESEXB_ACTIVATE_AUTO_SHOT				= 0x00000020,	// 5, spell that enable's auto shoot
-    ATTRIBUTESEXB_UNK8								= 0x00000040,	// 6, Polymorph spells
-    ATTRIBUTESEXB_UNK9								= 0x00000080,	// 7,
-    ATTRIBUTESEXB_UNUSED1							= 0x00000100,	// 8, not set in 3.0.3
-    ATTRIBUTESEXB_UNK11								= 0x00000200,	// 9, used by 2 spells, 30421 | Nether Portal - Perseverence and  30466 | Nether Portal - Perseverence
-    ATTRIBUTESEXB_TAME_X							= 0x00000400,	// 10, tame [creature]
-    ATTRIBUTESEXB_FUNNEL							= 0x00000800,	// 11, only funnel spells
-    ATTRIBUTESEXB_UNK14								= 0x00001000,	// 12, swipe / Cleave spells
-    ATTRIBUTESEXB_ENCHANT_OWN_ONLY					= 0x00002000,	// 13, no trade window targets, BoE items get soulbound to you
-    ATTRIBUTESEXB_SPELL_PLAYER_EVENT				= 0x00004000,	// 14, Player event's like logging in, finishing quests, triggering cinematic, being adored, Heartbroken etc
-    ATTRIBUTESEXB_UNUSED3							= 0x00008000,	// 15, not set in 3.0.3
-    ATTRIBUTESEXB_CONTROL_UNIT						= 0x00010000,	// 16, PvP Controller, RC, Creature taming, Taming Lesson
-    ATTRIBUTESEXB_REQ_RANGED_WEAPON					= 0x00020000,	// 17, used by hunters shot and stings... Possibly triggers autoshot?
-    ATTRIBUTESEXB_REQ_DEAD_PET						= 0x00040000,	// 18,
-    ATTRIBUTESEXB_NOT_NEED_SHAPESHIFT				= 0x00080000,	// 19, does not necessarily need shapeshift
-    ATTRIBUTESEXB_REQ_BEHIND_TARGET					= 0x00100000,	// 20,
-    ATTRIBUTESEXB_UNK23								= 0x00200000,	// 21,
-    ATTRIBUTESEXB_UNK24								= 0x00400000,	// 22,
-    ATTRIBUTESEXB_UNK25								= 0x00800000,	// 23,
-    ATTRIBUTESEXB_UNK26								= 0x01000000,	// 24,
-    ATTRIBUTESEXB_UNK27								= 0x02000000,	// 25,
-    ATTRIBUTESEXB_UNK28								= 0x04000000,	// 26,
-    ATTRIBUTESEXB_UNK29								= 0x08000000,	// 27, fishing spells and enchanting weapons
-    ATTRIBUTESEXB_UNK30								= 0x10000000,	// 28, some secondairy spell triggers, especialy for lightning shield alike spells
-    ATTRIBUTESEXB_CANT_CRIT							= 0x20000000,	// 29, spell can't crit
-    ATTRIBUTESEXB_UNK32								= 0x40000000,	// 30,
-    ATTRIBUTESEXB_UNK33								= 0x80000000,	// 31,
+    ATTRIBUTESEX2_NULL								= 0x00000000,	//
+    ATTRIBUTESEX2_UNK2								= 0x00000001,	// 0
+    ATTRIBUTESEX2_UNK3								= 0x00000002,	// 1, Can be used while stealthed
+    ATTRIBUTESEX2_UNK4								= 0x00000004,	// 2, request pet maybe
+    ATTRIBUTESEX2_UNK5								= 0x00000008,	// 3, something todo with temp enchanted items
+    ATTRIBUTESEX2_PARTY_EFFECTING_AURA				= 0x00000010,	// 4, Party affecting aura's
+    ATTRIBUTESEX2_ACTIVATE_AUTO_SHOT				= 0x00000020,	// 5, spell that enable's auto shoot
+    ATTRIBUTESEX2_UNK8								= 0x00000040,	// 6, Polymorph spells
+    ATTRIBUTESEX2_UNK9								= 0x00000080,	// 7,
+    ATTRIBUTESEX2_UNUSED1							= 0x00000100,	// 8, not set in 3.0.3
+    ATTRIBUTESEX2_UNK11								= 0x00000200,	// 9, used by 2 spells, 30421 | Nether Portal - Perseverence and  30466 | Nether Portal - Perseverence
+    ATTRIBUTESEX2_TAME_X							= 0x00000400,	// 10, tame [creature]
+    ATTRIBUTESEX2_FUNNEL							= 0x00000800,	// 11, only funnel spells
+    ATTRIBUTESEX2_UNK14								= 0x00001000,	// 12, swipe / Cleave spells
+    ATTRIBUTESEX2_ENCHANT_OWN_ONLY					= 0x00002000,	// 13, no trade window targets, BoE items get soulbound to you
+    ATTRIBUTESEX2_SPELL_PLAYER_EVENT				= 0x00004000,	// 14, Player event's like logging in, finishing quests, triggering cinematic, being adored, Heartbroken etc
+    ATTRIBUTESEX2_UNUSED3							= 0x00008000,	// 15, not set in 3.0.3
+    ATTRIBUTESEX2_CONTROL_UNIT						= 0x00010000,	// 16, PvP Controller, RC, Creature taming, Taming Lesson
+    ATTRIBUTESEX2_REQ_RANGED_WEAPON					= 0x00020000,	// 17, used by hunters shot and stings... Possibly triggers autoshot?
+    ATTRIBUTESEX2_REQ_DEAD_PET						= 0x00040000,	// 18,
+    ATTRIBUTESEX2_NOT_NEED_SHAPESHIFT				= 0x00080000,	// 19, does not necessarily need shapeshift
+    ATTRIBUTESEX2_REQ_BEHIND_TARGET					= 0x00100000,	// 20,
+    ATTRIBUTESEX2_UNK23								= 0x00200000,	// 21,
+    ATTRIBUTESEX2_UNK24								= 0x00400000,	// 22,
+    ATTRIBUTESEX2_UNK25								= 0x00800000,	// 23,
+    ATTRIBUTESEX2_UNK26								= 0x01000000,	// 24,
+    ATTRIBUTESEX2_UNK27								= 0x02000000,	// 25,
+    ATTRIBUTESEX2_UNK28								= 0x04000000,	// 26,
+    ATTRIBUTESEX2_UNK29								= 0x08000000,	// 27, fishing spells and enchanting weapons
+    ATTRIBUTESEX2_UNK30								= 0x10000000,	// 28, some secondairy spell triggers, especialy for lightning shield alike spells
+    ATTRIBUTESEX2_CANT_CRIT							= 0x20000000,	// 29, spell can't crit
+    ATTRIBUTESEX2_UNK32								= 0x40000000,	// 30,
+    ATTRIBUTESEX2_UNK33								= 0x80000000,	// 31,
 };
 
-enum Flags4 // AttributesExC
+enum Flags4 // ATTRIBUTESEX3
 {
-    FLAGS4_NULL							= 0x0,
-    FLAGS4_UNK2							= 0x1,
-    FLAGS4_UNK3							= 0x2,
-    FLAGS4_UNK4							= 0x4,
-    FLAGS4_UNK5							= 0x8,
-    FLAGS4_UNK6							= 0x10,
-    FLAGS4_UNK7							= 0x20,
-    FLAGS4_UNK8							= 0x40,
-    FLAGS4_UNK9							= 0x80,
-    FLAGS4_UNK10						= 0x100,
-    FLAGS4_UNK11						= 0x200,
-    FLAGS4_UNK12						= 0x400,
-    FLAGS4_BG_ONLY                      = 0x800,
-    FLAGS4_UNK14						= 0x1000,
-    FLAGS4_UNK15						= 0x2000,
-    FLAGS4_UNK16						= 0x4000,
-    FLAGS4_PLAYER_RANGED_SPELLS         = 0x8000,
-    FLAGS4_UNK18						= 0x10000,
-    FLAGS4_UNK19						= 0x20000,
-    FLAGS4_UNK20						= 0x40000,
-    FLAGS4_UNK21						= 0x80000,
+    ATTRIBUTESEX3_NULL							= 0x0,
+    ATTRIBUTESEX3_UNK2							= 0x1,
+    ATTRIBUTESEX3_UNK3							= 0x2,
+    ATTRIBUTESEX3_UNK4							= 0x4,
+    ATTRIBUTESEX3_UNK5							= 0x8,
+    ATTRIBUTESEX3_UNK6							= 0x10,
+    ATTRIBUTESEX3_UNK7							= 0x20,
+    ATTRIBUTESEX3_UNK8							= 0x40,
+    ATTRIBUTESEX3_UNK9							= 0x80,
+    ATTRIBUTESEX3_ONLY_TARGET_PLAYERS 	= 0x100,
+    ATTRIBUTESEX3_UNK11						= 0x200,
+    ATTRIBUTESEX3_UNK12						= 0x400,
+    ATTRIBUTESEX3_BG_ONLY                      = 0x800,
+    ATTRIBUTESEX3_UNK14						= 0x1000,
+    ATTRIBUTESEX3_UNK15						= 0x2000,
+    ATTRIBUTESEX3_UNK16						= 0x4000,
+    ATTRIBUTESEX3_PLAYER_RANGED_SPELLS         = 0x8000,
+    ATTRIBUTESEX3_CANT_TRIGGER_PROC		= 0x10000,
+    ATTRIBUTESEX3_NO_INITIAL_AGGRO		= 0x20000,
+    ATTRIBUTESEX3_UNK20						= 0x40000,
+    ATTRIBUTESEX3_UNK21						= 0x80000,
     CAN_PERSIST_AND_CASTED_WHILE_DEAD   = 0x100000,
-    FLAGS4_UNK23						= 0x200000,
-    FLAGS4_PLAYER_RANGED_WAND           = 0x400000,
-    FLAGS4_UNK25						= 0x800000,
-    FLAGS4_TYPE_OFFHAND					= 0x1000000,
-    FLAGS4_NO_HEALING_BONUS				= 0x2000000,
-    FLAGS4_CAN_PROC_ON_TRIGGERED		= 0x4000000,
-    FLAGS4_UNK29						= 0x8000000,
-    FLAGS4_UNK30						= 0x10000000,
-    FLAGS4_UNK31						= 0x20000000,
-    FLAGS4_UNK32						= 0x40000000,
-    FLAGS4_UNK33						= 0x80000000,
+    ATTRIBUTESEX3_UNK23						= 0x200000,
+    ATTRIBUTESEX3_PLAYER_RANGED_WAND           = 0x400000,
+    ATTRIBUTESEX3_UNK25						= 0x800000,
+    ATTRIBUTESEX3_TYPE_OFFHAND					= 0x1000000,
+    ATTRIBUTESEX3_NO_HEALING_BONUS				= 0x2000000,
+    ATTRIBUTESEX3_CAN_PROC_ON_TRIGGERED		= 0x4000000,
+    ATTRIBUTESEX3_UNK29						= 0x8000000,
+    ATTRIBUTESEX3_UNK30						= 0x10000000,
+    ATTRIBUTESEX3_UNK31						= 0x20000000,
+    ATTRIBUTESEX3_UNK32						= 0x40000000,
+    ATTRIBUTESEX3_UNK33						= 0x80000000,
 };
 
-enum Flags5 // AttributesExD
+enum Flags5 // AttributesEx4
 {
-    FLAGS5_NULL							= 0x0,
-    FLAGS5_UNK2							= 0x1,
-    FLAGS5_PROCCHANCE_COMBOBASED        = 0x2,
-    FLAGS5_UNK4							= 0x4,
-    FLAGS5_UNK5							= 0x8,
-    FLAGS5_UNK6							= 0x10,
-    FLAGS5_UNK7							= 0x20,
-    FLAGS5_UNK8							= 0x40,
-    FLAGS5_UNK9							= 0x80,
-    FLAGS5_UNK10						= 0x100,
-    FLAGS5_UNK11						= 0x200,
-    FLAGS5_UNK12						= 0x400,
-    FLAGS5_UNK13						= 0x800,
-    FLAGS5_UNK14						= 0x1000,
-    FLAGS5_UNK15						= 0x2000,
-    FLAGS5_UNK16						= 0x4000,
-    FLAGS5_UNK17						= 0x8000,
-    FLAGS5_NOT_IN_ARENA					= 0x10000,
-    FLAGS5_UNK19						= 0x20000,
-    FLAGS5_UNK20						= 0x40000,
-    FLAGS5_UNK21						= 0x80000,
-    FLAGS5_UNK22						= 0x100000,
-    FLAGS5_UNK23						= 0x200000,
-    FLAGS5_UNK24						= 0x400000,
-    FLAGS5_UNK25						= 0x800000,
-    FLAGS5_UNK26						= 0x1000000,
-    FLAGS5_UNK27						= 0x2000000,
-    FLAGS5_ONLY_IN_OUTLANDS             = 0x4000000,
-    FLAGS5_UNK29						= 0x8000000,
-    FLAGS5_UNK30						= 0x10000000,
-    FLAGS5_UNK31						= 0x20000000,
-    FLAGS5_UNK32						= 0x40000000,
-    FLAGS5_UNK33						= 0x80000000,
+    ATTRIBUTESEX4_NULL							= 0x0,
+    ATTRIBUTESEX4_UNK2							= 0x1,
+    ATTRIBUTESEX4_PROCCHANCE_COMBOBASED        = 0x2,
+    ATTRIBUTESEX4_UNK4							= 0x4,
+    ATTRIBUTESEX4_UNK5							= 0x8,
+    ATTRIBUTESEX4_UNK6							= 0x10,
+    ATTRIBUTESEX4_UNK7							= 0x20,
+    ATTRIBUTESEX4_UNK8							= 0x40,
+    ATTRIBUTESEX4_UNK9							= 0x80,
+    ATTRIBUTESEX4_UNK10						= 0x100,
+    ATTRIBUTESEX4_UNK11						= 0x200,
+    ATTRIBUTESEX4_UNK12						= 0x400,
+    ATTRIBUTESEX4_UNK13						= 0x800,
+    ATTRIBUTESEX4_UNK14						= 0x1000,
+    ATTRIBUTESEX4_UNK15						= 0x2000,
+    ATTRIBUTESEX4_UNK16						= 0x4000,
+    ATTRIBUTESEX4_UNK17						= 0x8000,
+    ATTRIBUTESEX4_NOT_IN_ARENA					= 0x10000,
+    ATTRIBUTESEX4_UNK19						= 0x20000,
+    ATTRIBUTESEX4_UNK20						= 0x40000,
+    ATTRIBUTESEX4_UNK21						= 0x80000,
+    ATTRIBUTESEX4_UNK22						= 0x100000,
+    ATTRIBUTESEX4_UNK23						= 0x200000,
+    ATTRIBUTESEX4_UNK24						= 0x400000,
+    ATTRIBUTESEX4_UNK25						= 0x800000,
+    ATTRIBUTESEX4_UNK26						= 0x1000000,
+    ATTRIBUTESEX4_UNK27						= 0x2000000,
+    ATTRIBUTESEX4_ONLY_IN_OUTLANDS             = 0x4000000,
+    ATTRIBUTESEX4_UNK29						= 0x8000000,
+    ATTRIBUTESEX4_UNK30						= 0x10000000,
+    ATTRIBUTESEX4_UNK31						= 0x20000000,
+    ATTRIBUTESEX4_UNK32						= 0x40000000,
+    ATTRIBUTESEX4_UNK33						= 0x80000000,
 };
 
-enum Flags6 // AttributesExE
+enum Flags6 // AttributesEx5
 {
-    FLAGS6_NULL							= 0x0,
-    FLAGS6_UNK2							= 0x1,
-    FLAGS6_REAGENT_REMOVAL				= 0x2,
-    FLAGS6_UNK4							= 0x4,
-    FLAGS6_USABLE_WHILE_STUNNED         = 0x8,
-    FLAGS6_UNK6							= 0x10,
-    FLAGS6_SINGLE_TARGET_AURA			= 0x20,
-    FLAGS6_UNK8							= 0x40,
-    FLAGS6_UNK9							= 0x80,
-    FLAGS6_UNK10						= 0x100,
-    FLAGS6_UNK11						= 0x200,
-    FLAGS6_UNK12						= 0x400,
-    FLAGS6_UNK13						= 0x800,
-    FLAGS6_UNK14						= 0x1000,
-    FLAGS6_UNK15						= 0x2000,
-    FLAGS6_UNK16						= 0x4000,
-    FLAGS6_UNK17						= 0x8000,
-    FLAGS6_UNK18						= 0x10000,
-    FLAGS6_USABLE_WHILE_FEARED          = 0x20000,
-    FLAGS6_USABLE_WHILE_CONFUSED        = 0x40000,
-    FLAGS6_UNK21						= 0x80000,
-    FLAGS6_UNK22						= 0x100000,
-    FLAGS6_UNK23						= 0x200000,
-    FLAGS6_UNK24						= 0x400000,
-    FLAGS6_UNK25						= 0x800000,
-    FLAGS6_UNK26						= 0x1000000,
-    FLAGS6_UNK27						= 0x2000000,
-    FLAGS6_UNK28						= 0x4000000,
-    FLAGS6_UNK29						= 0x8000000,
-    FLAGS6_UNK30						= 0x10000000,
-    FLAGS6_UNK31						= 0x20000000,
-    FLAGS6_UNK32						= 0x40000000,
-    FLAGS6_UNK33						= 0x80000000,
+    ATTRIBUTESEX5_NULL							= 0x0,
+    ATTRIBUTESEX5_UNK2							= 0x1,
+    ATTRIBUTESEX5_REAGENT_REMOVAL				= 0x2,
+    ATTRIBUTESEX5_UNK4							= 0x4,
+    ATTRIBUTESEX5_USABLE_WHILE_STUNNED         = 0x8,
+    ATTRIBUTESEX5_UNK6							= 0x10,
+    ATTRIBUTESEX5_SINGLE_TARGET_AURA			= 0x20,
+    ATTRIBUTESEX5_UNK8							= 0x40,
+    ATTRIBUTESEX5_UNK9							= 0x80,
+    ATTRIBUTESEX5_UNK10						= 0x100,
+    ATTRIBUTESEX5_UNK11						= 0x200,
+    ATTRIBUTESEX5_UNK12						= 0x400,
+    ATTRIBUTESEX5_UNK13						= 0x800,
+    ATTRIBUTESEX5_UNK14						= 0x1000,
+    ATTRIBUTESEX5_UNK15						= 0x2000,
+    ATTRIBUTESEX5_UNK16						= 0x4000,
+    ATTRIBUTESEX5_UNK17						= 0x8000,
+    ATTRIBUTESEX5_UNK18						= 0x10000,
+    ATTRIBUTESEX5_USABLE_WHILE_FEARED          = 0x20000,
+    ATTRIBUTESEX5_USABLE_WHILE_CONFUSED        = 0x40000,
+    ATTRIBUTESEX5_UNK21						= 0x80000,
+    ATTRIBUTESEX5_UNK22						= 0x100000,
+    ATTRIBUTESEX5_UNK23						= 0x200000,
+    ATTRIBUTESEX5_UNK24						= 0x400000,
+    ATTRIBUTESEX5_UNK25						= 0x800000,
+    ATTRIBUTESEX5_UNK26						= 0x1000000,
+    ATTRIBUTESEX5_UNK27						= 0x2000000,
+    ATTRIBUTESEX5_UNK28						= 0x4000000,
+    ATTRIBUTESEX5_UNK29						= 0x8000000,
+    ATTRIBUTESEX5_UNK30						= 0x10000000,
+    ATTRIBUTESEX5_UNK31						= 0x20000000,
+    ATTRIBUTESEX5_UNK32						= 0x40000000,
+    ATTRIBUTESEX5_UNK33						= 0x80000000,
 };
 
-enum Flags7 // AttributesExF
+enum Flags7 // AttributesEx6
 {
-    FLAGS7_NULL							= 0x0,
-    FLAGS7_UNK2							= 0x1,
-    FLAGS7_UNUSED1						= 0x2, // unused 2.4.3
-    FLAGS7_UNK4							= 0x4,
-    FLAGS7_UNK5							= 0x8,
-    FLAGS7_UNUSED2						= 0x10, // unused 2.4.3
-    FLAGS7_UNK7							= 0x20,
-    FLAGS7_UNK8							= 0x40,
-    FLAGS7_UNK9							= 0x80,
-    FLAGS7_UNK10						= 0x100,
-    FLAGS7_UNUSED3						= 0x200, // unused 2.4.3
-    FLAGS7_UNK12						= 0x400,
-    FLAGS7_UNK13						= 0x800,
-    FLAGS7_UNUSED4						= 0x1000, // unused 2.4.3
-    FLAGS7_UNK15						= 0x2000,
-    FLAGS7_UNUSED5						= 0x4000, // unused 2.4.3
-    FLAGS7_UNUSED6						= 0x8000, // unused 2.4.3
-    FLAGS7_UNUSED7						= 0x10000, // unused 2.4.3 - 20-33 also unused 2.4.3
-    FLAGS7_UNK19						= 0x20000,
+    ATTRIBUTESEX6_NULL							= 0x0,
+    ATTRIBUTESEX6_UNK2							= 0x1,
+    ATTRIBUTESEX6_UNUSED1						= 0x2, // unused 2.4.3
+    ATTRIBUTESEX6_UNK4							= 0x4,
+    ATTRIBUTESEX6_UNK5							= 0x8,
+    ATTRIBUTESEX6_UNUSED2						= 0x10, // unused 2.4.3
+    ATTRIBUTESEX6_UNK7							= 0x20,
+    ATTRIBUTESEX6_UNK8							= 0x40,
+    ATTRIBUTESEX6_UNK9							= 0x80,
+    ATTRIBUTESEX6_UNK10						= 0x100,
+    ATTRIBUTESEX6_UNUSED3						= 0x200, // unused 2.4.3
+    ATTRIBUTESEX6_UNK12						= 0x400,
+    ATTRIBUTESEX6_UNK13						= 0x800,
+    ATTRIBUTESEX6_UNUSED4						= 0x1000, // unused 2.4.3
+    ATTRIBUTESEX6_UNK15						= 0x2000,
+    ATTRIBUTESEX6_UNUSED5						= 0x4000, // unused 2.4.3
+    ATTRIBUTESEX6_UNUSED6						= 0x8000, // unused 2.4.3
+    ATTRIBUTESEX6_UNUSED7						= 0x10000, // unused 2.4.3 - 20-33 also unused 2.4.3
+    ATTRIBUTESEX6_UNK19						= 0x20000,
 };
 
 
@@ -1364,7 +1364,7 @@ typedef enum
     EFF_TARGET_ALL_ENEMIES_AROUND_CASTER					= 22,
     EFF_TARGET_GAMEOBJECT								= 23,
     EFF_TARGET_IN_FRONT_OF_CASTER						= 24,
-    EFF_TARGET_DUEL										= 25,//Don't know the real name!!!
+    EFF_TARGET_ANY_TARGET										= 25,//Don't know the real name!!!
     EFF_TARGET_GAMEOBJECT_ITEM							= 26,
     EFF_TARGET_PET_MASTER								= 27,
     EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED				= 28,
@@ -1379,10 +1379,10 @@ typedef enum
     EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET					= 38,
     EFF_TARGET_SELF_FISHING								= 39,
     EFF_TARGET_SCRIPTED_GAMEOBJECT						= 40,
-    EFF_TARGET_TOTEM_EARTH								= 41,
-    EFF_TARGET_TOTEM_WATER								= 42,
-    EFF_TARGET_TOTEM_AIR									= 43,
-    EFF_TARGET_TOTEM_FIRE								= 44,
+    EFF_TARGET_FRONT_RIGHT								= 41,
+    EFF_TARGET_BACK_RIGHT								= 42,
+    EFF_TARGET_BACK_LEFT									= 43,
+    EFF_TARGET_FRONT_LEFT								= 44,
     EFF_TARGET_CHAIN										= 45,
     EFF_TARGET_SCIPTED_OBJECT_LOCATION					= 46,
     EFF_TARGET_DYNAMIC_OBJECT							= 47,//not sure exactly where is used
@@ -1457,7 +1457,7 @@ inline int GetAiTargetType(SpellEntry* sp)
 	if(
 	    HasTargetType(sp, EFF_TARGET_SINGLE_ENEMY) ||
 	    HasTargetType(sp, EFF_TARGET_ALL_ENEMIES_AROUND_CASTER) ||
-	    HasTargetType(sp, EFF_TARGET_DUEL) ||
+	    HasTargetType(sp, EFF_TARGET_ANY_TARGET) ||
 	    HasTargetType(sp, EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET) ||
 	    HasTargetType(sp, EFF_TARGET_CHAIN) ||
 	    HasTargetType(sp, EFF_TARGET_CURRENT_SELECTION) ||
@@ -1706,19 +1706,19 @@ class SERVER_DECL Spell : public EventableObject
 		}
 		ARCEMU_INLINE bool hasAttributeExB(uint32 attribute)
 		{
-			return ((GetProto()->AttributesExB & attribute) > 0);
+			return ((GetProto()->ATTRIBUTESEX2 & attribute) > 0);
 		}
 		ARCEMU_INLINE bool hasAttributeExC(uint32 attribute)
 		{
-			return ((GetProto()->AttributesExC & attribute) > 0);
+			return ((GetProto()->ATTRIBUTESEX3 & attribute) > 0);
 		}
 		ARCEMU_INLINE bool hasAttributeExD(uint32 attribute)
 		{
-			return ((GetProto()->AttributesExD & attribute) > 0);
+			return ((GetProto()->AttributesEx4 & attribute) > 0);
 		}
 		ARCEMU_INLINE bool hasAttributeExE(uint32 attribute)
 		{
-			return ((GetProto()->AttributesExE & attribute) > 0);
+			return ((GetProto()->AttributesEx5 & attribute) > 0);
 		}
 		// Removes reagents, ammo, and items/charges
 		void RemoveItems();
