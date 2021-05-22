@@ -41,6 +41,7 @@ void CreateDummySpell(uint32 id)
 	dbcSpell.SetRow(id, sp);
 	sWorld.dummyspells.push_back(sp);
 }
+
 void ApplyNormalFixes()
 {
 	//Updating spell.dbc
