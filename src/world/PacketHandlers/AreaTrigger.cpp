@@ -79,6 +79,28 @@ uint32 CheckTriggerPrerequisites(AreaTrigger* pAreaTrigger, WorldSession* pSessi
 	// These can be overridden by cheats/GM
 	if(pPlayer->TriggerpassCheat)
 		return AREA_TRIGGER_FAILURE_OK;
+	/*
+	Phase Progression System Checks
+	*/
+	// Patch 3.0 Content disable Ulduar, Trial Of Chamapion, Trial of Crusader/Grand Crusader, FoS/PoS/HoR, ICC, Ruby Sanctum
+	if (pMapInfo->mapid == MAP_ULDUAR || pMapInfo->mapid == MAP_TRIAL_OF_CHAMPION || pMapInfo->mapid == MAP_TRIAL_OF_CRUSADER || pMapInfo->mapid == MAP_FORGE_OF_SOULS || pMapInfo->mapid == MAP_PIT_OF_SARON || pMapInfo->mapid == MAP_HALLSOFREFLECTION || pMapInfo->mapid == MAP_ICECROWNCITADEL || pMapInfo->mapid == MAP_RUBY_SANCTUM
+		&& Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 0))
+		return AREA_TRIGGER_FAILURE_UNAVAILABLE;
+
+	// Patch 3.1 Content disable Trial Of Chamapion, Trial of Crusader/Grand Crusader, FoS/PoS/HoR, ICC, Ruby Sanctum
+	if (pMapInfo->mapid == MAP_TRIAL_OF_CHAMPION || pMapInfo->mapid == MAP_TRIAL_OF_CRUSADER || pMapInfo->mapid == MAP_FORGE_OF_SOULS || pMapInfo->mapid == MAP_PIT_OF_SARON || pMapInfo->mapid == MAP_HALLSOFREFLECTION || pMapInfo->mapid == MAP_ICECROWNCITADEL || pMapInfo->mapid == MAP_RUBY_SANCTUM
+		&& Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 1))
+		return AREA_TRIGGER_FAILURE_UNAVAILABLE;
+
+	// Patch 3.2 Content disable FoS/PoS/HoR, ICC, Ruby Sanctum
+	if (pMapInfo->mapid == MAP_FORGE_OF_SOULS || pMapInfo->mapid == MAP_PIT_OF_SARON || pMapInfo->mapid == MAP_HALLSOFREFLECTION || pMapInfo->mapid == MAP_ICECROWNCITADEL || pMapInfo->mapid == MAP_RUBY_SANCTUM
+		&& Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 2))
+		return AREA_TRIGGER_FAILURE_UNAVAILABLE;
+
+	// Patch 3.3 Content disable Ruby Sanctum
+	if (pMapInfo->mapid == MAP_RUBY_SANCTUM
+		&& Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 3))
+		return AREA_TRIGGER_FAILURE_UNAVAILABLE;
 
 	if(pAreaTrigger->required_level && pPlayer->getLevel() < pAreaTrigger->required_level)
 		return AREA_TRIGGER_FAILURE_LEVEL;

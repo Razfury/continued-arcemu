@@ -634,6 +634,12 @@ enum InstanceMaps
 	MAP_OS = 615,  //ObsidianSanctum
 	MAP_ICECROWNCITADEL = 631,  //Icecrown Citadel
 	MAP_HALLSOFREFLECTION = 668,  //Halls of Reflection
+	MAP_ULDUAR = 603,
+	MAP_TRIAL_OF_CHAMPION = 650,
+	MAP_TRIAL_OF_CRUSADER = 649,
+	MAP_FORGE_OF_SOULS = 632,
+	MAP_PIT_OF_SARON = 658,
+	MAP_RUBY_SANCTUM = 724,
 
 	/*
 	30	Alterac Valley
@@ -674,6 +680,13 @@ enum InstanceMaps
 	580	The Sunwell
 	595	The Culling of Stratholme
 	598	Sunwell Fix (Unused)
+
+	MAP_ULDUAR = 603,
+	MAP_TRIAL_OF_CHAMPION = 650,
+	MAP_TRIAL_OF_CRUSADER = 649,
+	MAP_FORGE_OF_SOULS = 632,
+	MAP_PIT_OF_SARON = 658,
+	MAP_RUBY_SANCTUM = 724,
 
 	603	Ulduar
 	607	Strand of the Ancients

@@ -1484,6 +1484,12 @@ void World::Rehash(bool load)
 	if(instance_DailyHeroicInstanceResetHour > 23)
 		instance_DailyHeroicInstanceResetHour = 23;
 
+	if (Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 4) > 4)
+		Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 4);
+
+	if (Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 0) < 0)
+		Config.MainConfig.GetIntDefault("Server", "ProgressionVersion", 0);
+
 	// ======================================
 	m_movementCompressInterval = Config.MainConfig.GetIntDefault("Movement", "FlushInterval", 1000);
 	m_movementCompressRate = Config.MainConfig.GetIntDefault("Movement", "CompressRate", 1);

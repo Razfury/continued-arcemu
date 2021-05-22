@@ -68,6 +68,16 @@ enum Rates
     MAX_RATES
 };
 
+enum ProgressiveVersions
+{
+	// All dungeons and raids not avaliable in there respective patches will be disabled.
+	PROGRESSION_PHASE_0 = 0, // Patch 3.0
+	PROGRESSION_PHASE_1 = 1, // Patch 3.1
+	PROGRESSION_PHASE_2 = 2, // Patch 3.2
+	PROGRESSION_PHASE_3 = 3, // Patch 3.3
+	PROGRESSION_PHASE_4 = 4, // Patch 3.3.5
+};
+
 enum IntRates
 {
     INTRATE_SAVE = 0,
