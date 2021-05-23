@@ -1281,6 +1281,15 @@ bool MapMgr::Do()
 	worldstateshandler.InitWorldStates( objmgr.GetWorldStatesForMap( _mapId ) );
 	worldstateshandler.setObserver( this );
 
+	//Load all map cells if is an instance/raid
+	if (pInstance)
+	{
+		if (GetMapInfo()->type == INSTANCE_NONRAID || GetMapInfo()->type == INSTANCE_RAID)
+		{
+			LoadAllCells();
+		}
+	}
+
 	// always declare local variables outside of the loop!
 	// otherwise there's a lot of sub esp; going on.
 
