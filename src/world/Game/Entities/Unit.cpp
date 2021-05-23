@@ -3504,7 +3504,7 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 		case 0:
 			hit_status |= HITSTATUS_MISS;
 			// dirty ai agro fix
-			if(pVictim->IsCreature() && pVictim->GetAIInterface()->getNextTarget() == NULL)
+			if(pVictim->IsCreature() && pVictim->GetAIInterface()->getNextTarget() == NULL && !(ability && ability->ATTRIBUTESEX3 & ATTRIBUTESEX3_NO_INITIAL_AGGRO))
 				pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
 			break;
 //--------------------------------dodge-----------------------------------------------------
