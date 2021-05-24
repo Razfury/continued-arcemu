@@ -834,6 +834,15 @@ void GameObject::SetState(uint8 state)
 	SetByte(GAMEOBJECT_BYTES_1, 0, state);
 }
 
+void GameObject::SetStateTimed(uint8 state, uint32 time)
+{
+    SetByte(GAMEOBJECT_BYTES_1, 0, state);
+    if (state == GAMEOBJECT_STATE_OPEN)
+    {
+        sEventMgr.AddEvent(TO_OBJECT(this), &Object::SetByte, (uint32)GAMEOBJECT_BYTES_1, (uint32)GAMEOBJECT_BYTES_STATE, (uint8)1, EVENT_UNK, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+    }
+}
+
 uint8 GameObject::GetState()
 {
 	return GetByte(GAMEOBJECT_BYTES_1, 0);

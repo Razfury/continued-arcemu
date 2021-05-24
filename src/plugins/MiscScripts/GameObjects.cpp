@@ -1146,6 +1146,23 @@ class SacredFireofLife : public GameObjectAIScript
 		}
 };
 
+class VioletHoldLever : public GameObjectAIScript
+{
+public:
+	VioletHoldLever(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript* Create(GameObject* GO) { return new VioletHoldLever(GO); }
+
+	void OnActivate(Player* pPlayer)
+	{
+        if (pPlayer)
+        {
+            GameObject * violet_hold_door = pPlayer->GetMapMgr()->GetGameObject(48955);
+            if (violet_hold_door)
+                violet_hold_door->SetStateTimed(GAMEOBJECT_STATE_OPEN, urand(6000, 9000));
+        }
+	}
+};
+
 void SetupGoHandlers(ScriptMgr* mgr)
 {
 	mgr->register_gameobject_script(179879, &OrbOfCommand::Create);
@@ -1195,4 +1212,5 @@ void SetupGoHandlers(ScriptMgr* mgr)
 	mgr->register_gameobject_script(310033, &AndorhalTower4::Create);
 
 	mgr->register_gameobject_script(184588, &TyraliusPrison::Create);
+    mgr->register_gameobject_script(193020, &VioletHoldLever::Create);
 }

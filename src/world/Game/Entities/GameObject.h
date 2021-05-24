@@ -289,6 +289,8 @@ class SERVER_DECL GameObject : public Object
 		MapCell* m_respawnCell;
 
 		void SetState(uint8 state);
+        // Set a timer until the gameobject returns to closed state.
+        void SetStateTimed(uint8 state, uint32 time);
 		uint8 GetState();
 
 		uint32 GetOverrides() { return m_overrides; }
