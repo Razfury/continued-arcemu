@@ -255,6 +255,8 @@ class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,
 		bool IsCombatInProgress() { return (_combatProgress.size() > 0); }
 		void TeleportPlayers();
 
+        void VisitCoords(uint32 x, uint32 y, Object* obj);
+
 		uint32 GetInstanceID() { return m_instanceID; }
 		MapInfo* GetMapInfo() { return pMapInfo; }
 

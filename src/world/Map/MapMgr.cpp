@@ -276,8 +276,8 @@ void MapMgr::PushObject(Object* obj)
 			obj->GetPositionV()->ChangeCoords(0, 0, 0, 0);
 		}
 
-		x = GetPosX(obj->GetPositionX() + urand(20, 200));
-		y = GetPosY(obj->GetPositionY() + urand(20, 200));
+		x = GetPosX(obj->GetPositionX());
+		y = GetPosY(obj->GetPositionY());
 	}
 
 	MapCell* objCell = GetCell(x, y);
@@ -413,6 +413,225 @@ void MapMgr::PushObject(Object* obj)
 		InactiveMoveTime = 0;
 }
 
+
+/*void MapMgr::VisitCoords(uint32 x, uint32 y, Object* obj)
+{
+    uint32 aposX = GetPosX(x);
+    uint32 aposY = GetPosY(y);
+
+    MapCell* objCell = GetCell(aposX, aposY);
+    if (objCell == NULL)
+    {
+        objCell = Create(aposX, aposY);
+        objCell->Init(aposX, aposY, this);
+    }
+    ARCEMU_ASSERT(objCell != NULL);
+
+    uint32 eendX = (aposX <= _sizeX) ? aposX + 1 : (_sizeX - 1);
+    uint32 eendY = (aposY <= _sizeY) ? aposY + 1 : (_sizeY - 1);
+    uint32 sstartX = aposX > 0 ? aposX - 1 : 0;
+    uint32 sstartY = aposY > 0 ? aposY - 1 : 0;
+    uint32 posX, posY;
+    MapCell* cell;
+
+
+    ByteBuffer* buf = 0;
+    uint32 count;
+    Player* plObj = TO_PLAYER(obj);
+
+    //////////////////////
+    // Build in-range data
+    //////////////////////
+
+    for (posX = sstartX; posX <= eendX; posX++)
+    {
+        for (posY = sstartY; posY <= eendY; posY++)
+        {
+            cell = GetCell(posX, posY);
+            if (cell)
+            {
+                UpdateInRangeSet(obj, plObj, cell, &buf);
+            }
+        }
+    }
+
+    //Add to the cell's object list
+    objCell->AddObject(obj);
+
+    obj->SetMapCell(objCell);
+    //Add to the mapmanager's object list
+    if (plObj != NULL)
+    {
+        UpdateCellActivity(aposX, aposY, 2);
+    }
+
+    if (buf)
+        delete buf;
+} */
+
+void MapMgr::VisitCoords(uint32 x, uint32 y, Object* obj)
+{
+    ARCEMU_ASSERT(obj != NULL);
+    // Anything not a player has no interest for us
+    if (!obj->IsPlayer() || obj->GetMapMgr() != this)
+    {
+        return;
+    }
+
+    Player* plObj = NULL;
+    ByteBuffer* buf = 0;
+
+    if (obj->IsPlayer())
+    {
+        plObj = TO< Player* >(obj);
+    }
+
+    Object* curObj;
+    float fRange = 0.0f;
+
+    ///////////////////////////////////////
+    // Update in-range data for old objects
+    ///////////////////////////////////////
+
+    if (obj->HasInRangeObjects())
+    {
+        for (Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin(); iter != obj->GetInRangeSetEnd();)
+        {
+            curObj = *iter;
+            ++iter;
+
+            if (curObj->IsPlayer() && plObj != NULL && plObj->transporter_info.guid && plObj->transporter_info.guid == TO< Player* >(curObj)->transporter_info.guid)
+                fRange = 0.0f; // unlimited distance for people on same boat
+            else if (curObj->GetTypeFromGUID() == HIGHGUID_TYPE_TRANSPORTER)
+                fRange = 0.0f; // unlimited distance for transporters (only up to 2 cells +/- anyway.)
+            //If the object announcing its position is a transport, or other special object, then deleting it from visible objects should be avoided. - By: VLack
+            else if (obj->IsGameObject() && (TO< GameObject* >(obj)->GetOverrides() & GAMEOBJECT_INFVIS) && obj->GetMapId() == curObj->GetMapId())
+                fRange = 0.0f;
+            //If the object we're checking for possible removal is a transport or other special object, and we are players on the same map, don't remove it...
+            else if (plObj && curObj->IsGameObject() && (TO< GameObject* >(curObj)->GetOverrides() & GAMEOBJECT_INFVIS) && obj->GetMapId() == curObj->GetMapId())
+                fRange = 0.0f;
+            else if (curObj->IsPlayer() && TO< Player* >(curObj)->GetFarsightTarget() == obj->GetGUID())
+                fRange = 0.0f;//Mind Vision, Eye of Kilrogg
+            else
+                fRange = m_UpdateDistance; // normal distance
+
+            if (fRange > 0.0f && (curObj->GetDistance2dSq(obj) > fRange))
+            {
+                if (plObj != NULL)
+                    plObj->RemoveIfVisible(curObj->GetGUID());
+
+                if (curObj->IsPlayer())
+                    TO< Player* >(curObj)->RemoveIfVisible(obj->GetGUID());
+
+                curObj->RemoveInRangeObject(obj);
+
+                if (obj->GetMapMgr() != this)
+                {
+                    /* Something removed us. */
+                    return;
+                }
+                obj->RemoveInRangeObject(curObj);
+            }
+        }
+    }
+
+    ///////////////////////////
+    // Get new cell coordinates
+    ///////////////////////////
+    if (obj->GetMapMgr() != this)
+    {
+        /* Something removed us. */
+        return;
+    }
+
+    uint32 cellX = GetPosX(x);
+    uint32 cellY = GetPosY(y);
+
+    if (cellX >= _sizeX || cellY >= _sizeY)
+    {
+        return;
+    }
+
+    MapCell* objCell = GetCell(cellX, cellY);
+    MapCell* pOldCell = obj->GetMapCell();
+    if (objCell == NULL)
+    {
+        objCell = Create(cellX, cellY);
+        objCell->Init(cellX, cellY, this);
+    }
+
+    ARCEMU_ASSERT(objCell != NULL);
+
+    // If object moved cell
+    if (objCell != pOldCell)
+    {
+        // THIS IS A HACK!
+        // Current code, if a creature on a long waypoint path moves from an active
+        // cell into an inactive one, it will disable itself and will never return.
+        // This is to prevent cpu leaks. I will think of a better solution very soon :P
+
+        if (!objCell->IsActive() && !plObj && obj->IsActive())
+            obj->Deactivate(this);
+
+        if (pOldCell != NULL)
+            pOldCell->RemoveObject(obj);
+
+        objCell->AddObject(obj);
+        obj->SetMapCell(objCell);
+
+        // if player we need to update cell activity
+        // radius = 2 is used in order to update both
+        // old and new cells
+        if (obj->IsPlayer())
+        {
+            // have to unlock/lock here to avoid a deadlock situation.
+            UpdateCellActivity(cellX, cellY, 2);
+            if (pOldCell != NULL)
+            {
+                // only do the second check if there's -/+ 2 difference
+                if (abs((int)cellX - (int)pOldCell->_x) > 2 ||
+                    abs((int)cellY - (int)pOldCell->_y) > 2)
+                {
+                    UpdateCellActivity(pOldCell->_x, pOldCell->_y, 2);
+                }
+            }
+        }
+    }
+
+
+    //////////////////////////////////////
+    // Update in-range set for new objects
+    //////////////////////////////////////
+
+    uint32 endX = cellX <= _sizeX ? cellX + 1 : (_sizeX - 1);
+    uint32 endY = cellY <= _sizeY ? cellY + 1 : (_sizeY - 1);
+    uint32 startX = cellX > 0 ? cellX - 1 : 0;
+    uint32 startY = cellY > 0 ? cellY - 1 : 0;
+    uint32 posX, posY;
+    MapCell* cell;
+
+    //If the object announcing it's position is a special one, then it should do so in a much wider area - like the distance between the two transport towers in Orgrimmar, or more. - By: VLack
+    if (obj->IsGameObject() && (TO< GameObject* >(obj)->GetOverrides() & GAMEOBJECT_ONMOVEWIDE))
+    {
+        endX = cellX + 5 <= _sizeX ? cellX + 6 : (_sizeX - 1);
+        endY = cellY + 5 <= _sizeY ? cellY + 6 : (_sizeY - 1);
+        startX = cellX > 5 ? cellX - 6 : 0;
+        startY = cellY > 5 ? cellY - 6 : 0;
+    }
+
+    for (posX = startX; posX <= endX; ++posX)
+    {
+        for (posY = startY; posY <= endY; ++posY)
+        {
+            cell = GetCell(posX, posY);
+            if (cell)
+                UpdateInRangeSet(obj, plObj, cell, &buf);
+        }
+    }
+
+    if (buf)
+        delete buf;
+}
 
 void MapMgr::PushStaticObject(Object* obj)
 {
@@ -710,8 +929,8 @@ void MapMgr::ChangeObjectLocation(Object* obj)
 		}
 	}
 
-	uint32 cellX = GetPosX(obj->GetPositionX() + urand(20, 200));
-	uint32 cellY = GetPosY(obj->GetPositionY() + urand(20, 200));
+	uint32 cellX = GetPosX(obj->GetPositionX());
+	uint32 cellY = GetPosY(obj->GetPositionY());
 
 	if(cellX >= _sizeX || cellY >= _sizeY)
 	{
