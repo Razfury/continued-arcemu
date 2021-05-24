@@ -26,6 +26,7 @@ SET(sources
 	PacketHandlers/AuctionHouseHandler.cpp
 	Game/Auction/AuctionMgr.cpp 
 	Game/BattleGround/Battleground.cpp
+	Game/BattleGround/LakeWintergrasp.cpp
 	Chat/BattlegroundCommands.cpp 
 	PacketHandlers/BattlegroundHandler.cpp 
 	Game/BattleGround/BattlegroundMgr.cpp 
