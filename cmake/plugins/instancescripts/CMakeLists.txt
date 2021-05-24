@@ -45,6 +45,7 @@ Instance_TheSteamvault.cpp
 Instance_TheUnderbog.cpp 
 Instance_Uldaman.cpp 
 Instance_UtgardeKeep.cpp 
+Instance_VioletHold.cpp
 Instance_WailingCaverns.cpp 
 Instance_TheStockade.cpp 
 Instance_ZulFarrak.cpp 
@@ -71,6 +72,7 @@ Setup.cpp )
 
 SET( headers
 Instance_Ahnkahet.h
+Instance_VioletHold.h
 Raid_Naxxramas.h
 Raid_Ulduar.h
 Setup.h

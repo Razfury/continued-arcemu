@@ -61,6 +61,7 @@ void SetupTheSteamvault(ScriptMgr* mgr);
 void SetupTheUnderbog(ScriptMgr* mgr);
 void SetupUldaman(ScriptMgr* mgr);
 void SetupUtgardeKeep(ScriptMgr* mgr);
+void SetupVioletHold(ScriptMgr* mgr);
 void SetupTheStockade(ScriptMgr* mgr);
 void SetupWailingCaverns(ScriptMgr* mgr);
 void SetupMagistersTerrace(ScriptMgr* mgr);

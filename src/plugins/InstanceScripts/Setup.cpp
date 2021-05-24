@@ -28,6 +28,7 @@ extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any script to disable it
 {
 	//Instances
+    SetupAhnkahet(mgr);
 	SetupArcatraz(mgr);
 	SetupAuchenaiCrypts(mgr);
 	SetupAzjolNerub(mgr);
@@ -61,6 +62,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any 
 	SetupTheSlavePens(mgr);
 	SetupTheSteamvault(mgr);
 	SetupTheUnderbog(mgr);
+    SetupVioletHold(mgr);
 	SetupUldaman(mgr);
 	SetupUtgardeKeep(mgr);
 	SetupTheStockade(mgr);
