@@ -8,6 +8,7 @@ PROJECT(InstanceScripts)
 SET( prefix ${SCRIPTS_PATH}/InstanceScripts )
 
 set(sources
+Instance_Ahnkahet.cpp
 Instance_Arcatraz.cpp 
 Instance_AuchenaiCrypts.cpp 
 Instance_AzjolNerub.cpp 
@@ -69,6 +70,7 @@ Raid_ZulAman.cpp
 Setup.cpp )
 
 SET( headers
+Instance_Ahnkahet.h
 Raid_Naxxramas.h
 Raid_Ulduar.h
 Setup.h

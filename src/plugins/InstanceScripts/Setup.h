@@ -25,6 +25,7 @@
 #define INSTANCE_SCRIPTS_SETUP_H
 
 //Instances
+void SetupAhnkahet(ScriptMgr* mgr);
 void SetupArcatraz(ScriptMgr* mgr);
 void SetupAuchenaiCrypts(ScriptMgr* mgr);
 void SetupAzjolNerub(ScriptMgr* mgr) ;
