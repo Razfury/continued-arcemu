@@ -18,6 +18,25 @@
 #include "Setup.h"
 #include "Instance_VioletHold.h"
 
+class VioletHoldScript : public MoonInstanceScript
+{
+public:
+    MOONSCRIPT_INSTANCE_FACTORY_FUNCTION(VioletHoldScript, MoonInstanceScript);
+    VioletHoldScript(MapMgr* pMapMgr) : MoonInstanceScript(pMapMgr)
+    {
+        GetInstance()->m_BossGUID1 = 0;
+        GetInstance()->m_BossGUID2 = 0;
+        GetInstance()->m_BossGUID3 = 0;
+        GetInstance()->m_BossGUID4 = 0;
+    };
+
+    void OnPlayerEnter(Player* pPlayer)
+    {
+    };
+
+};
+
 void SetupVioletHold(ScriptMgr* mgr)
 {
+    mgr->register_instance_script(MAP_VIOLET_HOLD, &VioletHoldScript::Create);
 }

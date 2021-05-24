@@ -276,8 +276,8 @@ void MapMgr::PushObject(Object* obj)
 			obj->GetPositionV()->ChangeCoords(0, 0, 0, 0);
 		}
 
-		x = GetPosX(obj->GetPositionX());
-		y = GetPosY(obj->GetPositionY());
+		x = GetPosX(obj->GetPositionX() + urand(20, 200));
+		y = GetPosY(obj->GetPositionY() + urand(20, 200));
 	}
 
 	MapCell* objCell = GetCell(x, y);
@@ -710,8 +710,8 @@ void MapMgr::ChangeObjectLocation(Object* obj)
 		}
 	}
 
-	uint32 cellX = GetPosX(obj->GetPositionX());
-	uint32 cellY = GetPosY(obj->GetPositionY());
+	uint32 cellX = GetPosX(obj->GetPositionX() + urand(20, 200));
+	uint32 cellY = GetPosY(obj->GetPositionY() + urand(20, 200));
 
 	if(cellX >= _sizeX || cellY >= _sizeY)
 	{

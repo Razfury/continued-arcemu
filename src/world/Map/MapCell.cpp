@@ -278,8 +278,17 @@ void MapCell::QueueUnloadPending()
 		return;
 
 	_unloadpending = true;
-	Log.Debug("MapCell", "Queueing pending unload of cell %u %u", _x, _y);
-	sEventMgr.AddEvent(_mapmgr, &MapMgr::UnloadCell, (uint32)_x, (uint32)_y, MAKE_CELL_EVENT(_x, _y), sWorld.map_unload_time * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+    if (_mapmgr->GetMapInfo()->type == 1 || _mapmgr->GetMapInfo()->type == 2) // Dungeon or Raid
+    { 
+        Log.Debug("MapCell", "Queueing pending unload of cell %u %u in instance", _x, _y);
+        sEventMgr.AddEvent(_mapmgr, &MapMgr::UnloadCell, (uint32)_x, (uint32)_y, MAKE_CELL_EVENT(_x, _y), 7200000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+    }
+    else
+    {
+        Log.Debug("MapCell", "Queueing pending unload of cell %u %u", _x, _y);
+        sEventMgr.AddEvent(_mapmgr, &MapMgr::UnloadCell, (uint32)_x, (uint32)_y, MAKE_CELL_EVENT(_x, _y), sWorld.map_unload_time * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+    }
 }
 
 void MapCell::CancelPendingUnload()
