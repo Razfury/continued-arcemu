@@ -279,7 +279,7 @@ void MapCell::QueueUnloadPending()
 
 	_unloadpending = true;
 
-    if (_mapmgr->GetMapInfo()->type == 1 || _mapmgr->GetMapInfo()->type == 2) // Dungeon or Raid
+    if (_mapmgr->GetMapInfo()->playerlimit >= 5) // Dungeon or Raid
     { 
         Log.Debug("MapCell", "Queueing pending unload of cell %u %u in instance", _x, _y);
         sEventMgr.AddEvent(_mapmgr, &MapMgr::UnloadCell, (uint32)_x, (uint32)_y, MAKE_CELL_EVENT(_x, _y), 7200000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
