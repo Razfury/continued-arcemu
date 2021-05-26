@@ -907,6 +907,8 @@ void Aura::Remove()
 	uint32 flag = 0;
 	if(m_spellProto->MechanicsType == MECHANIC_ENRAGED && !--m_target->asc_enraged)
 		flag |= AURASTATE_FLAG_ENRAGED;
+    else if (m_spellProto->AdditionalAura)
+        m_target->RemoveAura(m_spellProto->AdditionalAura);
 	else if(m_spellProto->MechanicsType == MECHANIC_BLEEDING && !--m_target->asc_bleed)
 		flag |= AURASTATE_FLAG_BLEED;
 	if(m_spellProto->BGR_one_buff_on_target & SPELL_TYPE_SEAL && !--m_target->asc_seal)
@@ -1448,6 +1450,7 @@ void Aura::EventUpdateAA(float r)
 	}
 
 	Unit* u_caster = GetUnitCaster();
+    uint32 areatargets = m_spellProto->AreaAuraTarget;
 
 	// if the caster is no longer valid->remove the aura
 	if(u_caster == NULL)
@@ -1460,8 +1463,15 @@ void Aura::EventUpdateAA(float r)
 	uint32 AAEffectId = m_spellProto->GetAAEffectId();
 	if(AAEffectId == 0)
 	{
-		LOG_ERROR("Spell %u ( %s ) has tried to update Area Aura targets but Spell has no Area Aura effect.", m_spellProto->Id, m_spellProto->Name);
-		ARCEMU_ASSERT(false);
+        if (m_spellProto->AreaAuraTarget > 0) // We have a value in hackfixes, apply it.
+        {
+            AAEffectId = m_spellProto->AreaAuraTarget;
+        }
+        else
+        {
+            LOG_ERROR("Spell %u ( %s ) has tried to update Area Aura targets but Spell has no Area Aura effect.", m_spellProto->Id, m_spellProto->Name);
+            ARCEMU_ASSERT(false);
+        }
 	}
 
 	switch(AAEffectId)

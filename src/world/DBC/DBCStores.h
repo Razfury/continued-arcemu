@@ -775,6 +775,7 @@ struct SpellEntry
 	/// CUSTOM: these fields are used for the modifications made in the world.cpp
 	uint32 DiminishStatus;                  //
 	uint32 proc_interval;                   //!!! CUSTOM, <Fill description for variable>
+    float ProcsPerMinute;               //!!! CUSTOM, number of procs per minute
 	//Buff Groupin Rule -> caster can cast this spell only on 1 target. Value represents the group spell is part of. Can be part of only 1 group
 	//target can have only buff of this type on self. Value represents the group spell is part of. Can be part of only 1 group
 	uint32 BGR_one_buff_on_target;          //!!! CUSTOM, these are related to creating a item through a spell
@@ -787,6 +788,7 @@ struct SpellEntry
 	uint32 NameHash;                        //!!! CUSTOM, related to custom spells, summon spell quest related spells
 	uint32 talent_tree;                     //!!! CUSTOM,
 	uint32 in_front_status;                 //!!! CUSTOM,
+    //bool Unique;                        //!!! CUSTOM, Is this a unique effect? ex: Mortal Strike -50% healing.
 	uint32 EffectSpellGroupRelation_high[ MAX_SPELL_EFFECTS ];     //!!! this is not contained in client dbc but server must have it
 	uint32 ThreatForSpell;
 	float  ThreatForSpellCoef;
@@ -803,12 +805,16 @@ struct SpellEntry
 	float  Dspell_coef_override;            //!!! CUSTOM, overrides any spell coefficient calculation and use this value in DD&DH
 	float  OTspell_coef_override;           //!!! CUSTOM, overrides any spell coefficient calculation and use this value in HOT&DOT
 	int    ai_target_type;
+    uint32 AreaAuraTarget;
+
+    uint32 AdditionalAura;
 
 	bool   self_cast_only;
 	bool   apply_on_shapeshift_change;
 	bool   always_apply;
 	bool   is_melee_spell;                  //!!! CUSTOM,
 	bool   is_ranged_spell;                 //!!! CUSTOM,
+    bool   spell_can_crit;                //!!! CUSTOM
 	bool   noproc;
 
 	uint32 SchoolMask;                      // Custom

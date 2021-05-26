@@ -1079,27 +1079,9 @@ uint32 Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell, boo
 		            spe->NameHash == SPELL_HASH_FROSTBRAND_ATTACK || spellId == 16870))
 		{
 			float ppm = 1.0f;
-			switch(spe->NameHash)
-			{
-				case SPELL_HASH_MAGTHERIDON_MELEE_TRINKET:
-					ppm = 1.5f;
-					break; // dragonspine trophy
-				case SPELL_HASH_ROMULO_S_POISON:
-					ppm = 1.5f;
-					break; // romulo's
-				case SPELL_HASH_BLACK_TEMPLE_MELEE_TRINKET:
-					ppm = 1.0f;
-					break; // madness of the betrayer
-				case SPELL_HASH_FROSTBRAND_ATTACK:
-					ppm = 9.0f;
-					break; // Frostbrand Weapon
-			}
-			switch(spellId)
-			{
-				case 16870:
-					ppm = 2.0f;
-					break; //druid: clearcasting
-			}
+			
+            if (spe->ProcsPerMinute > 0)
+                ppm = spe->ProcsPerMinute;
 
 			Item* mh = TO< Player* >(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 			Item* of = TO< Player* >(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
@@ -1149,6 +1131,10 @@ uint32 Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell, boo
 			RemoveAura(origId);
 
 		int dmg_overwrite[3] = { 0, 0, 0 };
+
+        SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId);
+        if (victim == TO_UNIT(this) && spellInfo->c_is_flags & SPELL_FLAG_CANNOT_PROC_ON_SELF)
+            continue;
 
 		// give spell_proc a chance to handle the effect
 		if(spell_proc->ProcEffectOverride(victim, CastingSpell, flag, dmg, abs, dmg_overwrite, weapon_damage_type))
@@ -7909,6 +7895,10 @@ bool Unit::IsCriticalDamageForSpell(Object* victim, SpellEntry* spell)
 		if( !HasAura(55447) )	// Glyph of Flame Shock
 			fs->Remove();
 	}
+
+    // If a spell has custom spellflags that cannot crit result is always false.
+    if (spell->spell_can_crit == false)
+        result = false;
 
 	return result;
 }

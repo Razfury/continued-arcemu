@@ -137,6 +137,27 @@ class SCRIPT_DECL EasyFunctions
 			return pCreature;
 		}
 
+        Creature* AddCreatureToWorld(Unit* pThis, uint32 entry, float posX, float posY, float posZ, float posO, uint32 duration = 0, uint32 phase = 1)
+        {
+            ARCEMU_ASSERT(pThis != NULL);
+            ARCEMU_ASSERT(pThis->IsInWorld());
+
+            CreatureProto* p = CreatureProtoStorage.LookupEntry(entry);
+
+            if (p == NULL)
+                return NULL;
+
+            Creature* pCreature = pThis->GetMapMgr()->CreateCreature(entry);
+            pCreature->m_spawn = 0;
+            pCreature->Load(p, posX, posY, posZ);
+            pCreature->SetOrientation(posO);
+            pCreature->Despawn(duration, 0);
+            pCreature->PushToWorld(pThis->GetMapMgr());
+            pCreature->Phase(PHASE_SET, phase);
+
+            return pCreature;
+        }
+
 		void DeleteSpawned(Creature* creat)
 		{
 			PrintMessage("Function call: DeleteSpawned()");

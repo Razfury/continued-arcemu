@@ -42,6 +42,72 @@ void CreateDummySpell(uint32 id)
 	sWorld.dummyspells.push_back(sp);
 }
 
+// Copies effect number 'fromEffect' in 'fromSpell' to effect number 'toEffect' in 'toSpell'
+void CopyEffect(SpellEntry *fromSpell, uint8 fromEffect, SpellEntry *toSpell, uint8 toEffect)
+{
+    if (!fromSpell || !toSpell || fromEffect > 2 || toEffect > 2)
+        return;
+
+    uint32 *from = fromSpell->Effect;
+    uint32 *to = toSpell->Effect;
+    // Copy 20 values starting at Effect
+    for (uint8 index = 0; index < 20; index++)
+    {
+        to[index * 3 + toEffect] = from[index * 3 + fromEffect];
+    }
+}
+
+uint32 GetSpellClass(SpellEntry *sp)
+{
+    skilllinespell* sls;
+    sls = dbcSkillLineSpell.LookupRow(sp->Id);
+    switch (sls->Id)
+    {
+    case SKILL_ARMS:
+    case SKILL_FURY:
+    case SKILL_PROTECTION:
+        return WARRIOR;
+    case SKILL_HOLY2:
+    case SKILL_PROTECTION2:
+    case SKILL_RETRIBUTION:
+        return PALADIN;
+    case SKILL_BEAST_MASTERY:
+    case SKILL_SURVIVAL:
+    case SKILL_MARKSMANSHIP:
+        return HUNTER;
+    case SKILL_ASSASSINATION:
+    case SKILL_COMBAT:
+    case SKILL_SUBTLETY:
+        return ROGUE;
+    case SKILL_DISCIPLINE:
+    case SKILL_HOLY:
+    case SKILL_SHADOW_MAGIC:
+        return PRIEST;
+    case SKILL_ENHANCEMENT:
+    case SKILL_RESTORATION:
+    case SKILL_ELEMENTAL_COMBAT:
+        return SHAMAN;
+    case SKILL_FROST:
+    case SKILL_FIRE:
+    case SKILL_ARCANE:
+        return MAGE;
+    case SKILL_AFFLICTION:
+    case SKILL_DEMONOLOGY:
+    case SKILL_DESTRUCTION:
+        return WARLOCK;
+    case SKILL_RESTORATION2:
+    case SKILL_BALANCE:
+    case SKILL_FERAL_COMBAT:
+        return DRUID;
+    case SKILL_FROST2:
+    case SKILL_UNHOLY:
+    case SKILL_BLOOD:
+        return DEATHKNIGHT;
+    }
+
+    return 0;
+}
+
 void ApplyNormalFixes()
 {
 	//Updating spell.dbc
@@ -332,6 +398,21 @@ void ApplyNormalFixes()
 
 		if(sp->NameHash == SPELL_HASH_HEMORRHAGE)
 			sp->c_is_flags |= SPELL_FLAG_IS_MAXSTACK_FOR_DEBUFF;
+
+        for (uint32 b = 0; b < 3; ++b)
+        {
+            if (sp->Effect[b] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+            {
+                sp->EffectImplicitTargetA[b] = EFF_TARGET_SELF;
+                sp->EffectImplicitTargetB[b] = 0;
+            }
+
+            // 3.0.3 totemzzz
+            if (sp->Effect[b] == SPELL_EFFECT_APPLY_RAID_AREA_AURA)
+            {
+                sp->Effect[b] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
+            }
+        }
 
 		//stupid spell ranking problem
 		if(sp->spellLevel == 0)
@@ -1137,30 +1218,6 @@ void ApplyNormalFixes()
 		// CLASS-SPECIFIC SPELL FIXES						//
 		//////////////////////////////////////////////////////
 
-		/* Note: when applying spell hackfixes, please follow a template */
-		/* Please don't put fixes like "sp = CheckAndReturnSpellEntry( 15270 );" inside the loop */
-
-		//////////////////////////////////////////
-		// WARRIOR								//
-		//////////////////////////////////////////
-
-
-
-		//////////////////////////////////////////
-		// PALADIN								//
-		//////////////////////////////////////////
-
-		// Insert paladin spell fixes here
-
-		// Shield of Righteousness
-		if(sp->NameHash == SPELL_HASH_SHIELD_OF_RIGHTEOUSNESS)
-		{
-			sp->School = SCHOOL_HOLY;
-			sp->Effect[0] = SPELL_EFFECT_DUMMY;
-			sp->Effect[1] = SPELL_EFFECT_NULL; //hacks, handling it in Spell::SpellEffectSchoolDMG(uint32 i)
-			sp->Effect[2] = SPELL_EFFECT_SCHOOL_DAMAGE; //hack
-		}
-
 		// Paladin - Consecration
 		if(sp->NameHash == SPELL_HASH_CONSECRATION)
 		{
@@ -1168,75 +1225,12 @@ void ApplyNormalFixes()
 			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC; //Speaks for itself.
 		}
 
-		if(sp->NameHash == SPELL_HASH_SEALS_OF_THE_PURE)
-		{
-			sp->EffectSpellClassMask[0][0] = 0x08000400;
-			sp->EffectSpellClassMask[0][1] = 0x20000000;
-			sp->EffectSpellClassMask[1][1] = 0x800;
-		}
-
-		//////////////////////////////////////////
-		// HUNTER								//
-		//////////////////////////////////////////
-
-		// THESE FIXES ARE GROUPED FOR CODE CLEANLINESS.
-		//Mend Pet
-		if(sp->NameHash == SPELL_HASH_MEND_PET)
-			sp->ChannelInterruptFlags = 0;
-
-
 		// Disengage
 		// Only works in combat
 		if(sp->Id == 781)
 			sp->CustomFlags = CUSTOM_FLAG_SPELL_REQUIRES_COMBAT;
 
-		//////////////////////////////////////////
-		// ROGUE								//
-		//////////////////////////////////////////
-
-		// Insert rogue spell fixes here
-
-		//////////////////////////////////////////
-		// PRIEST								//
-		//////////////////////////////////////////
-
-		//Borrowed Time
-		if(sp->NameHash == SPELL_HASH_BORROWED_TIME)
-		{
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
-
-		//megai2: Grace http://www.wowhead.com/?spell=47516
-		if(sp->NameHash == SPELL_HASH_GRACE)
-		{
-			switch(sp->Id)
-			{
-				case 47516:	// Rank 1
-				case 47517:	// Rank 2
-					sp->procFlags = PROC_ON_CAST_SPELL;
-					break;
-
-				case 47930:
-					sp->rangeIndex = 4;
-					break;
-			}
-		}
-
-		//////////////////////////////////////////
-		// SHAMAN								//
-		//////////////////////////////////////////
-
 		// Insert shaman spell fixes here
-
-		// Flametongue Totem passive target fix
-		if(sp->NameHash == SPELL_HASH_FLAMETONGUE_TOTEM && sp->Attributes & ATTRIBUTES_PASSIVE)
-		{
-			sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-			sp->EffectImplicitTargetB[0] = 0;
-			sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-			sp->EffectImplicitTargetB[1] = 0;
-		}
-
 		// Frostbrand Weapon - 10% spd coefficient
 		if(sp->NameHash == SPELL_HASH_FROSTBRAND_ATTACK)
 			sp->fixed_dddhcoef = 0.1f;
@@ -1252,39 +1246,6 @@ void ApplyNormalFixes()
 		// Healing Stream Totem - 8% healing coefficient
 		if(sp->NameHash == SPELL_HASH_HEALING_STREAM)
 			sp->OTspell_coef_override = 0.08f;
-
-		// Nature's Guardian
-		if(sp->NameHash == SPELL_HASH_NATURE_S_GUARDIAN)
-		{
-			sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_MELEE_ATTACK_RECEIVED |
-			                PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_ANY_DAMAGE_RECEIVED;
-			sp->proc_interval = 5000;
-			sp->EffectTriggerSpell[0] = 31616;
-		}
-
-		if(sp->NameHash == SPELL_HASH_HEX)
-		{
-			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_UNUSED2;
-		}
-
-		//////////////////////////////////////////
-		// MAGE									//
-		//////////////////////////////////////////
-
-		//////////////////////////////////////////
-		// WARLOCK								//
-		//////////////////////////////////////////
-
-		//////////////////////////////////////////
-		// DRUID								//
-		//////////////////////////////////////////
-
-		// Dash
-		if(sp->NameHash == SPELL_HASH_DASH)
-		{
-			// mask for FORM_CAT(1) = 1 << (1 - 1), which is 1
-			sp->RequiredShapeShift = 1;
-		}
 	}
 	// END OF LOOP
 
@@ -1362,27 +1323,6 @@ void ApplyNormalFixes()
 	/////////////////////////////////////////////////////////////////
 
 	/**********************************************************
-	 * thrown - add a 1.6 second cooldown
-	 **********************************************************/
-	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL, SPELL_RANGED_THROW, SPELL_RANGED_WAND, 26679, 29436, 37074, 41182, 41346, 0};
-	for(i = 0; thrown_spells[i] != 0; ++i)
-	{
-		sp = CheckAndReturnSpellEntry(thrown_spells[i]);
-		if(sp != NULL && sp->RecoveryTime == 0 && sp->StartRecoveryTime == 0)
-		{
-			if(sp->Id == SPELL_RANGED_GENERAL) sp->RecoveryTime = 500;    // cebernic: hunter general with 0.5s
-			else sp->RecoveryTime = 1500; // 1.5cd
-		}
-	}
-
-	/**********************************************************
-	 * Wands
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(SPELL_RANGED_WAND);
-	if(sp != NULL)
-		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
-
-	/**********************************************************
 	 * Misc stuff (questfixes etc)
 	 **********************************************************/
 
@@ -1425,5657 +1365,5288 @@ void ApplyNormalFixes()
 	if(sp != NULL)
 		sp->Effect[0] = SPELL_EFFECT_NULL;
 
-	//////////////////////////////////////////////////////
-	// CLASS-SPECIFIC SPELL FIXES						//
-	//////////////////////////////////////////////////////
-
-	/* Note: when applying spell hackfixes, please follow a template */
-
-	//////////////////////////////////////////
-	// WARRIOR								//
-	//////////////////////////////////////////
-
-	// Insert warrior spell fixes here
-
-	/**********************************************************
-	 *	Arms
-	 **********************************************************/
-
-	// Juggernaut
-	sp = CheckAndReturnSpellEntry(65156);
-	if(sp != NULL)
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
-
-	// Taste for Blood Rank 1
-	sp = CheckAndReturnSpellEntry(56636);
-	if(sp != NULL)
-	{
-		//sp->procChance = 33;
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_ANY_HOSTILE_ACTION;
-		sp->proc_interval = 6000;
-	}
-
-	// Taste for Blood Rank 2
-	sp = CheckAndReturnSpellEntry(56637);
-	if(sp != NULL)
-	{
-		//sp->procChance = 66;
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_ANY_HOSTILE_ACTION;
-		sp->proc_interval = 6000;
-	}
-
-	// Taste for Blood Rank 3
-	sp = CheckAndReturnSpellEntry(56638);
-	if(sp != NULL)
-	{
-		//sp->procChance = 100;
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_ANY_HOSTILE_ACTION;
-		sp->proc_interval = 6000;
-	}
-
-	// Wrecking Crew Rank 1
-	sp = CheckAndReturnSpellEntry(46867);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-	}
-
-	// Wrecking Crew Rank 2
-	sp = CheckAndReturnSpellEntry(56611);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-	}
-
-	// Wrecking Crew Rank 3
-	sp = CheckAndReturnSpellEntry(56612);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-	}
-
-	// Wrecking Crew Rank 4
-	sp = CheckAndReturnSpellEntry(56613);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-	}
-
-	// Wrecking Crew Rank 5
-	sp = CheckAndReturnSpellEntry(56614);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-	}
-
-	// Warrior - Deep Wounds
-	sp = CheckAndReturnSpellEntry(12834);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 12721;
-		sp->procFlags |= PROC_ON_SPELL_CRIT_HIT;
-	}
-	sp = CheckAndReturnSpellEntry(12849);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 12721;
-		sp->procFlags |= PROC_ON_SPELL_CRIT_HIT;
-	}
-	sp = CheckAndReturnSpellEntry(12867);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 12721;
-		sp->procFlags |= PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	// Warrior - Improved Hamstring Rank 1
-	sp = CheckAndReturnSpellEntry(12289);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 23694;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->procChance = 5;
-	}
-	// Warrior - Improved Hamstring Rank 2
-	sp = CheckAndReturnSpellEntry(12668);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 23694;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->procChance = 10;
-	}
-	// Warrior - Improved Hamstring Rank 3
-	sp = CheckAndReturnSpellEntry(23695);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 23694;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->procChance = 15;
-	}
-
-	// Warrior - Retaliation
-	sp = CheckAndReturnSpellEntry(20230);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA; //aura
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 22858; //evil , but this is good for us :D
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED; //add procflag here since this was not processed with the others !
-	}
-
-	// Warrior - Second Wind should trigger on self
-	sp = CheckAndReturnSpellEntry(29841);
-	if(sp != NULL)
-		sp->procFlags |= PROC_TARGET_SELF;
-
-	sp = CheckAndReturnSpellEntry(29842);
-	if(sp != NULL)
-		sp->procFlags |= PROC_TARGET_SELF;
-
-	// Warrior - Sudden Death Rank 1
-	sp = CheckAndReturnSpellEntry(29723);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 52437;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 3;
-	}
-
-	// Warrior - Sudden Death Rank 2
-	sp = CheckAndReturnSpellEntry(29725);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 52437;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 6;
-	}
-
-	// Warrior - Sudden Death Rank 3
-	sp = CheckAndReturnSpellEntry(29724);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 52437;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 9;
-	}
-
-	// Warrior - Overpower Rank 1
-	sp = CheckAndReturnSpellEntry(7384);
-	if(sp != NULL)
-		sp->Attributes |= ATTRIBUTES_CANT_BE_DPB;
-	// Warrior - Overpower Rank 2
-	sp = CheckAndReturnSpellEntry(7887);
-	if(sp != NULL)
-		sp->Attributes |= ATTRIBUTES_CANT_BE_DPB;
-	// Warrior - Overpower Rank 3
-	sp = CheckAndReturnSpellEntry(11584);
-	if(sp != NULL)
-		sp->Attributes |= ATTRIBUTES_CANT_BE_DPB;
-	// Warrior - Overpower Rank 4
-	sp = CheckAndReturnSpellEntry(11585);
-	if(sp != NULL)
-		sp->Attributes |= ATTRIBUTES_CANT_BE_DPB;
-
-	// Warrior - Tactical Mastery Rank 1
-	sp = CheckAndReturnSpellEntry(12295);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0x00070000;
-	// Warrior - Tactical Mastery Rank 2
-	sp = CheckAndReturnSpellEntry(12676);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0x00070000;
-	// Warrior - Tactical Mastery Rank 3
-	sp = CheckAndReturnSpellEntry(12677);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0x00070000;
-
-	// Warrior - Heroic Throw
-	sp = CheckAndReturnSpellEntry(57755);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-	}
-
-	// Warrior - Rend
-	sp = CheckAndReturnSpellEntry(772);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(6546);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(6547);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(6548);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11572);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11573);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11574);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(25208);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-
-	/**********************************************************
-	 *	Fury
-	 **********************************************************/
-
-	// Warrior - Slam
-	sp = CheckAndReturnSpellEntry(1464);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(8820);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(11604);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(11605);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(25241);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(25242);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(47474);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	sp = CheckAndReturnSpellEntry(47475);
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
-
-	// Warrior - Bloodsurge
-	sp = CheckAndReturnSpellEntry(46913);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CAST_SPELL;
-		sp->procChance = 7;
-	}
-	sp = CheckAndReturnSpellEntry(46914);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CAST_SPELL;
-		sp->procChance = 13;
-	}
-	sp = CheckAndReturnSpellEntry(46915);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-
-	// Warrior - Furious Attacks
-	sp = CheckAndReturnSpellEntry(46910);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 7000;
-	}
-	sp = CheckAndReturnSpellEntry(46911);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 5000;
-	}
-
-	// Warrior - Enrage Procflags
-	sp = CheckAndReturnSpellEntry(12317);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(13045);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(13046);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(13047);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(13048);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED;
-
-	/* Remove the charges only on melee attacks */
-	sp = CheckAndReturnSpellEntry(12880);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	sp = CheckAndReturnSpellEntry(14201);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	sp = CheckAndReturnSpellEntry(14202);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	sp = CheckAndReturnSpellEntry(14203);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	sp = CheckAndReturnSpellEntry(14204);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-
-	// Warrior - Blood Craze Procflags
-	sp = CheckAndReturnSpellEntry(16487);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(16489);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(16492);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED;
-
-	// Warrior - Bloodthirst new version is ok but old version is wrong from now on :(
-	sp = CheckAndReturnSpellEntry(23881);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL; //cast on us, it is good
-		sp->EffectTriggerSpell[1] = 23885; //evil , but this is good for us :D
-	}
-	sp = CheckAndReturnSpellEntry(23892);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 23886; //evil , but this is good for us :D
-	}
-	sp = CheckAndReturnSpellEntry(23893);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL; //
-		sp->EffectTriggerSpell[1] = 23887; //evil , but this is good for us :D
-	}
-	sp = CheckAndReturnSpellEntry(23894);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL; //
-		sp->EffectTriggerSpell[1] = 23888; //evil , but this is good for us :D
-	}
-	sp = CheckAndReturnSpellEntry(25251);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL; //aura
-		sp->EffectTriggerSpell[1] = 25252; //evil , but this is good for us :D
-	}
-	sp = CheckAndReturnSpellEntry(30335);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL; //aura
-		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
-	}
-
-	// Warrior - Berserker Rage
-	sp = CheckAndReturnSpellEntry(18499);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;//Forcing a dummy aura, so we can add the missing 4th effect.
-		sp->Effect[1] = SPELL_EFFECT_NULL;
-		sp->Effect[2] = SPELL_EFFECT_NULL;
-	}
-
-	// Warrior - Improved Berserker Rage
-	sp = CheckAndReturnSpellEntry(20500);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(20501);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-
-	// Warrior - Unbridled Wrath
-	sp = CheckAndReturnSpellEntry(12322);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(12999);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(13000);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(13001);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(13002);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-
-	// Warrior - Heroic Fury
-	sp = CheckAndReturnSpellEntry(60970);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_DUMMY;
-	}
-
-	/**********************************************************
-	 *	Protection
-	 **********************************************************/
-
-	// Sword and Board Rank 1
-	sp = CheckAndReturnSpellEntry(46951);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Sword and Board Rank 2
-	sp = CheckAndReturnSpellEntry(46952);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Sword and Board Rank 3
-	sp = CheckAndReturnSpellEntry(46953);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Safeguard Rank 1
-	sp = CheckAndReturnSpellEntry(46945);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Safeguard Rank 2
-	sp = CheckAndReturnSpellEntry(46949);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Improved Defensive Stance Rank 1
-	sp = CheckAndReturnSpellEntry(29593);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_RECEIVED | PROC_ON_BLOCK_RECEIVED;
-
-	// Improved Defensive Stance Rank 2
-	sp = CheckAndReturnSpellEntry(29594);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_RECEIVED | PROC_ON_BLOCK_RECEIVED;
-
-	// Improved Revenge Rank 1
-	sp = CheckAndReturnSpellEntry(12797);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 12798;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->procChance = 25;
-	}
-
-	// Improved Revenge Rank 2
-	sp = CheckAndReturnSpellEntry(12799);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 12798;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->procChance = 50;
-	}
-
-	// Intervene  Ranger: stop attack
-	sp = CheckAndReturnSpellEntry(3411);
-	if(sp != NULL)
-	{
-		sp->Attributes |= ATTRIBUTES_STOP_ATTACK;
-	}
-
-	// Gag Order Rank 1
-	sp = CheckAndReturnSpellEntry(12311);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 18498;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 50;
-	}
-
-	// Gag Order Rank 2
-	sp = CheckAndReturnSpellEntry(12958);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 18498;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-
-	// Shockwave Damage - useless?
-	sp = CheckAndReturnSpellEntry(46968);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_SCHOOL_DAMAGE;
-		sp->Effect[2] = SPELL_EFFECT_DUMMY;
-	}
-
-	//////////////////////////////////////////
-	// PALADIN								//
-	//////////////////////////////////////////
-
-	// Insert paladin spell fixes here
-
-	//Paladin - Judgement of Command
-	sp = CheckAndReturnSpellEntry(20467);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Judgement of Corruption
-	sp = CheckAndReturnSpellEntry(53733);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Judgement of Light
-	sp = CheckAndReturnSpellEntry(20185);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Judgement of Justice
-	sp = CheckAndReturnSpellEntry(20184);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Judgement of Righteousness
-	sp = CheckAndReturnSpellEntry(20187);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Judgement of Vengeance
-	sp = CheckAndReturnSpellEntry(31804);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Judgement of Wisdom
-	sp = CheckAndReturnSpellEntry(20186);
-	if(sp != NULL)
-		sp->procChance = 50;
-
-	//Paladin - Seal of Command
-	sp = CheckAndReturnSpellEntry(20375);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	//Paladin - Seal of Corruption
-	sp = CheckAndReturnSpellEntry(53736);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	//Paladin - Seal of Light
-	sp = CheckAndReturnSpellEntry(20165);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	//Paladin - Seal of Justice
-	sp = CheckAndReturnSpellEntry(20164);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	//Paladin - Seal of Righteousness
-	sp = CheckAndReturnSpellEntry(21084);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	//Paladin - Seal of Vengeance
-	sp = CheckAndReturnSpellEntry(31801);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	//Paladin - Seal of Wisdom
-	sp = CheckAndReturnSpellEntry(20166);
-	if(sp != NULL)
-		sp->proc_interval = 3000;
-
-	// Paladin - Vengeance
-	sp = CheckAndReturnSpellEntry(20050);   // Rank 1 proc
-	if(sp != NULL)
-		sp->maxstack = 3;
-
-	sp = CheckAndReturnSpellEntry(20056);   //Rank 2
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 20052;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	sp = CheckAndReturnSpellEntry(20052);   // Rank 2 proc
-	if(sp != NULL)
-		sp->maxstack = 3;
-
-	sp = CheckAndReturnSpellEntry(20057);   //Rank 3
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 20053;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
-	}
-	sp = CheckAndReturnSpellEntry(20053);   // Rank 3 proc
-	if(sp != NULL)
-		sp->maxstack = 3;
-
-	//Paladin - Seal of Command - Holy damage, but melee mechanics (crit damage, chance, etc)
-	sp = CheckAndReturnSpellEntry(20424);
-	if(sp != NULL)
-		sp->is_melee_spell = true;
-
-	//Paladin - Hammer of the Righteous
-	sp = CheckAndReturnSpellEntry(53595);
-	if(sp != NULL)
-	{
-		sp->speed = 0;	//without, no damage is done
-	}
-
-	sp = CheckAndReturnSpellEntry(38008);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 31893;
-	}
-
-	//Paladin - Seal of Martyr
-	sp = CheckAndReturnSpellEntry(53720);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 53719;
-		sp->School = SCHOOL_HOLY;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-	//Paladin - seal of blood
-	sp = CheckAndReturnSpellEntry(31892);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 31893;
-		sp->School = SCHOOL_HOLY;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-	sp = CheckAndReturnSpellEntry(53719);
-	if(sp != NULL)
-	{
-		sp->School = SCHOOL_HOLY;
-		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
-	}
-	sp = CheckAndReturnSpellEntry(31893);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_PHYSICAL_ATTACK;
-		sp->School = SCHOOL_HOLY;
-		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
-	}
-
-	//Paladin - Divine Storm
-	sp = CheckAndReturnSpellEntry(53385);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectRadiusIndex[0] = 43; //16 yards
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 54172;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-		sp->MaxTargets = 4;
-	}
-
-	//Paladin - Sacred Shield - bonus to flash is not working
-	sp = CheckAndReturnSpellEntry(53601);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->proc_interval = 6000;
-		sp->EffectTriggerSpell[0] = 58597;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
-
-	//Paladin - Vindication
-	sp = CheckAndReturnSpellEntry(26016);
-	if(sp != NULL)
-	{
-		sp->procChance = 30;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-	sp = CheckAndReturnSpellEntry(9452);
-	if(sp != NULL)
-	{
-		sp->procChance = 30;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-
-	//Righteous Vengeance
-	sp = dbcSpell.LookupEntryForced(53380);
-	if (sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 61840;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
-		sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
-	}
-	sp = dbcSpell.LookupEntryForced(53381);
-	if (sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 61840;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
-		sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
-	}
-	sp = dbcSpell.LookupEntryForced(53382);
-	if (sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 61840;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
-		sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
-	}
-
-	/**********************************************************
-	 *	Blessing of Light
-	 **********************************************************
-	sp = CheckAndReturnSpellEntry( 19977 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry( 19978 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry( 19979 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry( 27144 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry( 32770 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}*/
-
-	//Paladin - Reckoning
-	sp = CheckAndReturnSpellEntry(20177);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-
-	sp = CheckAndReturnSpellEntry(20179);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-
-	sp = CheckAndReturnSpellEntry(20180);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-
-	sp = CheckAndReturnSpellEntry(20181);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-
-	sp = CheckAndReturnSpellEntry(20182);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-
-	//Paladin - Reckoning Effect
-	sp = CheckAndReturnSpellEntry(20178);
-	if(sp != NULL)
-	{
-		sp->procChance = 100;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-
-	//Paladin - Judgements of the Wise
-	sp = CheckAndReturnSpellEntry(31930);
-	if(sp != NULL)
-	{
-		sp->SpellFamilyName = 0;
-		sp->SpellGroupType[0] = 0;
-		sp->SpellGroupType[1] = 0;
-		sp->SpellGroupType[2] = 0;
-		sp->RankNumber = 0;
-	}
-
-	sp = CheckAndReturnSpellEntry(54180);
-	if(sp != NULL)
-	{
-		sp->SpellFamilyName = 0;
-		sp->SpellGroupType[0] = 0;
-		sp->SpellGroupType[1] = 0;
-		sp->SpellGroupType[2] = 0;
-		sp->RankNumber = 0;
-		sp->proc_interval = 4000;
-	}
-
-	sp = CheckAndReturnSpellEntry(31876);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 54180;
-		sp->procChance = 33;
-	}
-	sp = CheckAndReturnSpellEntry(31877);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 54180;
-		sp->procChance = 66;
-	}
-	sp = CheckAndReturnSpellEntry(31878);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 54180;
-		sp->procChance = 100;
-	}
-
-	//Paladin - Blessed Life ranks 1-3
-	sp = CheckAndReturnSpellEntry(31828);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-
-	sp = CheckAndReturnSpellEntry(31829);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-
-	sp = CheckAndReturnSpellEntry(31830);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-
-	//Palarin - Light's Grace
-	sp = CheckAndReturnSpellEntry(31833);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(31835);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(31836);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Paladin - Spiritual Attunement
-	sp = CheckAndReturnSpellEntry(31785);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF) ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 31786;
-	}
-	sp = CheckAndReturnSpellEntry(33776);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 31786;
-	}
-
-	//Paladin - Improved Lay on Hands
-	sp = CheckAndReturnSpellEntry(20234);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(20235);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Paladin - Crusader Strike
-	sp = CheckAndReturnSpellEntry(35395);
-	if(sp != NULL)
-		sp->noproc = true;
-
-	//Paladin - Forbearance - Is forced debuff
-	sp = CheckAndReturnSpellEntry(25771);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	//Divine Protection
-	sp = CheckAndReturnSpellEntry(498);
-	if(sp != NULL)
-		sp->targetAuraSpellNot = 25771;
-
-	//Divine Shield
-	sp = CheckAndReturnSpellEntry(642);
-	if(sp != NULL)
-		sp->targetAuraSpellNot = 25771;
-
-	//Hand of Protection Rank 1
-	sp = CheckAndReturnSpellEntry(1022);
-	if(sp != NULL)
-		sp->targetAuraSpellNot = 25771;
-
-	//Hand of Protection Rank 2
-	sp = CheckAndReturnSpellEntry(5599);
-	if(sp != NULL)
-		sp->targetAuraSpellNot = 25771;
-
-	//Hand of Protection Rank 3
-	sp = CheckAndReturnSpellEntry(10278);
-	if(sp != NULL)
-		sp->targetAuraSpellNot = 25771;
-
-	//Paladin - Infusion of Light
-	sp = CheckAndReturnSpellEntry(53569);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(53576);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-		sp->procChance = 100;
-	}
-
-	//Paladin - Sacred Cleansing
-	sp = CheckAndReturnSpellEntry(53551);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 10;
-	}
-	sp = CheckAndReturnSpellEntry(53552);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(53553);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 30;
-	}
-
-	//Paladin - Judgements of the Pure
-	sp = CheckAndReturnSpellEntry(53671);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(53673);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(54151);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(54154);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(54155);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-
-	//Paladin -  Heart of the Crusader
-	sp = CheckAndReturnSpellEntry(20335);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 21183;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(20336);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 54498;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(20337);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 54499;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-
-	//Paladin - Art of War
-	sp = CheckAndReturnSpellEntry(53486);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->EffectTriggerSpell[1] = 53489;
-	}
-	sp = CheckAndReturnSpellEntry(53489);
-	if(sp != NULL)
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(53488);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->EffectTriggerSpell[1] = 59578;
-	}
-	sp = CheckAndReturnSpellEntry(59578);
-	if(sp != NULL)
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
-
-	//Paladin - Hammer of Justice - Interrupt effect
-	sp = CheckAndReturnSpellEntry(853);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-	sp = CheckAndReturnSpellEntry(5588);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-	sp = CheckAndReturnSpellEntry(5589);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-	sp = CheckAndReturnSpellEntry(10308);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-
-	// Paladin - Sheath of Light
-	sp = CheckAndReturnSpellEntry(53501);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 54203;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	sp = CheckAndReturnSpellEntry(53502);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 54203;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	sp = CheckAndReturnSpellEntry(53503);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 54203;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	//////////////////////////////////////////
-	// HUNTER								//
-	//////////////////////////////////////////
-	//Wild quiver rank 1
-	sp = CheckAndReturnSpellEntry(53215);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_RANGED_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 53254;
-		sp->procChance = 4;
-	}
-	sp = CheckAndReturnSpellEntry(53216);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_RANGED_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 53254;
-		sp->procChance = 7;
-	}
-	sp = CheckAndReturnSpellEntry(53217);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_RANGED_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 53254;
-		sp->procChance = 10;
-	}
-
-	// Insert hunter spell fixes here
-
-	// Pashtet: Lock'n'Load, only for traps. Need something more for Serpent Sting DoT.
-	sp = CheckAndReturnSpellEntry(56342);
-	if(sp != NULL)
-	{
-		sp->procFlags |= PROC_ON_TRAP_TRIGGER;
-		sp->proc_interval = 30000;
-	}
-	sp = CheckAndReturnSpellEntry(56343);
-	if(sp != NULL)
-	{
-		sp->procFlags |= PROC_ON_TRAP_TRIGGER;
-		sp->proc_interval = 30000;
-	}
-	sp = CheckAndReturnSpellEntry(56344);
-	if(sp != NULL)
-	{
-		sp->procFlags |= PROC_ON_TRAP_TRIGGER;
-		sp->proc_interval = 30000;
-	}
-
-	//Hunter - Bestial Wrath
-	sp = CheckAndReturnSpellEntry(19574);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
-
-	//Hunter - The Beast Within
-	sp = CheckAndReturnSpellEntry(34692);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-		sp->EffectTriggerSpell[0] = 34471;
-	}
-	sp = CheckAndReturnSpellEntry(34471);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
-
-	//Hunter - Go for the Throat
-	sp = CheckAndReturnSpellEntry(34950);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
-	sp = CheckAndReturnSpellEntry(34954);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
-	sp = CheckAndReturnSpellEntry(34952);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	sp = CheckAndReturnSpellEntry(34953);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-
-	// Hunter - Master Tactician
-	sp = CheckAndReturnSpellEntry(34506);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(34507);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(34508);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(34838);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(34839);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
-
-	// Hunter - Spirit Bond
-	sp = CheckAndReturnSpellEntry(19578);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 19579;
-	}
-	sp = CheckAndReturnSpellEntry(20895);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 24529;
-	}
-	sp = CheckAndReturnSpellEntry(19579);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we should do the same for player too as we did for pet
-		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
-		sp->EffectAmplitude[1] = sp->EffectAmplitude[0];
-		sp->EffectDieSides[1] = sp->EffectDieSides[0];
-	}
-	sp = CheckAndReturnSpellEntry(24529);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we should do the same for player too as we did for pet
-		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
-		sp->EffectAmplitude[1] = sp->EffectAmplitude[0];
-		sp->EffectDieSides[1] = sp->EffectDieSides[0];
-	}
-
-	//Hunter Silencing Shot
-	sp = CheckAndReturnSpellEntry(34490);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_SILENCE ;
-	}
-
-	// Hunter - Ferocious Inspiration
-	sp = CheckAndReturnSpellEntry(34455);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->EffectTriggerSpell[0] = 34456;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF); //maybe target master ?
-		sp->Effect[1] = SPELL_EFFECT_NULL; //remove this
-	}
-	sp = CheckAndReturnSpellEntry(34459);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->EffectTriggerSpell[0] = 34456;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->Effect[1] = SPELL_EFFECT_NULL; //remove this
-	}
-	sp = CheckAndReturnSpellEntry(34460);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->EffectTriggerSpell[0] = 34456;
-		sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->Effect[1] = SPELL_EFFECT_NULL; //remove this
-	}
-
-	// Hunter - Focused Fire
-	sp = CheckAndReturnSpellEntry(35029);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 35060;
-	}
-	sp = CheckAndReturnSpellEntry(35030);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 35061;
-	}
-	sp = CheckAndReturnSpellEntry(35060);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-	sp = CheckAndReturnSpellEntry(35061);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-
-	// Hunter - Thrill of the Hunt
-	sp = CheckAndReturnSpellEntry(34497);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = sp->EffectBasePoints[0] + 1;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 34720;
-	}
-	sp = CheckAndReturnSpellEntry(34498);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = sp->EffectBasePoints[0] + 1;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 34720;
-	}
-	sp = CheckAndReturnSpellEntry(34499);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = sp->EffectBasePoints[0] + 1;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 34720;
-	}
-
-	// Hunter - Expose Weakness
-	sp = CheckAndReturnSpellEntry(34500);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
-	sp = CheckAndReturnSpellEntry(34502);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
-	sp = CheckAndReturnSpellEntry(34503);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
-
-	//Hunter - Frenzy
-	sp = CheckAndReturnSpellEntry(19621);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 19615;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->procChance = sp->EffectBasePoints[0];
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(19622);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 19615;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->procChance = sp->EffectBasePoints[0];
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(19623);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 19615;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->procChance = sp->EffectBasePoints[0];
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(19624);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 19615;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->procChance = sp->EffectBasePoints[0];
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(19625);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 19615;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->procChance = sp->EffectBasePoints[0];
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-
-	//Hunter : Pathfinding
-	sp = CheckAndReturnSpellEntry(19559);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(19560);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-
-	//Hunter : Rapid Killing - might need to add honor trigger too here. I'm guessing you receive Xp too so I'm avoiding double proc
-	sp = CheckAndReturnSpellEntry(34948);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(34949);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-
-	//Hunter : Entrapment
-	sp = CheckAndReturnSpellEntry(19184);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_TRAP_TRIGGER;
-	sp = CheckAndReturnSpellEntry(19387);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_TRAP_TRIGGER;
-	sp = CheckAndReturnSpellEntry(19388);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_TRAP_TRIGGER;
-
-	/* aspect of the pack - change to AA */
-	sp = CheckAndReturnSpellEntry(13159);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-
-	/* aspect of the cheetah - add proc flags */
-	sp = CheckAndReturnSpellEntry(5118);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-
-	// Feed pet
-	sp = CheckAndReturnSpellEntry(6991);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = 0;
-	}
-	/*	// !!! not sure this is good !!! have to test
-		// Hunter's mark r1
-		sp = CheckAndReturnSpellEntry( 1130 );
-		if( sp != NULL )
-			sp->maxstack = (sp->EffectBasePoints[1]*3) / (sp->EffectBasePoints[1]/10);
-		sp = CheckAndReturnSpellEntry( 14323 );
-		if( sp != NULL )
-			sp->maxstack = (sp->EffectBasePoints[1]*3) / (sp->EffectBasePoints[1]/10);
-		sp = CheckAndReturnSpellEntry( 14324 );
-		if( sp != NULL )
-			sp->maxstack = (sp->EffectBasePoints[1]*3) / (sp->EffectBasePoints[1]/10);
-		sp = CheckAndReturnSpellEntry( 14325 );
-		if( sp != NULL )
-			sp->maxstack = (sp->EffectBasePoints[1]*3) / (sp->EffectBasePoints[1]/10);
-			*/
-	// MesoX: Serendipity http://www.wowhead.com/?spell=63730
-	sp = CheckAndReturnSpellEntry(63730);   // Rank 1
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_BINDING_HEAL;
-		sp->ProcOnNameHash[1] = SPELL_HASH_FLASH_HEAL;
-	}
-	sp = CheckAndReturnSpellEntry(63733);   // Rank 2
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_BINDING_HEAL;
-		sp->ProcOnNameHash[1] = SPELL_HASH_FLASH_HEAL;
-	}
-	sp = CheckAndReturnSpellEntry(63737);   // Rank 3
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_BINDING_HEAL;
-		sp->ProcOnNameHash[1] = SPELL_HASH_FLASH_HEAL;
-	}
-
-
-	//////////////////////////////////////////
-	// ROGUE								//
-	//////////////////////////////////////////
-	// Insert rogue spell fixes here
-
-	//Rogue - Blade Twisting Rank 1
-	sp = CheckAndReturnSpellEntry(31124);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 31125;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 10;
-	}
-
-	//Rogue - Blade Twisting Rank 2
-	sp = CheckAndReturnSpellEntry(31126);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 51585;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 10;
-	}
-
-	/**********************************************************
-	 *	Garrote - this is used?
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(37066);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
-	}
-
-	//rogue - Camouflage.
-	sp = CheckAndReturnSpellEntry(13975);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(14062);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(14063);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-
-	//rogue - Vanish : Second Trigger Spell
-	sp = CheckAndReturnSpellEntry(18461);
-	if(sp != NULL)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-
-	// rogue - Blind (Make it able to miss!)
-	sp = CheckAndReturnSpellEntry(2094);
-	if(sp != NULL)
-	{
-		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
-		sp->is_ranged_spell = true;
-	}
-
-	//rogue - Shadowstep
-	sp = CheckAndReturnSpellEntry(36563);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[2] = SMT_MISC_EFFECT;
-	}
-	// Still related to shadowstep - prevent the trigger spells from breaking stealth.
-	sp = CheckAndReturnSpellEntry(44373);
-	if(sp)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-	sp = CheckAndReturnSpellEntry(36563);
-	if(sp)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-	sp = CheckAndReturnSpellEntry(36554);
-	if(sp != NULL)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-
-	//rogue - Seal Fate
-	sp = CheckAndReturnSpellEntry(14186);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 14189;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(14190);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 14189;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->procChance = 40;
-	}
-	sp = CheckAndReturnSpellEntry(14193);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 14189;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->procChance = 60;
-	}
-	sp = CheckAndReturnSpellEntry(14194);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 14189;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->procChance = 80;
-	}
-	sp = CheckAndReturnSpellEntry(14195);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 14189;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->procChance = 100;
-	}
-	//garrot
-	sp = CheckAndReturnSpellEntry(703);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(8631);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(8632);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(8633);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11289);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11290);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(26839);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(26884);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-
-	//rupture
-	sp = CheckAndReturnSpellEntry(1943);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(8639);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(8640);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11273);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11274);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(11275);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = CheckAndReturnSpellEntry(26867);
-	if(sp != NULL)
-		sp->MechanicsType = MECHANIC_BLEEDING;
-
-	//Rogue - Killing Spree Stealth fix
-	sp = CheckAndReturnSpellEntry(51690);
-	if(sp != NULL)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-
-	/* Rogue - Improved Expose Armor (rank 1)
-	sp = CheckAndReturnSpellEntry( 14168 );
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = */
-
-	//////////////////////////////////////////
-	// PRIEST								//
-	//////////////////////////////////////////
-
-	// Insert priest spell fixes here
-
-	// Prayer of mending
-	sp = CheckAndReturnSpellEntry(41635);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-	sp = CheckAndReturnSpellEntry(48110);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-	sp = CheckAndReturnSpellEntry(48111);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-	sp = CheckAndReturnSpellEntry(33110);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-
-	// Spirit Tap
-	sp = CheckAndReturnSpellEntry(15270);   //rank 1
-	if(sp != NULL)
-	{
-//			sp->procFlags = PROC_ON_TARGET_DIE;
-		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE;
-	}
-	sp = CheckAndReturnSpellEntry(15335);   //rank 2
-	if(sp != NULL)
-	{
-//			sp->procFlags = PROC_ON_TARGET_DIE;
-		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE;
-	}
-	sp = CheckAndReturnSpellEntry(15336);   //rank 3
-	if(sp != NULL)
-	{
-//			sp->procFlags = PROC_ON_TARGET_DIE;
-		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE;
-	}
-
-	// Vampiric Embrace heal spell
-	sp = CheckAndReturnSpellEntry(15290);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] = 2;
-		sp->EffectBasePoints[1] = 14;
-	}
-
-	// Improved Mind Blast
-	sp = CheckAndReturnSpellEntry(15273);   //rank 1
-	if(sp != NULL)
-	{
-		sp->procChance = 20;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry(15312);   //rank 2
-	if(sp != NULL)
-	{
-		sp->procChance = 40;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry(15313);   //rank 3
-	if(sp != NULL)
-	{
-		sp->procChance = 60;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry(15314);   //rank 4
-	if(sp != NULL)
-	{
-		sp->procChance = 80;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-	sp = CheckAndReturnSpellEntry(15316);   //rank 5
-	if(sp != NULL)
-	{
-		sp->procChance = 100;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-	}
-
-	// Body and soul - fix duration of cleanse poison
-	sp = CheckAndReturnSpellEntry(64134);
-	if(sp != NULL)
-		sp->DurationIndex = 29;
-
-	// Spirit of Redemption - required spells can be casted while dead
-	sp = CheckAndReturnSpellEntry(27795);   // This is casted by shape shift
-	if(sp != NULL)
-		sp->ATTRIBUTESEX3 |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
-	sp = CheckAndReturnSpellEntry(27792);   // This is casted by Apply Aura: Spirit of Redemption
-	if(sp != NULL)
-		sp->ATTRIBUTESEX3 |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
-
-	/**********************************************************
-	 *	Holy Nova
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(15237);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 23455;
-	}
-	sp = CheckAndReturnSpellEntry(15430);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 23458;
-	}
-	sp = CheckAndReturnSpellEntry(15431);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 23459;
-	}
-	sp = CheckAndReturnSpellEntry(27799);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 27803;
-	}
-	sp = CheckAndReturnSpellEntry(27800);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 27804;
-	}
-	sp = CheckAndReturnSpellEntry(27801);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 27805;
-	}
-	sp = CheckAndReturnSpellEntry(25331);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 25329;
-	}
-	sp = CheckAndReturnSpellEntry(48077);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 48075;
-	}
-	sp = CheckAndReturnSpellEntry(48078);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 48076;
-	}
-
-	//Priest: Blessed Recovery
-	sp = CheckAndReturnSpellEntry(27811);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 27813;
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	}
-	sp = CheckAndReturnSpellEntry(27815);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 27817;
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	}
-	sp = CheckAndReturnSpellEntry(27816);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 27818;
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	}
-	//priest- Blessed Resilience
-	sp = CheckAndReturnSpellEntry(33142);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(33145);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-		sp->procChance = 40;
-	}
-	sp = CheckAndReturnSpellEntry(33146);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-		sp->procChance = 60;
-	}
-
-	//priest- Focused Will
-	sp = CheckAndReturnSpellEntry(45234);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	sp = CheckAndReturnSpellEntry(45243);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	sp = CheckAndReturnSpellEntry(45244);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-
-	//Priest - Wand Specialization
-	sp = CheckAndReturnSpellEntry(14524);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(14525);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(14526);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(14527);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(14528);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-	}
-
-	//Priest - Inspiration proc spell
-	sp = CheckAndReturnSpellEntry(14893);
-	if(sp != NULL)
-		sp->rangeIndex = 4;
-	sp = CheckAndReturnSpellEntry(15357);
-	if(sp != NULL)
-		sp->rangeIndex = 4;
-	sp = CheckAndReturnSpellEntry(15359);
-	if(sp != NULL)
-		sp->rangeIndex = 4;
-
-	//priest - surge of light
-	sp = CheckAndReturnSpellEntry(33150);
-	if(sp != NULL)
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF));
-	sp = CheckAndReturnSpellEntry(33154);
-	if(sp != NULL)
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF));
-	sp = CheckAndReturnSpellEntry(33151);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
-	}
-	// priest - Reflective Shield
-	sp = CheckAndReturnSpellEntry(33201);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ABSORB;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
-	}
-	sp = CheckAndReturnSpellEntry(33202);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ABSORB;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
-	}
-	// Weakened Soul - Is forced debuff
-	sp = CheckAndReturnSpellEntry(6788);
-	if(sp != NULL)
-	{
-		sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	// Penance
-	sp = CheckAndReturnSpellEntry(47540);
-	if(sp != NULL)
-	{
-		sp->DurationIndex = 566; // Change to instant cast as script will cast the real channeled spell.
-		sp->ChannelInterruptFlags = 0; // Remove channeling behavior.
-	}
-
-	sp = CheckAndReturnSpellEntry(53005);
-	if(sp != NULL)
-	{
-		sp->DurationIndex = 566;
-		sp->ChannelInterruptFlags = 0;
-	}
-
-	sp = CheckAndReturnSpellEntry(53006);
-	if(sp != NULL)
-	{
-		sp->DurationIndex = 566;
-		sp->ChannelInterruptFlags = 0;
-	}
-
-	sp = CheckAndReturnSpellEntry(53007);
-	if(sp != NULL)
-	{
-		sp->DurationIndex = 566;
-		sp->ChannelInterruptFlags = 0;
-	}
-
-	// Penance triggered healing spells have wrong targets.
-	sp = CheckAndReturnSpellEntry(47750);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-
-	sp = CheckAndReturnSpellEntry(52983);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-
-	sp = CheckAndReturnSpellEntry(52984);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-
-	sp = CheckAndReturnSpellEntry(52985);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-	}
-
-	//Grace Rank 1
-	sp = CheckAndReturnSpellEntry(47516);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 100;
-	}
-
-	//Grace Rank 2
-	sp = CheckAndReturnSpellEntry(47517);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 100;
-	}
-
-	//////////////////////////////////////////
-	// SHAMAN								//
-	//////////////////////////////////////////
-
-	// Insert shaman spell fixes here
-	//shaman - Healing Way
-	sp = CheckAndReturnSpellEntry(29202);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(29205);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(29206);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
-
-
-	/**********************************************************
-	 *	Elemental Mastery
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(16166);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_CRITICAL;
-		sp->EffectMiscValue[1] = SMT_COST;
-		// sp->AuraInterruptFlags = AURA_INTERRUPT_ON_AFTER_CAST_SPELL;
-	}
-
-	/**********************************************************
-	 *	Shamanistic Rage
-	 **********************************************************/
-	SpellEntry*  parentsp = CheckAndReturnSpellEntry(30823);
-	SpellEntry* triggersp = CheckAndReturnSpellEntry(30824);
-	if(parentsp != NULL && triggersp != NULL)
-		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
-
-	//summon only 1 elemental totem
-	sp = CheckAndReturnSpellEntry(2894);
-	if(sp != NULL && sp->Id == 2894)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_FRONT_LEFT; //remove this targeting. it is enough to get 1 target
-
-	//summon only 1 elemental totem
-	sp = CheckAndReturnSpellEntry(2062);
-	if(sp != NULL && sp->Id == 2062)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_FRONT_RIGHT; //remove this targeting. it is enough to get 1 target
-
-	/**********************************************************
-	 *	Elemental Focus
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(16164);
-	if(sp != NULL && sp->Id == 16164)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	/**********************************************************
-	 *	Stormstrike
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(17364);
-	if(sp != NULL && sp->Id == 17364)
-	{
-		sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED ;
-	}
-
-	/**********************************************************
-	 *	Bloodlust
-	 **********************************************************/
-	//Bloodlust
-	sp = CheckAndReturnSpellEntry(2825);
-	if(sp != NULL)
-		sp->casterAuraSpellNot = 57724; //sated debuff
-
-	//Sated
-	sp = CheckAndReturnSpellEntry(57724);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	/**********************************************************
-	 *	Heroism
-	 **********************************************************/
-	//Heroism
-	sp = CheckAndReturnSpellEntry(32182);
-	if(sp != NULL)
-		sp->casterAuraSpellNot = 57723; //sated debuff
-
-	//Sated
-	sp = CheckAndReturnSpellEntry(57723);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	/**********************************************************
-	 *	Lightning Overload
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(30675);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 39805;//proc something (we will override this)
-		sp->procFlags = PROC_ON_SPELL_HIT;
-	}
-	sp = CheckAndReturnSpellEntry(30678);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 39805;//proc something (we will override this)
-		sp->procFlags = PROC_ON_SPELL_HIT;
-	}
-	sp = CheckAndReturnSpellEntry(30679);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 39805;//proc something (we will override this)
-		sp->procFlags = PROC_ON_SPELL_HIT;
-	}
-	/**********************************************************
-	 *	Purge
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(370);
-	if(sp != NULL)
-		sp->DispelType = DISPEL_MAGIC;
-	sp = CheckAndReturnSpellEntry(8012);
-	if(sp != NULL)
-		sp->DispelType = DISPEL_MAGIC;
-	sp = CheckAndReturnSpellEntry(27626);
-	if(sp != NULL)
-		sp->DispelType = DISPEL_MAGIC;
-	sp = CheckAndReturnSpellEntry(33625);
-	if(sp != NULL)
-		sp->DispelType = DISPEL_MAGIC;
-
-	/**********************************************************
-	 *	Eye of the Storm
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(29062);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(29064);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
-	sp = CheckAndReturnSpellEntry(29065);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
-
-	//Shaman - Shamanistic Focus
-	// needs to be fixed (doesn't need to proc, it now just reduces mana cost always by %)
-	sp = CheckAndReturnSpellEntry(43338);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 43339;
-	}
-
-	sp = CheckAndReturnSpellEntry(43339);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_COST;
-	}
-
-	//shaman - Improved Chain Heal
-	sp = CheckAndReturnSpellEntry(30873);
-	if(sp != NULL)
-	{
-		sp->EffectDieSides[0] = 0;
-	}
-	sp = CheckAndReturnSpellEntry(30872);
-	if(sp != NULL)
-	{
-		sp->EffectDieSides[0] = 0;
-	}
-
-	//shaman - Improved Weapon Totems
-	sp = CheckAndReturnSpellEntry(29193);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-		sp->EffectMiscValue[1] = SMT_MISC_EFFECT;
-	}
-	sp = CheckAndReturnSpellEntry(29192);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
-		sp->EffectMiscValue[1] = SMT_MISC_EFFECT;
-	}
-
-	// Shaman - Improved Fire Totems
-	sp = CheckAndReturnSpellEntry(16544);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_DURATION;
-	}
-	sp = CheckAndReturnSpellEntry(16086);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_DURATION;
-	}
-
-	// Shaman Arena totems fix
-	// Totem of Third WInd
-	sp = CheckAndReturnSpellEntry(46098);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(34138);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(42370);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(43728);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	//shaman - Elemental Weapons
-	sp = CheckAndReturnSpellEntry(29080);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[1] = SMT_DAMAGE_DONE;
-		sp->EffectMiscValue[2] = SMT_DAMAGE_DONE;
-	}
-	sp = CheckAndReturnSpellEntry(29079);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[1] = SMT_DAMAGE_DONE;
-		sp->EffectMiscValue[2] = SMT_DAMAGE_DONE;
-	}
-	sp = CheckAndReturnSpellEntry(16266);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[1] = SMT_DAMAGE_DONE;
-		sp->EffectMiscValue[2] = SMT_DAMAGE_DONE;
-	}
-
-	// Magma Totem - 0% spd coefficient
-	sp = CheckAndReturnSpellEntry(25550);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.0f;
-	sp = CheckAndReturnSpellEntry(10581);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.0f;
-	sp = CheckAndReturnSpellEntry(10580);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.0f;
-	sp = CheckAndReturnSpellEntry(10579);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.0f;
-	sp = CheckAndReturnSpellEntry(8187);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.0f;
-
-	//Tidal Waves
-	sp = CheckAndReturnSpellEntry(51562);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(51563);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(51564);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(51565);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(51566);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-
-	//Earthliving Weapon
-	sp = CheckAndReturnSpellEntry(51940);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(51989);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(52004);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(52005);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(52007);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-	sp = CheckAndReturnSpellEntry(52008);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-
-	//Maelstrom Weapon
-	sp = CheckAndReturnSpellEntry(51528);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 24000;
-	}
-	sp = CheckAndReturnSpellEntry(51529);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 12000;
-	}
-	sp = CheckAndReturnSpellEntry(51530);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 8000;
-	}
-	sp = CheckAndReturnSpellEntry(51531);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 6000;
-	}
-	sp = CheckAndReturnSpellEntry(51532);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->proc_interval = 5000;
-	}
-	sp = CheckAndReturnSpellEntry(53817);
-	if(sp != NULL)
-		sp->procCharges = 0;
-
-	/**********************************************************
-	 *	Healing Way
-	 **********************************************************/
-	/*
-	Zack : disabled this to not create confusion that it is working. Burlex deleted code so it needs to be reverted in order to work
-	sp = CheckAndReturnSpellEntry( 29202 );
-	if( sp != NULL )
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	    sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	    sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
-		sp->procChance = sp->EffectBasePoints[0] + 1;
-	}
-	sp = CheckAndReturnSpellEntry( 29205 );
-	if( sp != NULL )
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	    sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	    sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
-		sp->procChance = sp->EffectBasePoints[0] + 1;
-	}
-	sp = CheckAndReturnSpellEntry( 29206 );
-	if( sp != NULL )
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	    sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	    sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
-		sp->procChance = sp->EffectBasePoints[0] + 1;
-	}
-	*/
-	/*********************************************************
-	 * Unleashed Rage - LordLeeCH
-	 *********************************************************/
-	sp = CheckAndReturnSpellEntry(30802);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(30808);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(30809);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-	}
-
-	/**********************************************************
-	 *	Elemental Devastation
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(29179);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = CheckAndReturnSpellEntry(29180);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = CheckAndReturnSpellEntry(30160);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	/**********************************************************
-	 *	Ancestral healing
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(16176);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = CheckAndReturnSpellEntry(16235);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = CheckAndReturnSpellEntry(16240);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	/**********************************************************
-	 *	Ancestral healing proc spell
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(16177);
-	if(sp != NULL)
-		sp->rangeIndex = 4;
-	sp = CheckAndReturnSpellEntry(16236);
-	if(sp != NULL)
-		sp->rangeIndex = 4;
-	sp = CheckAndReturnSpellEntry(16237);
-	if(sp != NULL)
-		sp->rangeIndex = 4;
-
-	sp = CheckAndReturnSpellEntry(20608);   //Reincarnation
-	if(sp != NULL)
-	{
-		for(i = 0; i < 8; i++)
-		{
-			if(sp->Reagent[i])
-			{
-				sp->Reagent[i] = 0;
-				sp->ReagentCount[i] = 0;
-			}
-		}
-	}
-
-	//////////////////////////////////////////
-	// SHAMAN WRATH OF AIR TOTEM			//
-	//////////////////////////////////////////
-	sp = CheckAndReturnSpellEntry(2895);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-		sp->EffectImplicitTargetA[2] = 0;
-		sp->EffectImplicitTargetB[0] = 0;
-		sp->EffectImplicitTargetB[1] = 0;
-		sp->EffectImplicitTargetB[2] = 0;
-	}
-
-	// Rogue - Master of Subtlety
-	sp = CheckAndReturnSpellEntry(31665);
-	if(sp != NULL)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-
-	//////////////////////////////////////////
-	// MAGE									//
-	//////////////////////////////////////////
-
-	// Insert mage spell fixes here
-
-
-	//Missile Barrage
-	sp = CheckAndReturnSpellEntry(44404);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 4;
-	}
-	sp = CheckAndReturnSpellEntry(54486);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 8;
-	}
-	sp = CheckAndReturnSpellEntry(54488);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 12;
-	}
-	sp = CheckAndReturnSpellEntry(54489);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 16;
-	}
-	sp = CheckAndReturnSpellEntry(54490);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 20;
-	}
-
-	// Brain Freeze rank 1
-	sp = CheckAndReturnSpellEntry(44546);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-
-	// Brain Freeze rank 2
-	sp = CheckAndReturnSpellEntry(44548);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-
-	// Brain Freeze rank 3
-	sp = CheckAndReturnSpellEntry(44549);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-
-	// Fingers of Frost rank 1
-	sp = CheckAndReturnSpellEntry(44543);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-
-
-	// Fingers of Frost rank 2
-	sp = CheckAndReturnSpellEntry(44545);
-	if(sp != NULL)
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-
-	/**********************************************************
-	*    Improved Blink by Alice
-	**********************************************************/
-
-	//Improved Blink - *Rank 1*
-	sp = CheckAndReturnSpellEntry(31569);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-	}
-	//Improved Blink - *Rank 2*
-	sp = CheckAndReturnSpellEntry(31570);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-	}
-	/**********************************************************
-	 *	Arcane Concentration
-	 **********************************************************/
-
-	sp = CheckAndReturnSpellEntry(11213);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(12574);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(12575);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(12576);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-	sp = CheckAndReturnSpellEntry(12577);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-
-	//Mage - Arcane Concentration proc
-	sp = CheckAndReturnSpellEntry(12536);
-	if(sp != NULL)
-	{
-		sp->BGR_one_buff_on_target = 0;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procCharges = 2;
-	}
-
-	//Mage - Spell Power
-	sp = CheckAndReturnSpellEntry(35578);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_CRITICAL_DAMAGE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-	}
-	sp = CheckAndReturnSpellEntry(35581);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[0] = SMT_CRITICAL_DAMAGE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-	}
-
-	//Mage - Elemental Precision
-	sp = CheckAndReturnSpellEntry(29438);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_COST;
-	}
-	sp = CheckAndReturnSpellEntry(29439);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_COST;
-	}
-	sp = CheckAndReturnSpellEntry(29440);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[0] = SMT_COST;
-	}
-
-	//Mage - Arcane Blast
-	sp = CheckAndReturnSpellEntry(30451);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 36032;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[1] = SPELL_HASH_ARCANE_BLAST;
-	}
-
-	// Updated ranks by Joker
-	// Arcane Blast
-	sp = CheckAndReturnSpellEntry(42894);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 36032;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[1] = SPELL_HASH_ARCANE_BLAST;
-	}
-
-	sp = CheckAndReturnSpellEntry(42896);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 36032;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-	}
-
-	sp = CheckAndReturnSpellEntry(42897);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 36032;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-	}
-
-	//mage - Arcane Blast Proc
-	sp = CheckAndReturnSpellEntry(36032);
-	{
-		sp->procFlags = 0;
-		sp->maxstack = 4;
-		sp->procCharges = 0;
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	//mage : Empowered Arcane Missiles
-	//heh B thinks he is smart by adding this to description ? If it doesn't work std then it still needs to made by hand
-	sp = CheckAndReturnSpellEntry(31579);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] = 5 * (sp->EffectBasePoints[0] + 1);
-	}
-	sp = CheckAndReturnSpellEntry(31582);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] = 5 * (sp->EffectBasePoints[0] + 1);
-	}
-	sp = CheckAndReturnSpellEntry(31583);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] = 5 * (sp->EffectBasePoints[0] + 1);
-	}
-
-	//Mage - Improved Blizzard
-	sp = CheckAndReturnSpellEntry(11185);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 12484;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(12487);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 12485;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(12488);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 12486;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	// cebernic: not for self?
-	// impact
-	sp = CheckAndReturnSpellEntry(12355);
-	if(sp != NULL)
-	{
-		// passive rank: 11103, 12357, 12358 ,12359,12360 :D
-		sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED | PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_HIT;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetB[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetA[2] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetB[2] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	//Mage - Invisibility
-	sp = CheckAndReturnSpellEntry(66);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
-		sp->Effect[1] = SPELL_EFFECT_NULL;
-		sp->EffectApplyAuraName[2] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-		sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectAmplitude[2] = 3000;
-		sp->EffectImplicitTargetA[2] = EFF_TARGET_SELF;
-		//sp->EffectBaseDice[2] = 1;
-		sp->EffectDieSides[2] = 1;
-		sp->EffectTriggerSpell[2] = 32612;
-		sp->EffectBasePoints[2] = -1;
-	}
-
-	//Invisibility triggered spell, should be removed on cast
-	sp = CheckAndReturnSpellEntry(32612);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
-	}
-
-	//Fingers of frost proc
-	sp = CheckAndReturnSpellEntry(44544);
-	if(sp != NULL)
-	{
-		sp->procCharges = 2;
-		sp->procFlags = PROC_ON_SPELL_HIT;
-	}
-
-	//Brain Freeze proc (Fireball!)
-	sp = CheckAndReturnSpellEntry(57761);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procCharges = 1;
-	}
-
-	//Arcane Potency procs
-	sp = CheckAndReturnSpellEntry(57529);
-	if(sp != NULL)
-	{
-		sp->procFlags = 0;
-		sp->procCharges = 1;
-		sp->RankNumber = 100;
-		sp->AuraInterruptFlags = 0;
-	}
-
-	sp = CheckAndReturnSpellEntry(57531);
-	if(sp != NULL)
-	{
-		sp->procFlags = 0;
-		sp->procCharges = 1;
-		sp->RankNumber = 101;
-		sp->AuraInterruptFlags = 0;
-	}
-
-	//Hot Streak proc
-	sp = CheckAndReturnSpellEntry(48108);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
-	}
-
-	//Ice Lances
-	sp = CheckAndReturnSpellEntry(42914);
-	if(sp != NULL)
-		sp->Dspell_coef_override = 0.1429f;
-
-	sp = CheckAndReturnSpellEntry(42913);
-	if(sp != NULL)
-		sp->Dspell_coef_override = 0.1429f;
-
-	sp = CheckAndReturnSpellEntry(30455);
-	if(sp != NULL)
-		sp->Dspell_coef_override = 0.1429f;
-
-	// Frostfire Bolts
-	sp = CheckAndReturnSpellEntry(47610);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.8571f;
-
-	sp = CheckAndReturnSpellEntry(44614);
-	if(sp != NULL)
-		sp->fixed_dddhcoef = 0.8571f;
-
-
-	//mage - Combustion
-	sp = CheckAndReturnSpellEntry(11129);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 28682;
-		sp->procFlags = PROC_ON_SPELL_HIT | PROC_ON_SPELL_CRIT_HIT | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procCharges = 0;
-		sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
-	}
-
-	//mage - Master of Elements
-	sp = CheckAndReturnSpellEntry(29074);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 29077;
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF);
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(29075);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 29077;
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF);
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(29076);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 29077;
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF);
-		sp->procChance = 100;
-	}
-
-	//mage: Blazing Speed
-	sp = CheckAndReturnSpellEntry(31641);
-	if(sp != NULL)
-		sp->EffectTriggerSpell[0] = 31643;
-	sp = CheckAndReturnSpellEntry(31642);
-	if(sp != NULL)
-		sp->EffectTriggerSpell[0] = 31643;
-
-	//Mage - Improved Scorch
-	sp = CheckAndReturnSpellEntry(11095);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 33;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(12872);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 66;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(12873);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 100;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	// mage - Frost Warding
-	sp = CheckAndReturnSpellEntry(11189);
-	if(sp != NULL)
-	{
-		sp->procChance = 10;
-	}
-	sp = CheckAndReturnSpellEntry(28332);
-	if(sp != NULL)
-	{
-		sp->procChance = 20;
-	}
-
-	// mage - Conjure Refreshment Table
-	sp = CheckAndReturnSpellEntry(43985);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_DYNAMIC_OBJECT;
-
-	// Hypothermia: undispellable
-	sp = CheckAndReturnSpellEntry(41425);
-	if(sp != NULL)
-		sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	// Mage - Permafrost Rank 1
-	sp = CheckAndReturnSpellEntry(11175);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[1] = SMT_MISC_EFFECT;
-	}
-
-	// Mage - Permafrost Rank 2
-	sp = CheckAndReturnSpellEntry(12569);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[1] = SMT_MISC_EFFECT;
-	}
-
-	// Mage - Permafrost Rank 3
-	sp = CheckAndReturnSpellEntry(12571);
-	if(sp != NULL)
-	{
-		sp->EffectMiscValue[1] = SMT_MISC_EFFECT;
-	}
-
-	//Improved Counterspell rank 1
-	sp = CheckAndReturnSpellEntry(11255);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_COUNTERSPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 18469;
-	}
-
-	//Improved Counterspell rank 2
-	sp = CheckAndReturnSpellEntry(12598);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_COUNTERSPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 55021;
-	}
-	//////////////////////////////////////////
-	// WARLOCK								//
-	//////////////////////////////////////////
-
-	// Insert warlock spell fixes here
-
-	//Dummy for Demonic Circle
-	sp = CheckAndReturnSpellEntry(48018);
-	if(sp != NULL)
-	{
-
-		sp->EffectImplicitTargetA[1] = 1;
-		CreateDummySpell(62388);
-		sp = CheckAndReturnSpellEntry(62388);
-		if(sp != NULL)
-		{
-			sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-			sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		}
-	}
-
-	//megai2: Immolation Aura
-	sp = CheckAndReturnSpellEntry(50589);
-	if(sp != NULL)
-	{
-		sp->ChannelInterruptFlags = 0; // Remove channeling behaviour.
-	}
-
-	//megai2: Everlasting Affliction
-	sp = CheckAndReturnSpellEntry(47205);
-	if(sp != NULL)
-	{
-		sp->EffectSpellClassMask[1][0] = 0x111;
-		sp->EffectSpellClassMask[1][1] = 0;
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47204);
-	if(sp != NULL)
-	{
-		sp->EffectSpellClassMask[1][0] = 0x111;
-		sp->EffectSpellClassMask[1][1] = 0;
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47203);
-	if(sp != NULL)
-	{
-		sp->EffectSpellClassMask[1][0] = 0x111;
-		sp->EffectSpellClassMask[1][1] = 0;
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47202);
-	if(sp != NULL)
-	{
-		sp->EffectSpellClassMask[1][0] = 0x111;
-		sp->EffectSpellClassMask[1][1] = 0;
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47201);
-	if(sp != NULL)
-	{
-		sp->EffectSpellClassMask[1][0] = 0x111;
-		sp->EffectSpellClassMask[1][1] = 0;
-	}
-
-	//Unstable Affliction
-	sp = CheckAndReturnSpellEntry(31117);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	//warlock: Eradication
-	sp = CheckAndReturnSpellEntry(47195);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47196);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47197);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	//Warlock Molten Core
-	sp = CheckAndReturnSpellEntry(47245);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47246);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	sp = CheckAndReturnSpellEntry(47247);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procCharges = -1;
-	}
-
-	/**********************************************************
-	 *	Nether Protection
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(30299);
-	if(sp != NULL)
-	{
-		sp->procChance = 10;
-		sp->proc_interval = 13000;
-	}
-	sp = CheckAndReturnSpellEntry(30301);
-	if(sp != NULL)
-	{
-		sp->procChance = 20;
-		sp->proc_interval = 13000;
-	}
-	sp = CheckAndReturnSpellEntry(30302);
-	if(sp != NULL)
-	{
-		sp->procChance = 30;
-		sp->proc_interval = 13000;
-	}
-	/**********************************************************
-	 *	Backlash
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(34935);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 8000;
-		sp->procFlags |= PROC_ON_MELEE_ATTACK_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(34938);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 8000;
-		sp->procFlags |= PROC_ON_MELEE_ATTACK_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(34939);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 8000;
-		sp->procFlags |= PROC_ON_MELEE_ATTACK_RECEIVED | static_cast<uint32>(PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(34936);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
-	}
-
-	/**********************************************************
-	 *	Demonic Knowledge
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(35691);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 35696;
-		sp->EffectImplicitTargetA[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-	}
-	sp = CheckAndReturnSpellEntry(35692);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 35696;
-		sp->EffectImplicitTargetA[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-	}
-	sp = CheckAndReturnSpellEntry(35693);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 35696;
-		sp->EffectImplicitTargetA[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-	}
-	sp = CheckAndReturnSpellEntry(35696);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA; //making this only for the visible effect
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY; //no effect here
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-
-	//warlock -  Seed of Corruption
-	sp = CheckAndReturnSpellEntry(27243);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 27285;
-		sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_DIE;
-		sp->procChance = 100;
-	}
-
-	//warlock: Nightfall
-	sp = CheckAndReturnSpellEntry(18094);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 17941;
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = 2;
-	}
-	sp = CheckAndReturnSpellEntry(18095);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 17941;
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = 4;
-	}
-	//Shadow Trance should be removed on the first SB
-	sp = CheckAndReturnSpellEntry(17941);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
-	}
-
-	//warlock: Empowered Corruption
-	sp = CheckAndReturnSpellEntry(32381);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] *= 6;
-	}
-	sp = CheckAndReturnSpellEntry(32382);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] *= 6;
-	}
-	sp = CheckAndReturnSpellEntry(32383);
-	if(sp != NULL)
-	{
-		sp->EffectBasePoints[0] *= 6;
-	}
-
-	//warlock - Demonic Sacrifice
-	sp = CheckAndReturnSpellEntry(18789);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
-	sp = CheckAndReturnSpellEntry(18790);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
-	sp = CheckAndReturnSpellEntry(18791);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
-	sp = CheckAndReturnSpellEntry(18792);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
-	sp = CheckAndReturnSpellEntry(35701);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
-
-	//warlock - Demonic Tactics
-	sp = CheckAndReturnSpellEntry(30242);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //disable this. This is just blizz crap. Pure proof that they suck :P
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
-		sp->EffectApplyAuraName[2] = SPELL_AURA_MOD_SPELL_CRIT_CHANCE; //lvl 1 has it fucked up :O
-		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-	sp = CheckAndReturnSpellEntry(30245);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //disable this. This is just blizz crap. Pure proof that they suck :P
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-	sp = CheckAndReturnSpellEntry(30246);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //disable this. This is just blizz crap. Pure proof that they suck :P
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-	sp = CheckAndReturnSpellEntry(30247);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //disable this. This is just blizz crap. Pure proof that they suck :P
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-	sp = CheckAndReturnSpellEntry(30248);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //disable this. This is just blizz crap. Pure proof that they suck :P
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-
-	//warlock - Demonic Resilience
-	sp = CheckAndReturnSpellEntry(30319);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-	sp = CheckAndReturnSpellEntry(30320);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-	sp = CheckAndReturnSpellEntry(30321);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
-	}
-
-	//warlock - Improved Imp
-	sp = CheckAndReturnSpellEntry(18694);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18695);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18696);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-
-	//warlock - Improved Voidwalker
-	sp = CheckAndReturnSpellEntry(18705);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18706);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18707);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-
-	//warlock - Improved Succubus
-	sp = CheckAndReturnSpellEntry(18754);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18755);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18756);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-	}
-
-	//warlock - Fel Intellect
-	sp = CheckAndReturnSpellEntry(18731);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
-		sp->EffectMiscValue[0] = 3;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18743);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
-		sp->EffectMiscValue[0] = 3;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-	sp = CheckAndReturnSpellEntry(18744);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
-		sp->EffectMiscValue[0] = 3;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	}
-
-	//warlock - Demonic Tactics
-	sp = CheckAndReturnSpellEntry(30242);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		//this is required since blizz uses spells for melee attacks while we use fixed functions
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
-	}
-
-	//warlock - Unholy Power
-	sp = CheckAndReturnSpellEntry(18769);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		//this is required since blizz uses spells for melee attacks while we use fixed functions
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
-	}
-	sp = CheckAndReturnSpellEntry(18770);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		//this is required since blizz uses spells for melee attacks while we use fixed functions
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
-	}
-	sp = CheckAndReturnSpellEntry(18771);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		//this is required since blizz uses spells for melee attacks while we use fixed functions
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
-	}
-	sp = CheckAndReturnSpellEntry(18772);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		//this is required since blizz uses spells for melee attacks while we use fixed functions
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
-	}
-	sp = CheckAndReturnSpellEntry(18773);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-		//this is required since blizz uses spells for melee attacks while we use fixed functions
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
-		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
-		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
-	}
-
-	//warlock - Master Demonologist - 25 spells here
-	sp = CheckAndReturnSpellEntry(23785);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 23784;
-	}
-	sp = CheckAndReturnSpellEntry(23822);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 23830;
-	}
-	sp = CheckAndReturnSpellEntry(23823);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 23831;
-	}
-	sp = CheckAndReturnSpellEntry(23824);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 23832;
-	}
-	sp = CheckAndReturnSpellEntry(23825);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 35708;
-	}
-	//and the rest
-	sp = CheckAndReturnSpellEntry(23784);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	sp = CheckAndReturnSpellEntry(23830);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	sp = CheckAndReturnSpellEntry(23831);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	sp = CheckAndReturnSpellEntry(23832);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	sp = CheckAndReturnSpellEntry(35708);
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
-	sp = CheckAndReturnSpellEntry(23759);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23760);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23761);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23762);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23826);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23827);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23828);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	sp = CheckAndReturnSpellEntry(23829);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-	for(i = 23833; i <= 23844; i++)
-	{
-		sp = CheckAndReturnSpellEntry(i);
-		if(sp != NULL)
-		{
-			sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-			sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		}
-	}
-	sp = CheckAndReturnSpellEntry(35702);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->Effect[1] = SPELL_EFFECT_NULL; //hacks, we are handling this in another way
-	}
-	sp = CheckAndReturnSpellEntry(35703);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->Effect[1] = SPELL_EFFECT_NULL; //hacks, we are handling this in another way
-	}
-	sp = CheckAndReturnSpellEntry(35704);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->Effect[1] = SPELL_EFFECT_NULL; //hacks, we are handling this in another way
-	}
-	sp = CheckAndReturnSpellEntry(35705);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->Effect[1] = SPELL_EFFECT_NULL; //hacks, we are handling this in another way
-	}
-	sp = CheckAndReturnSpellEntry(35706);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->Effect[1] = SPELL_EFFECT_NULL; //hacks, we are handling this in another way
-	}
-
-	//warlock - Improved Drain Soul
-	sp = CheckAndReturnSpellEntry(18213);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_TARGET_DIE | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = 100;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 18371;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->Effect[2] = SPELL_EFFECT_NULL ; //remove this effect
-	}
-	sp = CheckAndReturnSpellEntry(18372);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_TARGET_DIE | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->procChance = 100;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 18371;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->Effect[2] = SPELL_EFFECT_NULL ; //remove this effect
-	}
-
-	//warlock - Shadow Embrace
-	sp = CheckAndReturnSpellEntry(32385);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->Effect[1] = SPELL_EFFECT_NULL ; //remove this effect ? Maybe remove the other one :P xD
-	}
-	sp = CheckAndReturnSpellEntry(32387);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->Effect[1] = SPELL_EFFECT_NULL ; //remove this effect ? Maybe remove the other one :P xD
-	}
-	sp = CheckAndReturnSpellEntry(32392);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->Effect[1] = SPELL_EFFECT_NULL ; //remove this effect ? Maybe remove the other one :P xD
-	}
-	sp = CheckAndReturnSpellEntry(32393);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->Effect[1] = SPELL_EFFECT_NULL ; //remove this effect ? Maybe remove the other one :P xD
-	}
-	sp = CheckAndReturnSpellEntry(32394);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->Effect[1] = SPELL_EFFECT_NULL ; //remove this effect ? Maybe remove the other one :P xD
-	}
-
-	//warlock - soul leech
-	sp = CheckAndReturnSpellEntry(30293);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA; //aura
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 30294;
-		sp->procFlags = uint32(PROC_ON_CAST_SPELL | PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(30295);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA; //aura
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 30294;
-		sp->procFlags = uint32(PROC_ON_CAST_SPELL | PROC_TARGET_SELF);
-	}
-	sp = CheckAndReturnSpellEntry(30296);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA; //aura
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 30294;
-		sp->procFlags = uint32(PROC_ON_CAST_SPELL | PROC_TARGET_SELF);
-	}
-
-	//warlock - Pyroclasm
-	sp = CheckAndReturnSpellEntry(18073);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //delete this override effect :P
-		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procChance = 13; //god, save us from fixed values !
-	}
-	sp = CheckAndReturnSpellEntry(18096);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_NULL; //delete this override effect :P
-		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
-		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
-		sp->procChance = 26; //god, save us from fixed values !
-	}
-	//Warlock Chaos bolt
-	sp = CheckAndReturnSpellEntry(50796);
-	if(sp != NULL)
-	{
-		sp->Attributes |= ATTRIBUTES_IGNORE_INVULNERABILITY;
-		sp->School = SCHOOL_FIRE;
-	}
-
-	sp = CheckAndReturnSpellEntry(59170);
-	if(sp != NULL)
-	{
-		sp->Attributes |= ATTRIBUTES_IGNORE_INVULNERABILITY;
-		sp->School = SCHOOL_FIRE;
-	}
-
-	sp = CheckAndReturnSpellEntry(59171);
-	if(sp != NULL)
-	{
-		sp->Attributes |= ATTRIBUTES_IGNORE_INVULNERABILITY;
-		sp->School = SCHOOL_FIRE;
-	}
-
-	sp = CheckAndReturnSpellEntry(59172);
-	if(sp != NULL)
-	{
-		sp->Attributes |= ATTRIBUTES_IGNORE_INVULNERABILITY;
-		sp->School = SCHOOL_FIRE;
-	}
-	// End Warlock chaos bolt
-
-	//Warlock Healthstones
-	int HealthStoneID[8] = {6201, 6202, 5699, 11729, 11730, 27230, 47871, 47878};
-	for(i = 0; i < 8; i++)
-	{
-		sp = CheckAndReturnSpellEntry(HealthStoneID[i]);
-		if(sp != NULL)
-		{
-			sp->Reagent[1] = 0;
-		}
-	}
-
-	//Backdraft Rank 1
-	sp = CheckAndReturnSpellEntry(47258);
-	if(sp != NULL)
-	{
-		sp->procFlags = uint32(PROC_TARGET_SELF | PROC_ON_ANY_HOSTILE_ACTION);
-		sp->procChance = 100;
-	}
-
-	//Backdraft Rank 2
-	sp = CheckAndReturnSpellEntry(47259);
-	if(sp != NULL)
-	{
-		sp->procFlags = uint32(PROC_TARGET_SELF | PROC_ON_ANY_HOSTILE_ACTION);
-		sp->procChance = 100;
-	}
-
-	//Backdraft Rank 3
-	sp = CheckAndReturnSpellEntry(47260);
-	if(sp != NULL)
-	{
-		sp->procFlags = uint32(PROC_TARGET_SELF | PROC_ON_ANY_HOSTILE_ACTION);
-		sp->procChance = 100;
-	}
-
-	//////////////////////////////////////////
-	// DRUID								//
-	//////////////////////////////////////////
-
-	// Insert druid spell fixes here
-
-	/**********************************************************
-	 *	Balance
-	 **********************************************************/
-
-	// Druid - Nature's Grace
-	sp = CheckAndReturnSpellEntry(16880);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	sp = CheckAndReturnSpellEntry(61345);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	sp = CheckAndReturnSpellEntry(61346);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	// Druid - Earth and Moon
-	sp = CheckAndReturnSpellEntry(48506);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(48510);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(48511);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Druid - Nature's Grasp //sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
-	sp = CheckAndReturnSpellEntry(16689);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(16810);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(16811);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(16812);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(16813);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(17329);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(27009);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	sp = CheckAndReturnSpellEntry(53312);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
-
-	// Druid - Force of Nature
-	sp = CheckAndReturnSpellEntry(33831);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_INHERITING_LEVEL;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF; //some land under target is used that gathers multiple targets ...
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_NONE;
-	}
-
-	/**********************************************************
-	 *	Feral Combat
-	 **********************************************************/
-
-	// Druid - Natural Reaction
-	sp = CheckAndReturnSpellEntry(57878);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_RECEIVED;
-
-	sp = CheckAndReturnSpellEntry(57880);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_RECEIVED;
-
-	sp = CheckAndReturnSpellEntry(57881);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_DODGE_RECEIVED;
-
-	// Druid - Infected Wounds
-	sp = CheckAndReturnSpellEntry(48483);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_SHRED;
-		sp->ProcOnNameHash[1] = SPELL_HASH_MAUL;
-		sp->ProcOnNameHash[2] = SPELL_HASH_MANGLE;
-	}
-
-	sp = CheckAndReturnSpellEntry(48484);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_SHRED;
-		sp->ProcOnNameHash[1] = SPELL_HASH_MAUL;
-		sp->ProcOnNameHash[2] = SPELL_HASH_MANGLE;
-	}
-
-	sp = CheckAndReturnSpellEntry(48485);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_SHRED;
-		sp->ProcOnNameHash[1] = SPELL_HASH_MAUL;
-		sp->ProcOnNameHash[2] = SPELL_HASH_MANGLE;
-	}
-
-	// Druid - Bash - Interrupt effect
-	sp = CheckAndReturnSpellEntry(5211);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-	sp = CheckAndReturnSpellEntry(6798);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-	sp = CheckAndReturnSpellEntry(8983);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 32747;
-	}
-
-	// Druid - Maim
-	sp = CheckAndReturnSpellEntry(22570);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_UNUSED2;
-		sp->is_melee_spell = true;
-	}
-	sp = CheckAndReturnSpellEntry(49802);
-	if(sp != NULL)
-	{
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_UNUSED2;
-		sp->is_melee_spell = true;
-	}
-
-	sp = CheckAndReturnSpellEntry(20719); //feline grace
-	if(sp != NULL)
-		sp->Effect[0] = SPELL_EFFECT_NULL;
-
-	// Druid - Feral Swiftness
-	sp = CheckAndReturnSpellEntry(17002);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 24867;
-	}
-	sp = CheckAndReturnSpellEntry(24866);
-	if(sp != NULL)
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 24864;
-	}
-
-	// Druid - Frenzied Regeneration
-	sp = CheckAndReturnSpellEntry(22842);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 22845;
-	}
-
-	// Druid - Improved Leader of the Pack
-	sp = CheckAndReturnSpellEntry(34297);
-	if(sp != NULL)
-		sp->proc_interval = 6000;//6 secs
-
-	sp = CheckAndReturnSpellEntry(34300);
-	if(sp != NULL)
-		sp->proc_interval = 6000;//6 secs
-
-	// Druid - Primal Fury (talent)
-	sp = CheckAndReturnSpellEntry(37116);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-
-	sp = CheckAndReturnSpellEntry(37117);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-
-	// Druid - Blood Frenzy (proc)
-	sp = CheckAndReturnSpellEntry(16954);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-
-	sp = CheckAndReturnSpellEntry(16952);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-
-	// Druid - Primal Fury (proc)
-	sp = CheckAndReturnSpellEntry(16961);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-
-	sp = CheckAndReturnSpellEntry(16958);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-
-	// Druid - Predatory Strikes
-	uint32 mm = Arcemu::Shared::Util::DecimalToMask(FORM_BEAR) | Arcemu::Shared::Util::DecimalToMask(FORM_DIREBEAR) | Arcemu::Shared::Util::DecimalToMask(FORM_MOONKIN) | Arcemu::Shared::Util::DecimalToMask(FORM_CAT);
-
-	sp = CheckAndReturnSpellEntry(16972);
-	if(sp != NULL)
-		sp->RequiredShapeShift = mm;
-	sp = CheckAndReturnSpellEntry(16974);
-	if(sp != NULL)
-		sp->RequiredShapeShift = mm;
-	sp = CheckAndReturnSpellEntry(16975);
-	if(sp != NULL)
-		sp->RequiredShapeShift = mm;
-
-	/**********************************************************
-	 *	Restoration
-	 **********************************************************/
-
-	// Druid - Tree Form Aura
-	sp = CheckAndReturnSpellEntry(34123);
-	if(sp != NULL)
-		sp->NameHash = 0;
-
-	// Druid - Omen of Clarity
-	sp = CheckAndReturnSpellEntry(16864);
-	if(sp != NULL)
-	{
-		sp->procChance = 6; //procchance dynamic. 3ppm
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CAST_SPELL;
-	}
-
-	// Druid - Natural Perfection
-	sp = CheckAndReturnSpellEntry(33881);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	sp = CheckAndReturnSpellEntry(33882);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-	sp = CheckAndReturnSpellEntry(33883);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
-
-	// Druid - Intensity
-	sp = CheckAndReturnSpellEntry(17106);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(17107);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(17108);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Druid - Natural Shapeshifter
-	sp = CheckAndReturnSpellEntry(16833);
-	if(sp != NULL)
-		sp->DurationIndex = 0;
-	sp = CheckAndReturnSpellEntry(16834);
-	if(sp != NULL)
-		sp->DurationIndex = 0;
-	sp = CheckAndReturnSpellEntry(16835);
-	if(sp != NULL)
-		sp->DurationIndex = 0;
-
-	//////////////////////////////////////////
-	// ITEMS								//
-	//////////////////////////////////////////
-
-	// Insert items spell fixes here
-
-	//Sharpened Twilight Scale (normal)
-	sp = CheckAndReturnSpellEntry(75455);
-	if (sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 75458;
-		sp->procChance = 35;
-		sp->proc_interval = 45000;
-	}
-
-	//Sharpened Twilight Scale (heroic)
-	sp = CheckAndReturnSpellEntry(75457);
-	if (sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 75456;
-		sp->procChance = 35;
-		sp->proc_interval = 45000;
-	}
-
-	//Compact Harvest Reaper
-	sp = CheckAndReturnSpellEntry(4078);
-	if(sp != NULL)
-	{
-		sp->DurationIndex = 6;
-	}
-
-	//Graccu's Mince Meat Fruitcake
-	sp = CheckAndReturnSpellEntry(25990);
-	if(sp != NULL)
-	{
-		sp->EffectAmplitude[1] = 1000;
-	}
-
-	//Extract Gas
-	sp = CheckAndReturnSpellEntry(30427);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_DUMMY;
-	}
-
-	//Relic - Idol of the Unseen Moon
-	sp = CheckAndReturnSpellEntry(43739);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 43740;
-	}
-
-	//Lunar Grace - Idol of the Unseen Moon proc
-	sp = CheckAndReturnSpellEntry(43740);
-	if(sp != NULL)
-	{
-		sp->ProcOnNameHash[0] = SPELL_HASH_MOONFIRE;
-	}
-
-	//Relic - Idol of Terror
-	sp = CheckAndReturnSpellEntry(43737);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 10001; //block proc when is already active.. (Primal Instinct duration = 10 sec)
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 43738;
-		sp->procChance = 85;
-	}
-
-	//Primal Instinct - Idol of Terror proc
-	sp = CheckAndReturnSpellEntry(43738);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->ProcOnNameHash[0] = SPELL_HASH_MANGLE__CAT_;
-		sp->ProcOnNameHash[1] = SPELL_HASH_MANGLE__BEAR_;
-	}
-
-	//Tome of Fiery Redemption
-	sp = CheckAndReturnSpellEntry(37197);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 37198;
-		sp->procChance = 15;
-	}
-
-	//Thunderfury
-	sp = CheckAndReturnSpellEntry(21992);
-	if(sp != NULL)
-	{
-		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 27648;
-		sp->EffectImplicitTargetA[2] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER; // cebernic: for enemies not self
-	}
-
-	//Energized
-	sp = CheckAndReturnSpellEntry(43750);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Spell Haste Trinket
-	sp = CheckAndReturnSpellEntry(33297);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-
-	//Enchant Weapon - Deathfrost
-	sp = CheckAndReturnSpellEntry(46662);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-
-	// Sigil of the Unfaltering Knight
-	sp = CheckAndReturnSpellEntry(62147);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_ICY_TOUCH;
-		sp->procChance = 100;
-		sp->proc_interval = 45000;
-	}
-
-	// Deadly Aggression - triggered by Deadly Gladiator's Relic/Idol/Libram/Totem
-	sp = CheckAndReturnSpellEntry(60549);
-	if(sp != NULL)
-	{
-		// effect 1 and 2 are the same... dunno why
-		sp->Effect[1] = SPELL_EFFECT_NULL;
-	}
-
-	// Furious Gladiator's Libram of Fortitude - triggered by LK Arena 4 Gladiator's Relic/Idol/Libram/Totem
-	sp = CheckAndReturnSpellEntry(60551);
-	if(sp != NULL)
-	{
-		// effect 1 and 2 are the same... dunno why
-		sp->Effect[1] = SPELL_EFFECT_NULL;
-	}
-
-	// Relentless Aggression - triggered by LK Arena 5 Gladiator's Relic/Idol/Libram/Totem
-	sp = CheckAndReturnSpellEntry(60553);
-	if(sp != NULL)
-	{
-		// effect 1 and 2 are the same... dunno why
-		sp->Effect[1] = SPELL_EFFECT_NULL;
-	}
-
-	// Savage Aggression - triggered by Savage Gladiator's Relic/Idol/Libram/Totem
-	sp = CheckAndReturnSpellEntry(60544);
-	if(sp != NULL)
-	{
-		// effect 1 and 2 are the same... dunno why
-		sp->Effect[1] = SPELL_EFFECT_NULL;
-	}
-
-	// Sigil of Haunted Dreams
-	sp = CheckAndReturnSpellEntry(60826);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		sp->ProcOnNameHash[0] = SPELL_HASH_BLOOD_STRIKE;
-		sp->ProcOnNameHash[1] = SPELL_HASH_HEART_STRIKE;
-		sp->procChance = 15;
-		sp->proc_interval = 45000;
-	}
-
-	// Vestige of Haldor
-	sp = CheckAndReturnSpellEntry(60306);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-	}
-
-	// Forge Ember
-	sp = CheckAndReturnSpellEntry(60473);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	// Mirror of Truth
-	sp = CheckAndReturnSpellEntry(33648);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_CRIT_ATTACK;
-	}
-
-	// Majestic Dragon Figurine
-	sp = CheckAndReturnSpellEntry(60524);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	// Flow of Knowledge
-	sp = CheckAndReturnSpellEntry(62114);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	// Embrace of the Spider
-	sp = CheckAndReturnSpellEntry(60490);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	// Anvil of Titans
-	sp = CheckAndReturnSpellEntry(62115);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-	}
-
-	// Soul of the Dead
-	sp = CheckAndReturnSpellEntry(60537);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	// Illustration of the Dragon Soul
-	sp = CheckAndReturnSpellEntry(60485);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	// Grim Toll
-	sp = CheckAndReturnSpellEntry(60436);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-	}
-
-	// Fury of the Five Flights
-	sp = CheckAndReturnSpellEntry(60313);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-	}
-
-	// Bandit's Insignia
-	sp = CheckAndReturnSpellEntry(60442);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-	}
-
-	// Meteorite Whetstone
-	sp = CheckAndReturnSpellEntry(60301);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 45000;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-	}
-
-	// Sonic Booster
-	sp = CheckAndReturnSpellEntry(54707);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 60000;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-
-	//Totem of the Third Wind - bad range
-	SpellEntry* sp_healing_wave = CheckAndReturnSpellEntry(8004);
-	sp = CheckAndReturnSpellEntry(34132);
-	if(sp != NULL)
-	{
-		sp->rangeIndex = sp_healing_wave->rangeIndex;
-	}
-	sp = CheckAndReturnSpellEntry(42371);
-	if(sp != NULL)
-	{
-		sp->rangeIndex = sp_healing_wave->rangeIndex;
-	}
-	sp = CheckAndReturnSpellEntry(43729);
-	if(sp != NULL)
-	{
-		sp->rangeIndex = sp_healing_wave->rangeIndex;
-	}
-	sp = CheckAndReturnSpellEntry(46099);
-	if(sp != NULL)
-	{
-		sp->rangeIndex = sp_healing_wave->rangeIndex;
-	}
-
-	//Moonkin Starfire Bonus
-	sp = CheckAndReturnSpellEntry(46832);
-	if(sp != NULL)
-	{
-		sp->procFlags = uint32(PROC_ON_CAST_SPELL | PROC_TARGET_SELF);
-	}
-
-	// Eye of Acherus, our phase shift mode messes up the control :/
-	sp = CheckAndReturnSpellEntry(51852);
-	if(sp != NULL)
-		sp->Effect[ 0 ] = 0;
-
-
-	//Spell Focus Trigger (Mystical Skyfire Diamond)
-	sp = CheckAndReturnSpellEntry(32837);
-	if(sp != NULL)
-		sp->procChance = 15;
-
-	// Band of the Eternal Sage
-	sp = CheckAndReturnSpellEntry(35083);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Band of the Eternal Restorer
-	sp = CheckAndReturnSpellEntry(35086);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Ashtongue Talisman of Shadows
-	sp = CheckAndReturnSpellEntry(40478);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Ashtongue Talisman of Swiftness
-	sp = CheckAndReturnSpellEntry(40485);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Ashtongue Talisman of Valor
-	sp = CheckAndReturnSpellEntry(40458);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	// Memento of Tyrande
-	sp = CheckAndReturnSpellEntry(37655);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 10;
-	}
-
-	// Ashtongue Talisman of Insight
-	sp = CheckAndReturnSpellEntry(40482);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-
-	//Ashtongue Talisman of Equilibrium
-	sp = CheckAndReturnSpellEntry(40442);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 40;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectTriggerSpell[0] = 40452;
-		sp->maxstack = 1;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 25;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectTriggerSpell[1] = 40445;
-		sp->maxstack = 1;
-		sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 25;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectTriggerSpell[2] = 40446;
-		sp->maxstack = 1;
-	}
-
-	//Ashtongue Talisman of Acumen
-	sp = CheckAndReturnSpellEntry(40438);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 10;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectTriggerSpell[0] = 40441;
-		sp->maxstack = 1;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 10;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectTriggerSpell[1] = 40440;
-		sp->maxstack = 1;
-	}
-	// Drums of war targets surrounding party members instead of us
-	sp = CheckAndReturnSpellEntry(35475);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2] = 0;
-		sp->EffectImplicitTargetB[0] = 0;
-		sp->EffectImplicitTargetB[1] = 0;
-		sp->EffectImplicitTargetB[2] = 0;
-	}
-
-	// Drums of Battle targets surrounding party members instead of us
-	sp = CheckAndReturnSpellEntry(35476);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2] = 0;
-		sp->EffectImplicitTargetB[0] = 0;
-		sp->EffectImplicitTargetB[1] = 0;
-		sp->EffectImplicitTargetB[2] = 0;
-	}
-
-	// Drums of Panic targets surrounding creatures instead of us
-	sp = CheckAndReturnSpellEntry(35474);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
-		sp->EffectImplicitTargetA[2] = 0;
-		sp->EffectImplicitTargetB[0] = 0;
-		sp->EffectImplicitTargetB[1] = 0;
-		sp->EffectImplicitTargetB[2] = 0;
-	}
-
-	// Drums of Restoration targets surrounding party members instead of us
-	sp = CheckAndReturnSpellEntry(35478);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2] = 0;
-		sp->EffectImplicitTargetB[0] = 0;
-		sp->EffectImplicitTargetB[1] = 0;
-		sp->EffectImplicitTargetB[2] = 0;
-	}
-	// Drums of Speed targets surrounding party members instead of us
-	sp = CheckAndReturnSpellEntry(35477);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2] = 0;
-		sp->EffectImplicitTargetB[0] = 0;
-		sp->EffectImplicitTargetB[1] = 0;
-		sp->EffectImplicitTargetB[2] = 0;
-	}
-
-	// Dragonspine Trophy
-	sp = CheckAndReturnSpellEntry(34774);
-	if(sp != NULL)
-	{
-		sp->procChance = 6;
-		sp->procFlags  = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-		sp->proc_interval = 30000;
-	}
-
-	//Serpent-Coil Braid
-	sp = CheckAndReturnSpellEntry(37447);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 100;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectTriggerSpell[0] = 37445;
-		sp->maxstack = 1;
-	}
-
-	// Band of the Eternal Champion
-	sp = CheckAndReturnSpellEntry(35080);
-	if(sp != NULL)
-	{
-		sp->procFlags  = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-		sp->proc_interval = 60000;
-	}
-	// Band of the Eternal Sage
-	sp = CheckAndReturnSpellEntry(35083);
-	if(sp != NULL)
-	{
-		sp->procFlags  = PROC_ON_CAST_SPELL;
-		sp->proc_interval = 60000;
-	}
-	// Band of the Eternal Restorer
-	sp = CheckAndReturnSpellEntry(35086);
-	if(sp != NULL)
-	{
-		sp->procFlags  = PROC_ON_CAST_SPELL;
-		sp->proc_interval = 60000;
-	}
-	// Band of the Eternal Defender
-	sp = CheckAndReturnSpellEntry(35077);
-	if(sp != NULL)
-	{
-		sp->procFlags  = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
-		sp->proc_interval = 60000;
-	}
-
-	//Item Set: Malorne Harness
-	sp = CheckAndReturnSpellEntry(37306);
-	if(sp != NULL)
-	{
-		sp->procChance = 4;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-	sp = CheckAndReturnSpellEntry(37311);
-	if(sp != NULL)
-	{
-		sp->procChance = 4;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-
-	//Item Set: Deathmantle
-	sp = CheckAndReturnSpellEntry(37170);
-	if(sp != NULL)
-	{
-		sp->procChance = 4;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-
-	//Item Set: Netherblade
-	sp = CheckAndReturnSpellEntry(37168);
-	if(sp != NULL)
-	{
-		sp->procChance = 15;
-		//sp->procFlags = PROC_ON_CAST_SPELL; Need new flag - PROC_ON_FINISH_MOVE;
-	}
-
-	//Item Set: Tirisfal Regalia
-	sp = CheckAndReturnSpellEntry(37443);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	//Item Set: Avatar Regalia
-	sp = CheckAndReturnSpellEntry(37600);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 6;
-	}
-
-	//Item Set: Incarnate Raiment
-	sp = CheckAndReturnSpellEntry(37568);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	//Item Set: Voidheart Raiment
-	sp = CheckAndReturnSpellEntry(37377);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 5;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->proc_interval = 20;
-		sp->EffectTriggerSpell[0] = 37379;
-	}
-	sp = CheckAndReturnSpellEntry(39437);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 5;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->proc_interval = 20;
-		sp->EffectTriggerSpell[0] = 37378;
-	}
-
-	//Item Set: Cataclysm Raiment
-	sp = CheckAndReturnSpellEntry(37227);
-	if(sp != NULL)
-	{
-		sp->proc_interval = 60000;
-		sp->procChance = 100;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	//Item Set: Cataclysm Regalia
-	sp = CheckAndReturnSpellEntry(37228);
-	if(sp != NULL)
-	{
-		sp->procChance = 7;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = CheckAndReturnSpellEntry(37237);
-	if(sp != NULL)
-	{
-		sp->procChance = 25;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	//Item Set: Cataclysm Harness
-	sp = CheckAndReturnSpellEntry(37239);
-	if(sp != NULL)
-	{
-		sp->procChance = 2;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-	}
-
-	//Item Set: Cyclone Regalia
-	sp = CheckAndReturnSpellEntry(37213);
-	if(sp != NULL)
-	{
-		sp->procChance = 11;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	}
-
-	//Item Set: Lightbringer Battlegear
-	sp = CheckAndReturnSpellEntry(38427);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 20;
-	}
-
-	//Item Set: Crystalforge Battlegear
-	sp = CheckAndReturnSpellEntry(37195);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 6;
-	}
-
-	//Item Set: Crystalforge Raiment
-	sp = CheckAndReturnSpellEntry(37189);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-		sp->proc_interval = 60000;
-	}
-	sp = CheckAndReturnSpellEntry(37188);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	//Item Set: Destroyer Armor
-	sp = CheckAndReturnSpellEntry(37525);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
-		sp->procChance = 7;
-	}
-
-	//Item Set: Destroyer Battlegear
-	sp = CheckAndReturnSpellEntry(37528);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-
-	//Item Set: Warbringer Armor
-	sp = CheckAndReturnSpellEntry(37516);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-
-	//Item Set: Shadowcraft Armor & Darkmantle Armor
-	sp = CheckAndReturnSpellEntry(27787);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
-		sp->procChance = 7;
-	}
-
-	// Item Set: Warlock Tier 7 Heroes' Plagueheart Garb
-	sp = CheckAndReturnSpellEntry(60172);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 61082;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 100;
-	}
-
-	//all Drums
-	sp = CheckAndReturnSpellEntry(35474);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-	sp = CheckAndReturnSpellEntry(35475);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-	sp = CheckAndReturnSpellEntry(35476);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-	sp = CheckAndReturnSpellEntry(35477);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-	sp = CheckAndReturnSpellEntry(35478);
-	if(sp != NULL)
-		sp->RequiredShapeShift = 0;
-
-	//this an on equip item spell(2824) :  ice arrow(29501)
-	sp = CheckAndReturnSpellEntry(29501);
-	if(sp != NULL)
-	{
-		sp->procChance = 30;//some say it is triggered every now and then
-		sp->procFlags = PROC_ON_RANGED_ATTACK;
-	}
-
-	//Purify helboar meat
-	sp = CheckAndReturnSpellEntry(29200);
-	if(sp != NULL)
-	{
-		sp->Reagent[1] = 0;
-		sp->ReagentCount[1] = 0;
-	}
-
-	// - Warrior - Warbringer Armor
-	// 2 pieces: You have a chance each time you parry to gain Blade Turning, absorbing 200 damage for 15 sec.
-	// SPELL ID = 37514 (http://www.wowhead.com/?spell=37514)
-
-	sp = CheckAndReturnSpellEntry(37514);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 37515;
-		sp->procChance = 25;
-	}
-
-	//Thorium Grenade
-	sp = CheckAndReturnSpellEntry(19769);
-	if(sp != NULL)
-	{
-		sp->InterruptFlags |= ~(CAST_INTERRUPT_ON_MOVEMENT);
-	}
-
-	//M73 Frag Grenade
-	sp = CheckAndReturnSpellEntry(13808);
-	if(sp != NULL)
-	{
-		sp->InterruptFlags |= ~(CAST_INTERRUPT_ON_MOVEMENT);
-	}
-
-	//Iron Grenade
-	sp = CheckAndReturnSpellEntry(4068);
-	if(sp != NULL)
-	{
-		sp->InterruptFlags |= ~(CAST_INTERRUPT_ON_MOVEMENT);
-	}
-
-	//Frost Grenade
-	sp = CheckAndReturnSpellEntry(39965);
-	if(sp != NULL)
-	{
-		sp->InterruptFlags |= ~(CAST_INTERRUPT_ON_MOVEMENT);
-	}
-
-	//Adamantine Grenade
-	sp = CheckAndReturnSpellEntry(30217);
-	if(sp != NULL)
-	{
-		sp->InterruptFlags |= ~(CAST_INTERRUPT_ON_MOVEMENT);
-	}
-
-	//Swordguard Embroidery
-	sp = CheckAndReturnSpellEntry(55776);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 55775;
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 25;
-		sp->proc_interval = 60000;
-	}
-
-	//Lightweave Embroidery - this will work in 3.1
-	/*sp = CheckAndReturnSpellEntry(55640);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 55637;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 50;
-		sp->proc_interval = 45000;
-	}*/
-
-	//Darkglow Embroidery
-	sp = CheckAndReturnSpellEntry(55768);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 55767;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 35;
-		sp->proc_interval = 60000;
-	}
-	/**************************************************************
-	* Trinket Fixes		Please keep nice and clean :)										  *
-	**************************************************************/
-
-	// Citrine Pendant of Golden Healing
-	sp = CheckAndReturnSpellEntry(25608);		//	http://www.wowhead.com/?item=20976
-	if(sp != NULL)
-	{
-		//Overrides any spell coefficient calculation - DBCStores.h
-		sp->Dspell_coef_override = 0;	//DD&DH
-		sp->OTspell_coef_override = 0;	//HOT&DOT
-	}
-	//Barricade of Eternity
-	sp = CheckAndReturnSpellEntry(40475);		//	http://www.wowhead.com/?item=40475
-	if(sp != NULL)
-		sp->procChance = 50;	// Sets change to proc
-
-	//Figurine - Shadowsong Panther
-	sp = CheckAndReturnSpellEntry(46784);		//	http://www.wowhead.com/?item=35702
-	if(sp != NULL)
-		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
-
-	// Infernal Protection
-	sp = CheckAndReturnSpellEntry(36488);			//	http://www.wowhead.com/?spell=36488
-	if(sp != NULL)
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
-
-	// Band of the Eternal Champion: reduced proc rate
-	sp = CheckAndReturnSpellEntry(35080);
-	if(sp != NULL)
-		sp->procChance = 5;
-
-	// Band of the Eternal Sage: reduced proc rate
-	sp = CheckAndReturnSpellEntry(35083);
-	if(sp != NULL)
-		sp->procChance = 5;
-
-	// Band of the Eternal Defender: reduced proc rate
-	sp = CheckAndReturnSpellEntry(35077);
-	if(sp != NULL)
-		sp->procChance = 5;
-
-	// Band of the Eternal Restorer: reduced proc rate
-	sp = CheckAndReturnSpellEntry(35086);
-	if(sp != NULL)
-		sp->procChance = 5;
-
-	// Deadly Throw Interrupt
-	sp = CheckAndReturnSpellEntry(32748);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_ON_CAST_SPELL;
-	}
-
-	//Sundial of the Exiled
-	sp = CheckAndReturnSpellEntry(60063);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 60064;
-		sp->procFlags = PROC_ON_SPELL_HIT;
-		sp->procChance = 10;
-		sp->proc_interval = 45000;
-	}
-
-	//Je'Tze's Bell
-	sp = CheckAndReturnSpellEntry(49622);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 49623;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 10;
-		sp->proc_interval = 45000;
-	}
-
-	//Tears of Bitter Anguish
-	sp = CheckAndReturnSpellEntry(58901);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 58904;
-		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK | PROC_ON_CRIT_ATTACK;
-		sp->procChance = 10;
-		sp->proc_interval = 60000;
-	}
-
-	//Embrace of the Spider
-	sp = CheckAndReturnSpellEntry(60490);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 60492;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 10;
-		sp->proc_interval = 30000;
-	}
-
-	//Dying Curse
-	sp = CheckAndReturnSpellEntry(60493);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 60494;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 15;
-		sp->proc_interval = 45000;
-	}
-
-	//Fury of the Five Flights
-	sp = CheckAndReturnSpellEntry(60313);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 60314;
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-		sp->procChance = 100;
-		sp->maxstack = 20;
-	}
-
-	//Vial of the Sunwell
-	sp = CheckAndReturnSpellEntry(45059);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Pendant of the Violet Eye
-	sp = CheckAndReturnSpellEntry(29601);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 35095;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(35095);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->procChance = 100;
-	}
-
-	sp = CheckAndReturnSpellEntry(38332);		// Ribbon of Sacrifice
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	sp = CheckAndReturnSpellEntry(40475);		// Black temple melee trinket
-	if(sp != NULL)
-		sp->procChance = 5;
-
-	sp = CheckAndReturnSpellEntry(32642);		// Sporegarr - Petrified Lichen Guard
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_BLOCK_RECEIVED;
-		sp->procChance = 100;
-		sp->EffectTriggerSpell[0] = 32643;
-	}
-
-	//Flow of Knowledge
-	sp = CheckAndReturnSpellEntry(62114);
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[1] = 60064;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->procChance = 10;
-		sp->proc_interval = 45000;
-	}
-
-	//Majestic Dragon Figurine
-	sp = CheckAndReturnSpellEntry(60524);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->proc_interval = 100;
-	}
-
-	//Illustration of the Dragon Soul
-	sp = CheckAndReturnSpellEntry(60485);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->proc_interval = 100;
-	}
-
-	//////////////////////////////////////////
-	// BOSSES								//
-	//////////////////////////////////////////
-
-	// Insert boss spell fixes here
-
-	// Major Domo - Magic Reflection
-	sp = CheckAndReturnSpellEntry(20619);
-	if(sp != NULL)
-	{
-		for(i = 0; i < 3; i++)
-		{
-			if(sp->EffectImplicitTargetA[i] > 0)
-				sp->EffectImplicitTargetA[i] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
-			if(sp->EffectImplicitTargetB[i] > 0)
-				sp->EffectImplicitTargetB[i] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
-		}
-	}
-
-	// Major Domo - Damage Shield
-	sp = CheckAndReturnSpellEntry(21075);
-	if(sp != NULL)
-	{
-		for(i = 0; i < 3; i++)
-		{
-			if(sp->EffectImplicitTargetA[i] > 0)
-				sp->EffectImplicitTargetA[i] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
-			if(sp->EffectImplicitTargetB[i] > 0)
-				sp->EffectImplicitTargetB[i] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
-		}
-	}
-
-	// Dark Glare
-	sp = CheckAndReturnSpellEntry(26029);
-	if(sp != NULL)
-		sp->cone_width = 15.0f; // 15 degree cone
-
-	// Drain Power (Malacrass) // bugged - the charges fade even when refreshed with new ones. This makes them everlasting.
-	sp = CheckAndReturnSpellEntry(44131);
-	if(sp != NULL)
-		sp->DurationIndex = 21;
-	sp = CheckAndReturnSpellEntry(44132);
-	if(sp != NULL)
-		sp->DurationIndex = 21;
-
-	// Zul'jin spell, proc from Creeping Paralysis
-	sp = CheckAndReturnSpellEntry(43437);
-	if(sp != NULL)
-	{
-		sp->EffectImplicitTargetA[0] = 0;
-		sp->EffectImplicitTargetA[1] = 0;
-	}
-
-	//Bloodboil
-	sp = CheckAndReturnSpellEntry(42005);
-	if(sp != NULL)
-	{
-		sp->MaxTargets = 5;
-	}
-
-	//Acidic Wound
-	sp = CheckAndReturnSpellEntry(40484);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 100;
-	}
-
-	//Inject Poison
-	sp = CheckAndReturnSpellEntry(44599);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(46046);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->procChance = 100;
-	}
-
-	//Anthropy
-	sp = CheckAndReturnSpellEntry(40327);
-	if(sp != NULL)
-	{
-		sp->maxstack = 10;
-	}
-
-	//Doom
-	sp = CheckAndReturnSpellEntry(31347);
-	if(sp != NULL)
-	{
-		sp->MaxTargets = 1;
-	}
-	//Shadow of Death
-	sp = CheckAndReturnSpellEntry(40251);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 0;
-	}
-
-	// Recently Dropped Flag
-	sp = CheckAndReturnSpellEntry(42792);
-	if(sp != NULL)
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	/*
-	cebernic 's fixes
-	*/
-	//resurrection sickness
-	sp = CheckAndReturnSpellEntry(15007);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-	// ghost ,NIGHTELF ghost & sprit
-	sp = CheckAndReturnSpellEntry(20584);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	sp = CheckAndReturnSpellEntry(9036);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 20584;
-	}
-
-	sp = CheckAndReturnSpellEntry(8326);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	sp = CheckAndReturnSpellEntry(26013);   //bg deserter
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	sp = CheckAndReturnSpellEntry(24379);   //bg Restoration
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 23493;
-		sp->c_is_flags = SPELL_FLAG_IS_FORCEDBUFF;
-	}
-
-	sp = CheckAndReturnSpellEntry(23493);   //bg Restoration
-	if(sp != NULL)
-	{
-		sp->EffectTriggerSpell[0] = 24379;
-		sp->c_is_flags = SPELL_FLAG_IS_FORCEDBUFF;
-	}
-
-	sp = CheckAndReturnSpellEntry(5246);    // why self?
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 20511; // cebernic: this just real spell
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_NONE;
-	}
-
-
-	//Bandage
-	sp = CheckAndReturnSpellEntry(11196);
-	if(sp != NULL)
-		sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
-
-	//////////////////////////////////////////
-	// DEATH KNIGHT							//
-	//////////////////////////////////////////
-
-	// Insert Death Knight spells here ---- Made by Alice
-
-	// Mark of Blood
-	// Necessary to proper create entry on m_chargeSpells
-	sp = CheckAndReturnSpellEntry(49005);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK | PROC_ON_SPELL_HIT;
-
-	/**********************************************************
-	 *	Unholy Aura - Ranks 1 & 2
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(50391);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_SPEED_ALWAYS;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 50392;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-	}
-	sp = CheckAndReturnSpellEntry(50392);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_SPEED_ALWAYS;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 50392;
-		sp->Effect[1] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-	}
-
-	/**********************************************************
-	 *	Blood Presence
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(48266);
-	if(sp != NULL)
-	{
-		sp->BGR_one_buff_from_caster_on_self = SPELL_TYPE3_DEATH_KNIGHT_AURA;
-	}
-
-	/**********************************************************
-	 *	Empower Rune Weapon
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(47568);
-	if(sp != NULL)
-	{
-		sp->Effect[2] = SPELL_EFFECT_ACTIVATE_RUNES;
-		sp->EffectBasePoints[2] = 1;
-		sp->EffectMiscValue[2] = RUNE_UNHOLY;
-	}
-
-	/**********************************************************
-	 *	Frost Presence
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(48263);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_BASE_RESISTANCE_PCT;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
-		sp->EffectBasePoints[1] = 9;
-		sp->EffectApplyAuraName[2] = SPELL_AURA_MOD_DAMAGE_TAKEN;
-		sp->BGR_one_buff_from_caster_on_self = SPELL_TYPE3_DEATH_KNIGHT_AURA;
-	}
-
-	/**********************************************************
-	 *	Unholy Presence
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(48265);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_HASTE;
-		sp->EffectBasePoints[0] = 14;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_SPEED;
-		sp->EffectBasePoints[1] = 14;
-		sp->BGR_one_buff_from_caster_on_self = SPELL_TYPE3_DEATH_KNIGHT_AURA;
-	}
-
-	/**********************************************************
-	 *	Death Grip
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(49576);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_DUMMY;
-	}
-
-	/**********************************************************
-	 *	Acherus Deatcharger
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(48778);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOUNTED;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED;
-		sp->EffectBasePoints[1] = 99;
-	}
-
-	/**********************************************************
-	 *	Path of Frost
-	 **********************************************************/
-	sp = CheckAndReturnSpellEntry(3714);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_WATER_WALK;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-	}
-
-	// Rune Strike
-	sp = CheckAndReturnSpellEntry(56815);
-	if(sp != NULL)
-	{
-		sp->Attributes |= ATTRIBUTES_CANT_BE_DPB;
-	}
-
-	CreateDummySpell(56817);
-	sp = CheckAndReturnSpellEntry(56817);
-	if(sp != NULL)
-	{
-		sp->DurationIndex = 28;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-	}
-
-	//Frost Strike
-	sp = CheckAndReturnSpellEntry(49143);
-	if(sp != NULL)
-	{
-		sp->Attributes = ATTRIBUTES_CANT_BE_DPB;
-	}
-	sp = CheckAndReturnSpellEntry(51416);
-	if(sp != NULL)
-	{
-		sp->Attributes = ATTRIBUTES_CANT_BE_DPB;
-	}
-	sp = CheckAndReturnSpellEntry(51417);
-	if(sp != NULL)
-	{
-		sp->Attributes = ATTRIBUTES_CANT_BE_DPB;
-	}
-	sp = CheckAndReturnSpellEntry(51418);
-	if(sp != NULL)
-	{
-		sp->Attributes = ATTRIBUTES_CANT_BE_DPB;
-	}
-	sp = CheckAndReturnSpellEntry(51419);
-	if(sp != NULL)
-	{
-		sp->Attributes = ATTRIBUTES_CANT_BE_DPB;
-	}
-	sp = CheckAndReturnSpellEntry(55268);
-	if(sp != NULL)
-	{
-		sp->Attributes = ATTRIBUTES_CANT_BE_DPB;
-	}
-
-	/**********************************************************
-	*      Bloodworms - handled in dummy code
-	**********************************************************/
-
-	// Bloodworms Rank 1
-	sp = CheckAndReturnSpellEntry(49027);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 50452;
-	}
-
-	// Bloodworms Rank 2
-	sp = CheckAndReturnSpellEntry(49542);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 50452;
-	}
-
-	// Bloodworms Rank 3
-	sp = CheckAndReturnSpellEntry(49543);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 50452;
-	}
-
-	// Blood Fury Healing Debuff
-	sp = CheckAndReturnSpellEntry(23230);
-	if(sp != NULL)
-	{
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
-	}
-
-	// Noggenfogger elixir - reduce size effect
-	sp = CheckAndReturnSpellEntry(16595);
-	if(sp != NULL)
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_SCALE;
-		sp->EffectBasePoints[0] = -50;
-		sp->maxstack = 1;
-	}
-
-	sp = CheckAndReturnSpellEntry(46584);
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_DUMMY;
-		sp->Effect[1] = 0;
-		sp->Effect[2] = 0;
-	}
-
-	//PvP Librams of Justice
-	//Gladiator's Libram of Justice
-	sp = CheckAndReturnSpellEntry(34139);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Merciless Gladiator's Libram of Justice
-	sp = CheckAndReturnSpellEntry(42368);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Vengeful Gladiator's Libram of Justice
-	sp = CheckAndReturnSpellEntry(43726);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Brutal Gladiator's Libram of Justice
-	sp = CheckAndReturnSpellEntry(46092);
-	if(sp != NULL)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
-	//Other Librams
-	//Libram of Saints Departed and Libram of Zeal
-	sp = CheckAndReturnSpellEntry(34262);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 34263;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(34263);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->ProcOnNameHash[0] = SPELL_HASH_JUDGEMENT;
-		sp->procChance = 100;
-	}
-
-	//Libram of Avengement
-	sp = CheckAndReturnSpellEntry(34258);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 34260;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(34260);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->ProcOnNameHash[0] = SPELL_HASH_JUDGEMENT;
-		sp->procChance = 100;
-	}
-
-	//Libram of Mending
-	sp = CheckAndReturnSpellEntry(43741);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 43742;
-		sp->procChance = 100;
-	}
-	sp = CheckAndReturnSpellEntry(43742);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->ProcOnNameHash[0] = SPELL_HASH_HOLY_LIGHT;
-		sp->procChance = 100;
-	}
-
-	//Libram of Divine Judgement
-	sp = CheckAndReturnSpellEntry(43745);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 43747;
-		sp->procChance = 40;
-	}
-	sp = CheckAndReturnSpellEntry(43747);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->procChance = 100;
-	}
-
-	//Stonebreaker's Totem
-	sp = CheckAndReturnSpellEntry(43748);
-	if(sp != NULL)
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL | static_cast<uint32>(PROC_TARGET_SELF);
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 43749;
-		sp->procChance = 50;
-	}
-	sp = CheckAndReturnSpellEntry(43749);
-	if(sp != NULL)
-	{
-		sp->self_cast_only = true;
-		sp->procChance = 100;
-	}
-
-	sp = CheckAndReturnSpellEntry(44856);		// Bash'ir Phasing Device
-	if(sp != NULL)
-		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_LEAVE_AREA;
-
-	sp = CheckAndReturnSpellEntry(27997);		//Spellsurge
-	if(sp != NULL)
-	{
-		sp->proc_interval = 30000; // Wowhead Comment
-		sp->procChance = 3; //Enchantment Text
-	}
-
-	sp = CheckAndReturnSpellEntry(24574);		// Zandalarian Hero Badge 24590 24575
-	if(sp != NULL)
-	{
-		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 24590;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance = 100;
-	}
-
-	//Tempfix for Stone Statues
-	sp = CheckAndReturnSpellEntry(32253);
-	if(sp != NULL)
-		sp->DurationIndex = 64;
-	sp = CheckAndReturnSpellEntry(32787);
-	if(sp != NULL)
-		sp->DurationIndex = 64;
-	sp = CheckAndReturnSpellEntry(32788);
-	if(sp != NULL)
-		sp->DurationIndex = 64;
-	sp = CheckAndReturnSpellEntry(32790);
-	if(sp != NULL)
-		sp->DurationIndex = 64;
-	sp = CheckAndReturnSpellEntry(32791);
-	if(sp != NULL)
-		sp->DurationIndex = 64;
-
-	//////////////////////////////////////////////////////
-	// GAME-OBJECT SPELL FIXES                          //
-	//////////////////////////////////////////////////////
-
-	// Blessing of Zim'Torga
-	sp = CheckAndReturnSpellEntry(51729);
-	if(sp)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDBUFF;
-	}
-
-	// Blessing of Zim'Abwa
-	sp = CheckAndReturnSpellEntry(51265);
-	if(sp)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDBUFF;
-	}
-
-	// Blessing of Zim'Rhuk
-	sp = CheckAndReturnSpellEntry(52051);
-	if(sp)
-	{
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
-		sp->c_is_flags |= SPELL_FLAG_IS_FORCEDBUFF;
-	}
+    uint32 cntt = dbcSpell.GetNumRows();
+
+
+    for (uint32 zx = 0; zx < cntt; zx++)
+    {
+        // Read every SpellEntry row
+        SpellEntry* sp = dbcSpell.LookupRow(zx);
+
+        sp->ProcsPerMinute = 0;
+        sp->spell_can_crit = true;
+        sp->AdditionalAura = 0;
+        //sp->Unique = false;
+
+        switch (sp->Id)
+        {
+        case 3286: // BIND HARDCODING
+        {
+            sp->Effect[0] = 11; sp->Effect[1] = 24;
+            sp->EffectImplicitTargetA[0] = sp->EffectImplicitTargetA[1] = 149;
+        }break;
+
+        case 1455: // Spell 1455 Proc Chance (Life Tap Rank 2:
+        case 1456: // Spell 1456 Proc Chance (Life Tap Rank 3:
+        case 8182: // Spell 8182 Proc Chance (Frost Resistance Rank 1:
+        case 8185: // Spell 8185 Proc Chance (Fire Resistance Rank 1:
+        case 10476: // Spell 10476 Proc Chance (Frost Resistance Rank 2:
+        case 10477: // Spell 10477 Proc Chance (Frost Resistance Rank 3:
+        case 10534: // Spell 10534 Proc Chance (Fire Resistance Rank 2:
+        case 10535: // Spell 10535 Proc Chance (Fire Resistance Rank 3:
+        case 11687: // Spell 11687 Proc Chance (Life Tap Rank 4:
+        case 11688: // Spell 11688 Proc Chance (Life Tap Rank 5:
+        case 11689: // Spell 11689 Proc Chance (Life Tap Rank 6:
+        case 12292: // Spell 12292 Proc Chance (Death Wish :
+        case 18803: // Spell 18803 Proc Chance (Focus :
+            sp->procChance = 100;
+            break;
+
+        case 3391: // Spell 3391 Proc Chance (Thrash :
+        case 15494: // Spell 15494 Proc Chance (Fury of Forgewright :
+        case 15601: // Spell 15601 Proc Chance (Hand of Justice :
+        case 15642: // Spell 15642 Proc Chance (Ironfoe :
+        case 16843: // Spell 16843 Proc Chance (Crimson Fury :
+        case 18797: // Spell 18797 Proc Chance (Flurry Axe :
+        case 19105: // Spell 19105 Proc Chance (MHTest01 Effect :
+        case 19109: // Spell 19109 Proc Chance (MHTest02 Effect :
+        case 27035: // Spell 27035 Proc Chance (Sword Specialization (OLD: :
+        case 21919: // Spell 21919 Proc Chance (Thrash :
+            sp->procChance = 10;
+            break;
+
+            // Spell 12284 Proc Chance (Mace Specialization Rank 1:
+        case 12284:
+            sp->procChance = 1;
+            break;
+
+            // Spell 12322 Proc Chance (Unbridled Wrath Rank 1:
+        case 12322:
+            sp->ProcsPerMinute = 3;
+            break;
+
+            // Spell 12701 Proc Chance (Mace Specialization Rank 2:
+        case 12701:
+            sp->procChance = 2;
+            break;
+
+            // Spell 12702 Proc Chance (Mace Specialization Rank 3:
+        case 12702:
+            sp->procChance = 3;
+            break;
+
+            // Spell 12703 Proc Chance (Mace Specialization Rank 4:
+        case 12703:
+            sp->procChance = 4;
+            break;
+
+            // Spell 12704 Proc Chance (Mace Specialization Rank 5:
+        case 12704:
+            sp->procChance = 6;
+            break;
+
+            // Spell 12999 Proc Chance (Unbridled Wrath Rank 2:
+        case 12999:
+            sp->ProcsPerMinute = 6;
+            break;
+
+            // Spell 13000 Proc Chance (Unbridled Wrath Rank 3:
+        case 13000:
+            sp->ProcsPerMinute = 9;
+            break;
+
+            // Spell 13001 Proc Chance (Unbridled Wrath Rank 4:
+        case 13001:
+            sp->ProcsPerMinute = 12;
+            break;
+
+            // Spell 13002 Proc Chance (Unbridled Wrath Rank 5:
+        case 13002:
+            sp->ProcsPerMinute = 15;
+            break;
+
+            // Spell 14076 Proc Chance (Dirty Tricks Rank 1:
+        case 14076:
+            sp->procChance = 30;
+            break;
+
+            // Spell 14094 Proc Chance (Dirty Tricks Rank 2:
+        case 14094:
+            sp->procChance = 60;
+            break;
+
+            // Spell 15600 Proc Chance (Hand of Justice :
+        case 15600:
+            sp->procChance = 2;
+            break;
+
+            // Spell 23158 Proc Chance (Concussive Shot Cooldown Reduction :
+        case 23158:
+            sp->procChance = 4;
+            break;
+
+            // Spell 27521 Proc Chance (Mana Restore :
+        case 27521:
+            sp->procChance = 2;
+            break;
+
+            // Spell 27867 Proc Chance (Freeze :
+        case 27867:
+            sp->procChance = 2;
+            break;
+
+            // Spell 27498 Crusader's Wrath
+        case 27498:
+            sp->procChance = 7;
+            break;
+
+            //Martyrdom
+        case 14531:
+        case 14774:
+        {
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED | PROC_ON_RANGED_CRIT_ATTACK_RECEIVED;
+        }break;
+
+        // Impact proc
+        case 64343:
+        {
+            sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        // Elemental Focus
+        case 16164:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 16246:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procCharges++; //   first   charge gets lost when   it gets procced
+        }break;
+
+        //shaman - Stormstrike
+        case 17364:
+        {
+            sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED;
+        }break;
+
+        //shaman - Improved Stormstrike
+        case 51521:
+        case 51522:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //shaman - Hex
+        case 51514:
+        {
+            // Damage   caused may interrupt the effect.
+            sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN;
+        }break;
+
+        case 52752:
+        {
+            sp->spell_can_crit = false;
+        }break;
+
+        // shaman   -   Maelstrom   Weapon
+        case 51528:
+        {
+            sp->procChance = 0;
+            sp->ProcsPerMinute = 1.3f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        case 51529:
+        {
+            sp->procChance = 0;
+            sp->ProcsPerMinute = 2.6f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        case 51530:
+        {
+            sp->procChance = 0;
+            sp->ProcsPerMinute = 3.9f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        case 51531:
+        {
+            sp->procChance = 0;
+            sp->ProcsPerMinute = 5.2f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        case 51532:
+        {
+            sp->procChance = 0;
+            sp->ProcsPerMinute = 6.5f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        // Maelstorm proc   charge removal
+        case 53817:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Astral   Shift
+        case 52179:
+        {
+            sp->EffectAmplitude[0] = 0;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+            sp->EffectMiscValue[0] = 127;
+        }break;
+
+        // Shamanistic Rage
+        case 30823:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        case 51479:
+        case 51478:
+        case 51474: // Astral Shift
+        {
+            sp->procChance = 100;
+            sp->EffectImplicitTargetA[0] = 1;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED;
+            sp->EffectTriggerSpell[0] = 52179;
+            sp->Effect[1] = 0;
+        }break;
+
+        case 51975:// shaman    -   Poison Cleansing Totem
+        case 52025:// shaman    -   Disease Cleansing   Totem
+        {
+
+            SpellEntry*  sp2 = dbcSpell.LookupEntryForced(58780);
+            if (sp2 != NULL)
+            {
+                sp->EffectRadiusIndex[0] = sp2->EffectRadiusIndex[0];   //30 yards
+                sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY_IN_AREA;
+            }
+        }break;
+
+        // Fire Nova Totem visual   fix
+        case 8349:
+        case 8502:
+        case 8503:
+        case 11306:
+        case 11307:
+        case 25535:
+        case 25537:
+        case 61650:
+        case 61654:
+        {
+            sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 19823;
+        }break;
+
+        case 64395:
+        {
+            sp->School = SCHOOL_ARCANE;
+        }break;
+
+        // Flurry
+        case 12319:
+        case 12971:
+        case 12972:
+        case 12973:
+        case 12974:
+        case 16256:
+        case 16281:
+        case 16282:
+        case 16283:
+        case 16284:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+
+        // Flurry   proc
+        case 12966:
+        case 12967:
+        case 12968:
+        case 12969:
+        case 12970:
+        case 16257:
+        case 16277:
+        case 16278:
+        case 16279:
+        case 16280:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procCharges++; //   first   charge gets lost when   it gets procced
+        }break;
+
+        //Minor Glyph Research + Northrend Inscription Research
+        case 61177:
+        case 61288:
+        case 60893:
+        {
+            sp->Effect[1] = 0;
+            sp->EffectBasePoints[1] = 0;
+            sp->EffectImplicitTargetA[1] = 0;
+            sp->EffectDieSides[1] = 0;
+        }break;
+
+        // Shaman   Totem   items   fixes
+        // Totem of Survival,   Totem   of the Tundra
+        case 46097:
+        case 43860:
+        case 43861:
+        case 43862:
+        case 60564:
+        case 60571:
+        case 60572:
+        case 37575:
+        {
+            sp->EffectSpellClassMask[0][0] = 0x00100000 | 0x10000000 | 0x80000000; //Earth + Flame + Frost Shocks
+            sp->EffectSpellClassMask[0][1] = 0x08000000;    // Wind Shock
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+        }break;
+        case 60567:
+        {
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+        }break;
+
+        // Totem of Third   Wind
+        case 46098:
+        case 34138:
+        case 42370:
+        case 43728:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x00000080;    // Lesser   Healing Wave
+        }break;
+
+        // Totem of the Elemental   Plane
+        case 60770:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x00000001;    // Lightning Bolt
+        }break;
+
+        // Fathom-Brooch of the Tidewalker
+        case 37247:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->proc_interval = 45000;
+        }break;
+
+        //Warlock: Backlash
+        case 34935:
+        case 34938:
+        case 34939:
+        {
+            sp->proc_interval = 8000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        case 34936:
+        {
+            sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        //Priest - Holy Nova
+        case 15237:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 23455;
+        }break;
+
+        case 15430:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 23458;
+        }break;
+
+        case 15431:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 23459;
+        }break;
+
+        case 25331:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 27803;
+        }break;
+
+        case 27799:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 27804;
+        }break;
+
+        case 27800:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 27805;
+        }break;
+
+        case 27801:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 25329;
+        }break;
+
+        case 48077:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 48075;
+        }break;
+
+        case 48078:
+        {
+            sp->Effect[0] = sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectTriggerSpell[1] = 48076;
+        }break;
+
+        // Moroes' garrote targets a single enemy   instead of us
+        case 37066:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+        }break;
+
+        // Penance
+        case 47540:
+        case 53005:
+        case 53006:
+        case 53007:
+        {
+            sp->AttributesEx = 0;
+            sp->DurationIndex = 566; // Change to instant cast as script will cast the real channeled spell.
+            sp->ChannelInterruptFlags = 0; // Remove channeling behaviour.
+        }break;
+
+        // Penance triggered healing spells have wrong targets.
+        case 47750:
+        case 52983:
+        case 52984:
+        case 52985:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_FRIEND;
+        }break;
+
+        // Hymn of Hope
+        case 60931:
+        case 60933:
+        {
+            sp->EffectImplicitTargetA[0] = 37;
+        }break;
+
+        //paladin   -   Reckoning
+        case 20177:
+        case 20179:
+        case 20180:
+        case 20181:
+        case 20182:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        //paladin   -   Reckoning   Effect = proc   on proc
+        case 20178:
+        {
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        //paladin   -   Judgement   of Wisdom
+        case 20186:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 20268;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->procChance = 35;
+            sp->Effect[1] = 0;
+            sp->EffectApplyAuraName[1] = 0;
+        }break;
+
+        //paladin   -   Judgement   of Light
+        case 20185:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 20267;
+            sp->procChance = 35;
+            sp->Effect[1] = 0;
+            sp->EffectApplyAuraName[1] = 0;
+        }break;
+
+        case 20267:
+        case 20268:
+        case 20341:
+        case 20342:
+        case 20343:
+        case 27163:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+        }break;
+        //paladin   -   Eye for an Eye
+        case 9799:
+        case 25988:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_CRIT_HIT_RECEIVED;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 25997;
+        }break;
+
+        //paladin Blessed Life
+        case 31828:
+        case 31829:
+        case 31830:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->EffectTriggerSpell[0] = 31828;
+        }break;
+
+        //paladin   -   Light's Grace
+        case 31833:
+        case 31835:
+        case 31836:
+        {
+            sp->EffectSpellClassMask[0][0] = 0x80000000;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //Paladin - Sacred Cleansing
+        case 53551:
+        case 53552:
+        case 53553:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x00001000;
+            sp->EffectSpellClassMask[0][1] = 0x00001000;
+            sp->EffectSpellClassMask[0][2] = 0x00001000;
+        }break;
+        //Shield of the Templar
+        case 53709:
+        case 53710:
+        case 53711:
+        {
+            sp->EffectSpellClassMask[0][0] = 64;
+            sp->EffectSpellClassMask[0][1] = 16384;
+            sp->EffectSpellClassMask[0][2] = 1048576;
+            sp->EffectSpellClassMask[1][0] = 64;
+            sp->EffectSpellClassMask[1][1] = 16384;
+            sp->EffectSpellClassMask[1][2] = 1048576;
+            sp->EffectSpellClassMask[2][0] = 64;
+            sp->EffectSpellClassMask[2][1] = 16384;
+            sp->EffectSpellClassMask[2][2] = 1048576;
+        }break;
+        //Paladin - Infusion of light
+        case 53569:
+        case 53576:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 53672:
+        case 54149:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+        //Paladin - Vindication
+        case 9452:
+        case 26016:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_ANY_HOSTILE_ACTION;
+            sp->procChance = 25;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; // hoax
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->maxstack = 1;
+        }break;
+        //Paladin - Art of War
+        case 53486:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[2] = 53489;
+        }break;
+        case 53488:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[2] = 59578;
+        }break;
+        case 53489:
+        case 59578:
+        {
+            sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        //shaman - Lightning Overload
+        case 30675: // rank 1
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 4;
+        }break;
+
+        case 30678:  // rank 2
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 8;
+        }break;
+
+        case 30679: // rank 3
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 12;
+        }break;
+
+        case 30680: // rank 4
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 16;
+        }break;
+
+        case 30681: // rank 5
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 20;
+        }break;
+
+        //shaman - Purge
+        case 370:
+        case 8012:
+        case 27626:
+        case 33625:
+        {
+            sp->DispelType = DISPEL_MAGIC;
+        }break;
+
+        case 57663: // Totem of Wrath
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_RAID_AREA_AURA;
+        }break;
+
+        //Shaman - Eye of   the Storm
+        case 29062:
+        case 29064:
+        case 29065:
+        {
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+
+        //shaman - Elemental Devastation
+        case 29179:
+        case 29180:
+        case 30160:
+            //shaman - Ancestral healing
+        case 16176:
+        case 16235:
+        case 16240:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //shaman - Ancestral healing proc   spell
+        case 16177:
+        case 16236:
+        case 16237:
+        {
+            sp->rangeIndex = 4;
+        }break;
+
+        case 1856: // Vanish r1
+        case 1857: // Vanish r2
+        case 11305: // Sprint
+        case 14183: // Premeditation
+        case 14185: // Preparation
+        case 26889: // Vanish r3
+        case 31665: // Master of Sub
+        case 36554: // Shadow Step
+        case 46784: // Shadowsong Panther
+        case 51724: // Sap
+        case 58427: // Overkill
+        {
+            sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+        }break;
+
+        //rogue -   Find Weakness.
+        case 31233:
+        case 31239:
+        case 31240:
+        case 31241:
+        case 31242:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //rogue -   Cheap   Shot
+        case 1833:
+        {
+            sp->ATTRIBUTESEX2 &= ~ATTRIBUTESEX2_REQ_BEHIND_TARGET;  //Doesn't   require to be   behind target
+            //sp->ATTRIBUTESEX3 &= ATTRIBUTESEX3_ONLY_TARGET_PLAYERS;  //Doesn't   require to be   behind target
+        }break;
+
+        //rogue -   Camouflage.
+        case 13975:
+        case 14062:
+        case 14063:
+        case 14064:
+        case 14065:
+        {
+            sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
+        }break;
+
+        //rogue -   Mace Specialization.
+        case 13709:
+        case 13800:
+        case 13801:
+        case 13802:
+        case 13803:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        //rogue - Shadowstep
+        case 36563:
+        {
+            sp->EffectMiscValue[1] = SMT_MISC_EFFECT;
+            sp->procFlags = 0;
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+            sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+        }break;
+
+        case 44373:
+        {
+            sp->procFlags = 0;
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+            sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+        }break;
+
+        //Rogue  - Ruthlessness
+        case 14156:
+        case 14160:
+        case 14161:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;//proc   spell
+            sp->EffectTriggerSpell[0] = 14157;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        //priest    -   Holy Concentration
+        case 34753:
+        case 34859:
+        case 34860:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 34754://Make it similar to Mage Clearcasting
+        {
+            sp->procCharges = 2;
+            sp->ATTRIBUTESEX2 = 4;
+            sp->ATTRIBUTESEX3 = 1073741824;
+            sp->procFlags = 87376;
+        }break;
+
+        //guardian spirit
+        case 47788:
+        {
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+            sp->AuraInterruptFlags = 0;
+        }break;
+
+        case 48153:
+        {
+            sp->EffectBasePoints[0] = 50;
+        }break;
+
+        //Priest:   Blessed Recovery
+        case 27811:
+        {
+            sp->EffectTriggerSpell[0] = 27813;
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+
+        case 27815:
+        {
+            sp->EffectTriggerSpell[0] = 27817;
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+
+        case 27816:
+        {
+            sp->EffectTriggerSpell[0] = 27818;
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+
+        //priest-   Blessed Resilience
+        case 33142:
+        case 33145:
+        case 33146:
+            //priest-   Focused Will
+        case 45234:
+        case 45243:
+        case 45244:
+        {
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+        //Priest:   Improved Vampiric Embrace (Rank1)
+        case 27839:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+        }break;
+
+        case 20154: // Seal of Righteousness
+        case 21084: // Seal of Righteousness
+        case 20164: // Seal of Justice
+        case 20165: // Seal of Light
+        case 20166: // Seal of Wisdom
+        case 31801: // Seal of Vengeance
+        case 53736: // Seal of Corruption
+            //LEGACY - These aren't ingame anymore... or are they?
+        case 38008: // Seal of Blood(30s)
+        case 31892: // Seal of Blood(30m)
+        case 53720: // Seal of the Martyr
+        {
+            sp->Effect[0] = sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+        }break;
+        case 20375: // Seal of Command
+        {
+            sp->ProcsPerMinute = 7;
+            sp->Effect[0] = sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+        }break;
+        case 57770:
+        {
+            sp->rangeIndex = 1;
+        }break;
+
+        //paladin - hammer of the righteous
+        case 53595:
+        {
+            sp->speed = 0;
+            sp->is_melee_spell = true;
+        }break;
+
+        //paladin   -   Spiritual   Attunement
+        case 31785:
+        case 33776:
+        {
+            sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 31786;
+        }break;
+
+        //fix   for the right   Enchant ID for Enchant Cloak - Major Resistance
+        case 27962:
+        case 36285:
+        {
+            sp->EffectMiscValue[0] = 2998;
+        }break;
+
+        //muhaha,   rewriting   Retaliation spell   as old one :D
+        case 20230:
+        {
+            sp->Effect[0] = 6; //aura
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 22858; //evil   ,   but this is good for us :D
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED; //add procflag here since this was not processed   with the others !
+        }break;
+
+        //"bloodthirst" new version is ok   but old version is wrong from   now on :(
+        case 23881:
+        {
+            sp->Effect[1] = 64; //cast on   us, it is   good
+            sp->EffectTriggerSpell[1] = 23885; //evil   ,   but this is good for us :D
+        }break;
+
+        case 23892:
+        {
+            sp->Effect[1] = 64;
+            sp->EffectTriggerSpell[1] = 23886; //evil   ,   but this is good for us :D
+        }break;
+
+        case 23893:
+        {
+            sp->Effect[1] = 64; //
+            sp->EffectTriggerSpell[1] = 23887; //evil   ,   but this is good for us :D
+        }break;
+
+        case 23894:
+        {
+            sp->Effect[1] = 64; //
+            sp->EffectTriggerSpell[1] = 23888; //evil   ,   but this is good for us :D
+        }break;
+
+        case 25251:
+        {
+            sp->Effect[1] = 64; //aura
+            sp->EffectTriggerSpell[1] = 25252; //evil   ,   but this is good for us :D
+        }break;
+
+        case 30335:
+        {
+            sp->Effect[1] = 64; //aura
+            sp->EffectTriggerSpell[1] = 30339; //evil   ,   but this is good for us :D
+        }break;
+
+        // Hunter   -   Master Tactician
+        case 34506:
+        case 34507:
+        case 34508:
+        case 34838:
+        case 34839:
+        {
+            sp->procFlags = PROC_ON_RANGED_ATTACK;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        // Hunter   -   T.N.T
+        case 56333:
+        case 56336:
+        case 56337:
+        {
+            sp->procFlags = PROC_ON_TRAP_TRIGGER | PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CRIT_ATTACK | PROC_ON_PHYSICAL_ATTACK | PROC_ON_RANGED_ATTACK;
+            sp->EffectSpellClassMask[0][0] = 0x00000004;
+            sp->EffectSpellClassMask[0][1] = sp->EffectSpellClassMask[1][1];
+            sp->EffectSpellClassMask[1][0] = 0x0;
+        }break;
+
+        // Hunter   -   Spirit Bond
+        case 19578:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 19579;
+        }break;
+
+        case 20895:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 24529;
+        }break;
+
+        case 19579:
+        case 24529:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we   should do   the same for player too as we   did for pet
+            sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+            sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+            sp->EffectAmplitude[1] = sp->EffectAmplitude[0];
+            sp->EffectDieSides[1] = sp->EffectDieSides[0];
+        }break;
+
+        // Hunter   -   Animal Handler
+        case 34453:
+        case 34454:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HIT_CHANCE;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+        }break;
+
+        // Hunter   -   Catlike Reflexes
+        case 34462:
+        case 34464:
+        case 34465:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+        }break;
+
+        // Hunter   -   Serpent's   Swiftness
+        case 34466:
+        case 34467:
+        case 34468:
+        case 34469:
+        case 34470:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HASTE;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+        }break;
+
+        // Hunter   -   Ferocious   Inspiration
+        case 34455:
+        case 34459:
+        case 34460:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+            sp->EffectTriggerSpell[0] = 34456;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
+            sp->Effect[1] = 0; //remove this
+        }break;
+
+        // Hunter   -   Focused Fire
+        case 35029:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 35060;
+        }break;
+        case 35030:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 35061;
+        }break;
+        case 35060:
+        case 35061:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+        }break;
+
+        // Hunter   -   Thick   Hide
+        case 19609:
+        case 19610:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor   rating for pets yet !
+            sp->EffectBasePoints[0] *= 10; //just   give it a   little juice :P
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        // Hunter   -   Ferocity
+        case 19612:
+        case 19599:
+        case 19600:
+        case 19601:
+        case 19602:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_CRIT_PERCENT;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        // Hunter   -   Bestial Swiftness
+        case 19596:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_SPEED;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        // Hunter   -   Endurance   Training
+        case 19583:
+        case 19584:
+        case 19585:
+        case 19586:
+        case 19587:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+        // Hunter - Thrill of the Hunt
+        case 34497:
+        case 34498:
+        case 34499:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->procChance = sp->EffectBasePoints[0] + 1;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 34720;
+        }break;
+
+        // Hunter   -   Expose Weakness
+        case 34500:
+        case 34502:
+        case 34503:
+        {
+            sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        // hunter - Wild Quiver
+        case 53215:
+        case 53216:
+        case 53217:
+        {
+            sp->procFlags = PROC_ON_RANGED_ATTACK;
+        }break;
+
+        //Hunter - Frenzy
+        case 19621:
+        case 19622:
+        case 19623:
+        case 19624:
+        case 19625:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 19615;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+            sp->procChance = sp->EffectBasePoints[0];
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->c_is_flags = SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+        }break;
+
+        case 56641:
+        case 34120:
+        case 49051:
+        case 49052: //Steady Shot cast time fix
+        {
+            sp->CastingTimeIndex = 5; // Set 2 sec cast time
+        }break;
+
+        case 61846:
+        case 61847: // Aspect of the Dragonhawk
+        {   // need to copy Mod Dodge Percent aura from a separate spell
+            CopyEffect(dbcSpell.LookupEntryForced(61848), 0, sp, 2);
+        }break;
+
+        //Hunter - Unleashed Fury
+        case 19616:
+        case 19617:
+        case 19618:
+        case 19619:
+        case 19620:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+            sp->EffectMiscValue[0] = 1; //tweekign melee dmg
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET | SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+        }break;
+
+        //Hunter : Pathfinding
+        case 19559:
+        case 19560:
+        {
+            sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
+        }break;
+
+        //Hunter : Rapid Killing - might need   to add honor trigger too here. I'm guessing you receive Xp too so   i'm avoiding double proc
+        case 34948:
+        case 34949:
+        {
+            sp->procFlags = PROC_ON_GAIN_EXPIERIENCE;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        // Winter's chill
+        case 12579:
+        {
+            sp->c_is_flags |= SPELL_FLAG_CANNOT_PROC_ON_SELF;
+        }break;
+
+        //Mage - Icy Veins
+        case 12472:
+        {
+            sp->EffectMiscValue[1] = SMT_TRIGGER;
+        }break;
+
+        //Mage - Ignite
+        case 11119:
+        case 11120:
+        case 12846:
+        case 12847:
+        case 12848:
+        {
+            sp->Effect[0] = 6; //aura
+            sp->EffectApplyAuraName[0] = 42; //force him to use procspell effect
+            sp->EffectTriggerSpell[0] = 12654;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //Mage - Wand   Specialization. Not the forst   thing   we messed   up. Blizz   uses attack as magic and wandds as weapons :S
+        case 6057:
+        case 6085:
+            //Priest - Wand Specialization
+        case 14524:
+        case 14525:
+        case 14526:
+        case 14527:
+        case 14528:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
+        }break;
+
+        //Mage - Elemental Precision
+        case 29438:
+        case 29439:
+        case 29440:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            sp->EffectMiscValue[0] = SMT_COST;
+        }break;
+
+        //Mage - Arcane Concentration
+        case 11213:
+        case 12574:
+        case 12575:
+        case 12576:
+        case 12577:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        //Mage - ClearCasting   Effect
+        //Druid - Clearcasting Effect
+        //Druid - Nature's Grace effect
+        case 16870:
+        case 12536:
+        case 16886:
+        {
+            sp->procCharges = 2;
+        }break;
+
+        //Mage - Arcane Blast
+        case 36032:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+            sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
+        }break;
+
+        //rogue - Prey on the weak
+        case 51685:
+        case 51686:
+        case 51687:
+        case 51688:
+        case 51689:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+
+        //rogue -   Seal Fate
+        case 14186:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 20;
+        }break;
+        case 14190:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 40;
+        }break;
+        case 14193:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 60;
+        }break;
+        case 14194:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 80;
+        }break;
+        case 14195:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 100;
+        }break;
+
+        // druid - Nature's Grace
+        case 16880:
+        case 61345:
+        case 61346:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //druid -   Blood   Frenzy
+        case 16954:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 100;
+        }break;
+        case 16952:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 50;
+        }break;
+
+        //druid -   Primal Fury
+        case 16961:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 100;
+        }break;
+        case 16958:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 50;
+        }break;
+
+        //druid -   Intensity
+        case 17106:
+        case 17107:
+        case 17108:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Druid - Nurturing Instinct
+        case 33872:
+        {
+            sp->AdditionalAura = 47179;
+        }break;
+        case 33873:
+        {
+            sp->AdditionalAura = 47180;
+        }break;
+
+        //Improved Sprint
+        case 13743:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 50;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+        }break;
+        case 13875:
+        {
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+        }break;
+
+        //Warlock - healthstones
+        case 6201:
+        case 6202:
+        case 5699:
+        case 11729:
+        case 11730:
+        case 27230:
+        case 47871:
+        case 47878:
+        {
+            sp->Reagent[1] = 0;
+            sp->ReagentCount[1] = 0;
+        }break;
+        //warlock   -    Seed   of Corruption
+        case 27243:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 27285;
+            sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_DIE;
+            sp->procChance = 100;
+        }break;
+        //warlock - soul link
+        case 19028:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_SPLIT_DAMAGE;
+            sp->EffectBasePoints[0] = 20;
+            sp->EffectMiscValue[0] = 127;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+
+            sp->Effect[1] = 6;
+            sp->EffectApplyAuraName[1] = 79;
+            sp->EffectBasePoints[1] = 4;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+            sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+        }break;
+
+        //warlock: Nightfall
+        case 18094:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 17941;
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+            sp->procChance = 2;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+        case 18095:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 17941;
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+            sp->procChance = 4;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+
+        //Warlock - Backdraft
+        case 47258:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54274;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+            sp->procCharges = 4;
+            sp->EffectSpellClassMask[0][0] = 0x00800000;
+            sp->EffectSpellClassMask[0][1] = 0x00800000;
+        }break;
+        case 47269:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54276;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+            sp->procCharges = 4;
+            sp->EffectSpellClassMask[0][0] = 0x00800000;
+            sp->EffectSpellClassMask[0][1] = 0x00800000;
+        }break;
+        case 47260:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54277;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+            sp->procCharges = 4;
+            sp->EffectSpellClassMask[0][0] = 0x00800000;
+            sp->EffectSpellClassMask[0][1] = 0x00800000;
+        }break;
+        //Warlock - Eradication
+        case 47195:
+        case 47196:
+        case 47197:
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+            sp->EffectSpellClassMask[0][0] = 2;
+            sp->proc_interval = 30000;
+        }break;
+
+        //warlock: Improved Enslave Demon
+        case 18821:
+        {
+            sp->EffectMiscValue[0] = SMT_SPELL_VALUE_PCT;
+            sp->EffectBasePoints[0] = -(sp->EffectBasePoints[0] + 2);
+        }break;
+        //Mage - Improved   Blizzard
+        case 11185:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 12484;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 12487:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 12485;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 12488:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 12486;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //mage - Combustion
+        case 11129:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
+            sp->procCharges = 0;
+            sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
+        }break;
+
+        //mage - Master of Elements
+        case 29074:
+        case 29075:
+        case 29076:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 29077;
+            sp->EffectImplicitTargetA[1] = 1;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->procChance = 100;
+        }break;
+
+        //mage: Blazing Speed
+        case 31641:
+        case 31642:
+        {
+            sp->EffectTriggerSpell[0] = 31643;
+        }break;
+
+        //mage talent   "frostbyte". we make it to be   dummy
+        case 11071:
+        case 12496:
+        case 12497:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 12494;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = sp->EffectBasePoints[0];
+        }break;
+
+        //rogue-shiv -> add 1   combo   point
+        case 5938:
+        {
+            sp->Effect[1] = 80;
+            sp->ATTRIBUTESEX2 &= ~ATTRIBUTESEX2_REQ_BEHIND_TARGET;  //Doesn't   require to be   behind target
+            sp->is_melee_spell = true;
+        }break;
+
+        //warlock   -   Demonic Sacrifice
+        case 18789:
+        case 18790:
+        case 18791:
+        case 18792:
+        case 35701:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
+        }break;
+
+
+        //warlock   -   Demonic Tactics
+        case 30242:
+        {
+            sp->Effect[0] = 0; //disble this.   This is just blizz crap. Pure   proove that they suck   :P
+            sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_MOD_SPELL_CRIT_CHANCE; //lvl 1 has it   fucked up   :O
+            sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+        }break;
+        case 30245:
+        case 30246:
+        case 30247:
+        case 30248:
+        {
+            sp->Effect[0] = 0; //disble this.   This is just blizz crap. Pure   proove that they suck   :P
+            sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+            sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+        }break;
+
+        //warlock   -   Demonic Resilience
+        case 30319:
+        case 30320:
+        case 30321:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+        }break;
+
+        //warlock   -   Improved Imp
+        case 18694:
+        case 18695:
+        case 18696:
+        case 18705:
+        case 18706:
+        case 18707:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        //warlock   -   Improved Succubus
+        case 18754:
+        case 18755:
+        case 18756:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+        }break;
+
+        //warlock   -   Fel Intellect
+        case 18731:
+        case 18743:
+        case 18744:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+            sp->EffectMiscValue[0] = 3;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        //warlock   -   Fel Stamina
+        case 18748:
+        case 18749:
+        case 18750:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+            sp->EffectMiscValue[0] = 2;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        //warlock   -   Unholy Power
+        case 18769:
+        case 18770:
+        case 18771:
+        case 18772:
+        case 18773:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+            //this is   required since blizz uses   spells for melee attacks while we   use fixed   functions
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+            sp->EffectMiscValue[1] = SCHOOL_NORMAL;
+            sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+        }break;
+
+        //warlock   -   Master Demonologist -   25 spells   here
+        case 23785:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 23784;
+        }break;
+        case 23822:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 23830;
+        }break;
+        case 23823:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 23831;
+        }break;
+        case 23824:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 23832;
+        }break;
+        case 23825:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 35708;
+        }break;
+        //and   the rest
+        case 23784:
+        case 23830:
+        case 23831:
+        case 23832:
+        case 35708:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        case 23759:
+        case 23760:
+        case 23761:
+        case 23762:
+        case 23826:
+        case 23827:
+        case 23828:
+        case 23829:
+        case 23833:
+        case 23834:
+        case 23835:
+        case 23836:
+        case 23837:
+        case 23838:
+        case 23839:
+        case 23840:
+        case 23841:
+        case 23842:
+        case 23843:
+        case 23844:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+        }break;
+
+        case 35702:
+        case 35703:
+        case 35704:
+        case 35705:
+        case 35706:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+        }break;
+        //warlock   -   Improved Healthstone
+        case 18692:
+        case 18693:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            sp->EffectMiscValue[0] = SMT_MISC_EFFECT;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+        }break;
+        //warlock   -   Improved Drain Soul
+        case 18213:
+        case 18372:
+        {
+            sp->procFlags = PROC_ON_TARGET_DIE;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+            sp->procChance = 100;
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 18371;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+            sp->Effect[2] = 0;   //remove this   effect
+        }break;
+
+        //warlock   -   Shadow Embrace
+        case 32385:
+        case 32387:
+        case 32392:
+        case 32393:
+        case 32394:
+        {
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_SPELL_HIT;
+            sp->Effect[1] = 0;  //remove this   effect ? Maybe remove   the other   one :P xD
+        }break;
+        //warlock - soul leech
+        case 30293:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 30294;
+            sp->procChance = 10;
+            sp->procFlags = PROC_ON_SPELL_HIT;
+        }break;
+        case 30295:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 30294;
+            sp->procChance = 20;
+            sp->procFlags = PROC_ON_SPELL_HIT;
+        }break;
+        case 30296:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 30294;
+            sp->procChance = 30;
+            sp->procFlags = PROC_ON_SPELL_HIT;
+        }break;
+        //warlock   -   Pyroclasm
+        case 18073:
+        case 18096:
+        case 63245:
+        {
+            sp->Effect[0] = 0; //delete this owerride   effect :P
+            sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+            sp->procChance = 26; //god, save us from fixed values   !
+        }break;
+
+        //Mage - Improved Scorch
+        case 11095:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 33;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 12872:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 66;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 12873:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //Nature's Grasp
+        case 16689:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 339;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+        case 16810:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 1062;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+        case 16811:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 5195;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+        case 16812:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 5196;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+        case 16813:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 9852;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+        case 17329:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 9853;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+        case 27009:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 26989;
+            sp->Effect[1] = 0;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_REMOVEONUSE;
+            sp->AuraInterruptFlags = 0; //we remove it on   proc or timeout
+            sp->procChance = 100;
+        }break;
+
+        //wrath of air totem targets sorounding creatures   instead of us
+        case 2895:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+            sp->EffectImplicitTargetA[2] = 0;
+            sp->EffectImplicitTargetB[0] = 0;
+            sp->EffectImplicitTargetB[1] = 0;
+            sp->EffectImplicitTargetB[2] = 0;
+        }break;
+        //Druid: Natural Shapeshifter
+        case 16833:
+        case 16834:
+        case 16835:
+        {
+            sp->DurationIndex = 0;
+        }break;
+
+
+        //Priest - Inspiration proc spell
+        case 14893:
+        case 15357:
+        case 15359:
+        {
+            sp->rangeIndex = 4;
+        }break;
+
+        //Relentless Strikes
+        case 14179:
+        case 58422:
+        case 58423:
+        case 58424:
+        case 58425:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;//proc    spell
+            sp->EffectTriggerSpell[0] = 14181;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+            sp->procChance = 100;
+        }break;
+
+        //priest - surge of light
+        case 33150:
+        case 33154:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        case 33151:
+        {
+            sp->procCharges = 2;
+        }break;
+
+        //Seal of   Justice -lowered proc   chance (experimental values !)
+        case 31895:
+        {
+            sp->procChance = 20;
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+        }break;
+        // judgement of command shit
+        case 20425:
+        {
+            sp->Effect[1] = 2;
+            sp->EffectImplicitTargetA[1] = 6;
+        }break;
+        //Berserking
+        case 26635:
+        {
+            sp->Attributes = 327680;
+            sp->CasterAuraState = 0;
+        }break;
+        //Escape Artist
+        case 20589:
+        {
+            sp->Attributes = 65552;
+            sp->ATTRIBUTESEX2 = 0;
+            sp->Effect[0] = 108;
+            sp->Effect[1] = 108;
+            sp->EffectDieSides[0] = 1;
+            sp->EffectDieSides[1] = 1;
+            sp->EffectBasePoints[0] = 9;
+            sp->EffectBasePoints[1] = 9;
+            sp->EffectMiscValue[0] = 7;
+            sp->EffectMiscValue[1] = 11;
+        }break;
+        //Zapthrottle Mote Extractor
+        case 30427:
+        {
+            sp->Effect[0] = SPELL_EFFECT_DUMMY;
+        }break;
+        //Goblin Jumper Cable
+        case 22999:
+        case 8342:
+        case 54732:
+        {
+            sp->Effect[0] = 113;
+            sp->EffectMiscValue[0] = 120;
+        }break;
+        //rogue -   intiative
+        case 13976:
+        case 13979:
+        case 13980:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        //this an   on equip item   spell(2824) :    ice arrow(29501)
+        case 29501:
+        {
+            sp->procChance = 30;//some say it   is triggered every now and then
+            sp->procFlags = PROC_ON_RANGED_ATTACK;
+        }break;
+
+        //deep wounds
+        case 12834:
+        case 12849:
+        case 12867:
+        {
+            sp->EffectTriggerSpell[0] = 12868;
+            sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_RANGED_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //warrior   -   second wind should trigger on   self
+        case 29841:
+        case 29842:
+        {
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        // Improved Revenge
+        case 12797:
+        case 12799:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //warrior   -   berserker   rage is missing 1   effect = regenerate rage
+        case 18499:
+        {
+            sp->Effect[2] = 6;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[2] = 37521; //not sure   if this is the one. In my   time this   adds 30 rage
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        //warrior   -   improved berserker rage
+        case 20500:
+        case 20501:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+
+        // warrior - Spell Reflection
+        case 23920:
+        {
+            sp->procFlags = PROC_NULL; //   No need to proc
+        }break;
+
+
+        // warrior - Titan's Grip
+        case 46917: // main spell
+        {
+            SpellEntry * sp2 = dbcSpell.LookupEntryForced(49152);  // move this aura   into main   spell
+            if (sp != NULL)
+            {
+                sp->Effect[1] = sp2->Effect[0];
+                sp->EffectApplyAuraName[1] = sp2->EffectApplyAuraName[0];
+                sp->EffectMiscValue[1] = sp2->EffectMiscValue[0];
+                sp->EffectSpellClassMask[1][0] = sp2->EffectSpellClassMask[0][0];
+                sp->EffectSpellClassMask[1][1] = sp2->EffectSpellClassMask[0][1];
+                sp->EffectSpellClassMask[1][2] = sp2->EffectSpellClassMask[0][2];
+                sp->EffectBasePoints[1] = sp2->EffectBasePoints[0];
+                sp->EffectDieSides[1] = sp2->EffectDieSides[0];
+            }
+        }break;
+
+        // Charge   -   Changing from   dummy   for the power   regen
+        case 100:
+        case 6178:
+        case 11578:
+        {
+            sp->Effect[1] = SPELL_EFFECT_ENERGIZE;
+            sp->EffectMiscValue[1] = 1;
+        }break;
+
+        //warrior   -   Rampage
+        case 30030:
+        case 30033:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+            sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
+            //          sp->Unique = true; // Crow: It should be, but what if we have 2 warriors?
+        }break;
+
+        // warrior - overpower
+        case 7384:
+        case 7887:
+        case 11584:
+        case 11585:
+        {
+            sp->Attributes |= ATTRIBUTES_CANT_BE_DPB;
+        }break;
+
+        // warrior - heroic fury
+        case 60970:
+        {
+            sp->Effect[1] = SPELL_EFFECT_DUMMY;
+        }break;
+
+        case 20608: //Reincarnation
+        {
+            for (uint32 i = 0; i < 8; ++i)
+            {
+                if (sp->Reagent[i])
+                {
+                    sp->Reagent[i] = 0;
+                    sp->ReagentCount[i] = 0;
+                }
+            }
+        }break;
+
+        // druid - travel   form
+        case 5419:
+        {
+            sp->Attributes |= ATTRIBUTES_MOUNT_CASTABLE;
+        }break;
+
+        // druid - Naturalist
+        case 17069:
+        case 17070:
+        case 17071:
+        case 17072:
+        case 17073:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+            sp->EffectMiscValue[1] = 1;
+        }break;
+
+        // Druid: Omen of Clarity
+        case 16864:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CAST_SPELL;
+            sp->procChance = 6;
+            sp->proc_interval = 10000;
+        }break;
+
+        //Serpent-Coil Braid
+        case 37447:
+        case 61062://Heroes' Frostfire Garb AND Valorous Frostfire Garb
+        {
+            sp->Effect[0] = 6;
+            sp->Effect[1] = 6;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[1] = 37445;
+            sp->maxstack = 1;
+        }break;
+
+        // Mark of Conquest
+        case 33510:
+        {
+            sp->procChance = 7;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+
+        //Paladin   -   Improved Lay on Hands
+        case 20234:
+        case 20235:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Sudden   Death
+        case 29724:
+        case 29725:
+        case 29723:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        // Taste for Blood
+        case 56638:
+        case 56637:
+        case 56636:
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+            sp->EffectSpellClassMask[1][0] = 0x0;
+        }break;
+
+        // Flametongue weapon
+        case 58792:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 58788;
+        }break;
+        case 58791:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 58787;
+        }break;
+        case 58784:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 58786;
+        }break;
+        case 16313:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 25488;
+        }break;
+        case 16312:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 16344;
+        }break;
+        case 16311:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 16343;
+        }break;
+        case 15569:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 10445;
+        }break;
+        case 15568:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 8029;
+        }break;
+        case 15567:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 8028;
+        }break;
+        case 10400:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 8026;
+        }break;
+
+        //windfury weapon
+        case 33757:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectTriggerSpell[0] = 25504;
+            sp->procChance = 20;
+            sp->proc_interval = 3000;
+            sp->maxstack = 1;
+        }break;
+
+        // dot heals
+        case 38394:
+        {
+            sp->procFlags = 1024;
+            //sp->SpellGroupType = 6;
+        }break;
+
+        case 16972:
+        case 16974:
+        case 16975:
+        {   //fix   for Predatory   Strikes
+            sp->RequiredShapeShift = (1 << (FORM_BEAR - 1)) | (1 << (FORM_DIREBEAR - 1)) | (1 << (FORM_CAT - 1));
+        }break;
+
+        case 20134:
+        {
+            sp->procChance = 50;
+        }break;
+
+        /* aspect   of the pack -   change to   AA */
+        case 13159:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+
+        /* aspect   of the cheetah - add proc   flags   */
+        case 5118:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;;
+        }break;
+
+
+        case SPELL_RANGED_GENERAL:
+        case SPELL_RANGED_THROW:
+        case 26679:
+        case 29436:
+        case 37074:
+        case 41182:
+        case 41346:
+        {
+            if (sp->RecoveryTime == 0 && sp->StartRecoveryTime == 0)
+                sp->RecoveryTime = 1600;
+        }break;
+
+        case SPELL_RANGED_WAND:
+        {
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
+            if (sp->RecoveryTime == 0 && sp->StartRecoveryTime == 0)
+                sp->RecoveryTime = 1600;
+        }break;
+
+        /**********************************************************
+        *   Misc stuff (NPC SPELLS)
+        **********************************************************/
+
+        case 5106:
+        {
+            sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN;
+        }break;
+
+        /**********************************************************
+        *   Misc stuff (QUEST)
+        **********************************************************/
+        // Bat Net
+        case 52151:
+        {
+            sp->EffectImplicitTargetA[0] = 6;
+        }break;
+
+        // queststuff
+        case 30877:
+        {
+            sp->EffectImplicitTargetB[0] = 0;
+        }break;
+
+        // quest stuff
+        case 23179:
+        {
+            sp->EffectMiscValue[0] = 1434;
+        }break;
+
+        // arcane charges
+        case 45072:
+        {
+            sp->Attributes |= ATTRIBUTES_MOUNT_CASTABLE;
+        }break;
+
+        case 48252: //Prototype Neural Needle
+        case 45634: //Neural Needle
+        {
+            sp->Effect[1] = 0;
+        }break;
+        //Tuber whistle
+        case 36652:
+        {
+            sp->Effect[1] = 3;
+        }break;
+        //Cure Caribou Hide
+        case 46387:
+        {
+            sp->ReagentCount[0] = 1;
+            sp->ReagentCount[1] = 0;
+            sp->Reagent[1] = 0;
+        }break;
+        //Create Totem of Issliruk
+        case 46816:
+        {
+            sp->Reagent[0] = 0;
+            sp->ReagentCount[0] = 0;
+        }break;
+        /**********************************************************
+        *   Misc stuff (ITEMS)
+        **********************************************************/
+
+        // Nitro Boosts
+        case 55004:
+        {
+            CopyEffect(dbcSpell.LookupEntryForced(54861), 0, sp, 2);
+            sp->DurationIndex = 39;
+        }break;
+
+        // Gnomish Lightning Generator
+        case 55039:
+        {
+            sp->InterruptFlags = 0;
+            sp->AuraInterruptFlags = 0;
+            sp->ChannelInterruptFlags = 0;
+        }break;
+
+        // Libram of Divinity
+        case 28853:
+            // Libram of Light
+        case 28851:
+            // Blessed Book of Nagrand
+        case 32403:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_FLAT_MODIFIER;
+            sp->EffectMiscValue[0] = 0;
+            sp->EffectSpellClassMask[0][0] = 1073741824;
+        }break;
+        // Libram of Mending
+        case 43741:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+            sp->EffectSpellClassMask[0][0] = 0x80000000;
+            sp->EffectSpellClassMask[0][1] = 0x0;
+            sp->EffectSpellClassMask[0][2] = 0x0;
+            sp->EffectSpellClassMask[1][0] = 0x0;
+            sp->EffectSpellClassMask[1][1] = 0x0;
+            sp->EffectSpellClassMask[1][2] = 0x0;
+            sp->EffectSpellClassMask[2][0] = 0x0;
+            sp->EffectSpellClassMask[2][1] = 0x0;
+            sp->EffectSpellClassMask[2][2] = 0x0;
+        }break;
+
+        // Druid Trinket Living Root of the Wildheart
+        case 37336:
+        {
+            sp->Effect[0] = SPELL_EFFECT_DUMMY;// oh noez, we   make it DUMMY, no   other   way to fix it   atm
+        }break;
+
+        // Palla trinket
+        case 43745:
+        case 34258:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 8388608 | 520;
+            sp->procChance = 100;
+        }break;
+
+        // Lesser Rune of Warding / Grater Rune of Warding
+        case 42135:
+        case 42136:
+        {
+            sp->EffectImplicitTargetA[1] = 6;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
+        }break;
+
+        //Idol of terror
+        case 43737:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        // Lesser   Heroism (Tenacious Earthstorm   Diamond)
+        case 32844:
+        {
+            sp->procChance = 5;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        // Darkmoon Card:   Heroism
+        case 23689:
+        {
+            sp->ProcsPerMinute = 2.5f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        // Darkmoon Card:   Maelstrom
+        case 23686:
+        {
+            sp->ProcsPerMinute = 2.5f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        // dragonspine trophy
+        case 34774:
+        {
+            sp->ProcsPerMinute = 1.5f;
+            sp->proc_interval = 20000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+
+        // Romulo's Poison Vial
+        case 34586:
+        {
+            sp->ProcsPerMinute = 1.6f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+
+        // madness of   the betrayer
+        case 40475:
+        {
+            sp->procChance = 50;
+            sp->ProcsPerMinute = 1.0f;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+
+        // Band of the Eternal Defender
+        case 35077:
+        {
+            sp->proc_interval = 55000;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+        // Band of the Eternal Champion
+        case 35080:
+        {
+            sp->proc_interval = 55000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        // Band of the Eternal Restorer
+        case 35086:
+            // Band of the Eternal Sage
+        case 35083:
+        {
+            sp->proc_interval = 55000;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        // Sonic Booster
+        case 54707:
+        {
+            sp->ProcsPerMinute = 1.0f;
+            sp->proc_interval = 60000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        case 60301: // Meteorite Whetstone
+        case 60317: // Signet of Edward the Odd
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+        // Bandit's Insignia
+        case 60442:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+        // Fury of the Five Flights
+        case 60313:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+        // Grim Toll
+        case 60436:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+        // Illustration of the Dragon Soul
+        case 60485:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        // Soul of the Dead
+        case 60537:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        // Anvil of Titans
+        case 62115:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+        // Embrace of the Spider
+        case 60490:
+            // Flow of Knowledge
+        case 62114:
+            // Forge Ember
+        case 60473:
+            // Mystical Skyfire Diamond
+        case 32837:
+            // Sundial of the Exiled
+        case 60063:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Majestic Dragon Figurine
+        case 60524:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        // Mirror of Truth
+        case 33648:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+
+        // Vestige of Haldor
+        case 60306:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+
+        //Energized
+        case 43750:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+
+        //Spell Haste   Trinket
+        case 33297:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+        }break;
+        case 57345: // Darkmoon Card: Greatness
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->proc_interval = 45000;
+        }break;
+
+        case 67702: // Death's Choice/Verdict
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->proc_interval = 45000;
+        }break;
+
+        case 67771: // Death's Choice/Verdict (heroic)
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->proc_interval = 45000;
+        }break;
+
+        case 72413: //Ashen Bands
+        {
+            sp->procChance = 10;
+        }break;
+
+        // Swordguard Embroidery
+        case 55776:
+        {
+            sp->proc_interval = 60000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        // Chuchu's Tiny Box of Horrors
+        case 61618:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        case 57351: // Darkmoon Card: Berserker!
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK | PROC_ON_ANY_DAMAGE_RECEIVED;; // when you strike, or are struck in combat
+        }break;
+        case 60196:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+        }break;
+        // Darkmoon Card: Death
+        case 57352:
+        {
+            sp->proc_interval = 45000;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK | PROC_ON_CAST_SPELL;
+        }break;
+        case 60493: //Dying Curse
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->proc_interval = 45000;
+        }break;
+
+        // Ashtongue Talisman   of Shadows
+        case 40478:
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+        }break;
+
+        // Ashtongue Talisman   of Swiftness
+        case 40485:
+            // Ashtongue Talisman   of Valor
+        case 40458:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        //Ashtongue Talisman of Zeal
+        case 40470:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 50;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[0] = 40472;
+            sp->maxstack = 1;
+        }break;
+
+        // Memento of   Tyrande
+        case 37655:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 10;
+            sp->proc_interval = 45000;
+        }break;
+
+        // Ashtongue Talisman   of Insight
+        case 40482:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+
+        //Ashtongue Talisman of Equilibrium
+        case 40442:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 40;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[0] = 40452;
+            sp->maxstack = 1;
+            sp->Effect[1] = 6;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 25;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[1] = 40445;
+            sp->maxstack = 1;
+            sp->Effect[2] = 6;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 25;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[2] = 40446;
+            sp->maxstack = 1;
+        }break;
+
+        //Ashtongue Talisman of Acumen
+        case 40438:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 10;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[0] = 40441;
+            sp->maxstack = 1;
+            sp->Effect[1] = 6;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 10;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[1] = 40440;
+            sp->maxstack = 1;
+        }break;
+
+        //Ashtongue Talisman of Lethality
+        case 40460:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 20;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectTriggerSpell[0] = 40461;
+            sp->maxstack = 1;
+        }break;
+        //Leatherworking Drums
+        case 35475://Drums of War
+        case 35476://Drums of Battle
+        case 35478://Drums of Restoration
+        case 35477://Drums of Speed
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+            sp->EffectImplicitTargetA[2] = EFF_TARGET_NONE;
+            sp->EffectImplicitTargetB[0] = EFF_TARGET_NONE;
+            sp->EffectImplicitTargetB[1] = EFF_TARGET_NONE;
+            sp->EffectImplicitTargetB[2] = EFF_TARGET_NONE;
+        }break;
+
+        case 46699:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_CONSUMES_NO_AMMO;
+        }break;
+        /**********************************************************
+        *   Misc stuff (ITEM SETS)
+        **********************************************************/
+
+        //Item Set: Malorne Harness
+        case 37306:
+        case 37311:
+            //Item Set: Deathmantle
+        case 37170:
+        {
+            sp->procChance = 4;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        //Item Set: Netherblade
+        case 37168:
+        {
+            sp->procChance = 15;
+        }break;
+
+        //Item Set: Tirisfal Regalia
+        case 37443:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //Item Set: Avatar Regalia
+        case 37600:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 6;
+        }break;
+
+        //Item Set: Incarnate   Raiment
+        case 37568:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //Item Set: Voidheart   Raiment
+        case 37377:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 5;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->proc_interval = 20;
+            sp->EffectTriggerSpell[0] = 37379;
+        }break;
+        case 39437:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 5;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->proc_interval = 20;
+            sp->EffectTriggerSpell[0] = 37378;
+        }break;
+
+        //Item Set: Cataclysm   Raiment
+        case 37227:
+        {
+            sp->proc_interval = 60000;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //Item Set: Cataclysm   Regalia
+        case 37228:
+        {
+            sp->procChance = 7;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 37237:
+        {
+            sp->procChance = 25;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //Item Set: Cataclysm   Harness
+        case 37239:
+        {
+            sp->procChance = 2;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+
+        //Item Set: Cyclone Regalia
+        case 37213:
+        {
+            sp->procChance = 11;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //Item Set: Lightbringer Battlegear
+        case 38427:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 20;
+        }break;
+
+        //Item Set: Crystalforge Battlegear
+        case 37195:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 6;
+        }break;
+
+        //Item Set: Crystalforge Raiment
+        case 37189:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->proc_interval = 60000;
+        }break;
+
+        case 37188:
+            //Item Set: Crystalforge Armor
+        case 37191:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //Item Set: Destroyer   Armor
+        case 37525:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
+            sp->procChance = 7;
+        }break;
+
+        //Item Set: Destroyer   Battlegear
+        case 37528:
+            //Item Set: Warbringer Armor
+        case 37516:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+        }break;
+
+        /**********************************************************
+        *   Misc stuff (GLYPH)
+        **********************************************************/
+
+        case 55680:// Glyph of Prayer of Healing
+        case 56176:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 56161;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 58631: // Glyph of Icy Touch
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Glyph of reneved life
+        case 58059:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Glyph of Vigor
+        case 56805:
+        {
+            CopyEffect(dbcSpell.LookupEntryForced(21975), 0, sp, 2);
+        }break;
+
+        // Glyph of Lesser Healing Wave
+        case 55438:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Glyph of Frostbolt
+        case 56370:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Glyph of Revenge
+        case 58364:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+            sp->EffectSpellClassMask[0][1] = 0x0;
+        }break;
+        // Glyph of Revenge Proc
+        case 58363:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+        case 56218://Glyph of Corruption
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 17941;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 4;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+
+        //////////////////////////////////////////////////////
+        // CLASS-SPECIFIC   SPELL   FIXES                           //
+        //////////////////////////////////////////////////////
+
+    /* Note: when   applying spell hackfixes,   please follow   a   template */
+
+        //////////////////////////////////////////
+        // WARRIOR                                  //
+        //////////////////////////////////////////
+        /*case 7405: //   Sunder Armor
+        case 7386: //   Sunder Armor
+        case 8380: //   Sunder Armor
+        case 11596: // Sunder   Armor
+        case 11597: // Sunder   Armor
+        case 25225: // Sunder   Armor
+        case 30330: // Mortal   Strike Ranks
+        case 25248: // Mortal   Strike Ranks
+        case 21553: // Mortal   Strike Ranks
+        case 21552: // Mortal   Strike Ranks
+        case 21551: // Mortal   Strike Ranks
+        case 12294: // Mortal   Strike Ranks
+        case 16511: // Hemo Rank 1
+        case 17347: // Hemo Rank 2
+        case 17348: // Hemo Rank 3
+        case 26864: // Hemo Rank 4
+        {
+            sp->Unique = true;
+        }break;*/
+        // Wrecking Crew
+        case 46867:
+        case 56611:
+        case 56612:
+        case 56613:
+        case 56614:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+        // Enrage
+        case 12317:
+        case 13045:
+        case 13046:
+        case 13047:
+        case 13048:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+        // Improved Defensive Stance (Missing Parry Flag)
+        case 29593:
+        case 29594:
+        {
+            sp->procFlags = PROC_ON_BLOCK_RECEIVED | PROC_ON_DODGE_RECEIVED;
+        }break;
+        // Sword and Board
+        case 46951:
+        case 46952:
+        case 46953:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        // Sword and Board Refresh
+        case 50227:
+        {
+            sp->Effect[1] = 3;
+        }break;
+        // Sword specialization
+        case 12281:
+        case 13960:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 1;
+        }break;
+        case 12812:
+        case 13961:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 2;
+        }break;
+        case 12813:
+        case 13962:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 3;
+        }break;
+        case 12814:
+        case 13963:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 4;
+        }break;
+        case 12815:
+        case 13964:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 5;
+        }break;
+        // vigilance
+        case 50720:
+        {
+            sp->MaxTargets = 1;
+            //sp->Unique = true;
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_MOD_MAX_AFFECTED_TARGETS;
+            sp->EffectImplicitTargetA[2] = 57;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
+        }break;
+
+        // Damage Shield
+        case 58872:
+        case 58874:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_BLOCK_RECEIVED;
+            sp->procChance = 100;
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[2] = 1;
+            sp->EffectTriggerSpell[2] = 59653;
+        }break;
+
+        // Improved Hamstring
+        case 12289:
+        case 12668:
+        case 23695:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 2;
+        }break;
+
+        // Whirlwind
+        case 1680:
+        {
+            //sp->AllowBackAttack = true;
+        }break;
+
+        // Shockwave
+        case 46968:
+        {
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MELEE;
+        }break;
+
+        // Blood Craze
+        case 16487:
+        case 16489:
+        case 16492:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT_RECEIVED | PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+
+        // Gag Order
+        case 12311:
+        case 12958:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        //////////////////////////////////////////
+        // PALADIN                                  //
+        //////////////////////////////////////////
+
+        // Insert   paladin spell   fixes   here
+        // Light's Grace PROC
+        case 31834:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        // Seal of Command - Holy   damage, but melee   mechanics   (crit   damage, chance, etc)
+        case 20424:
+        {
+            sp->rangeIndex = 4;
+            sp->is_melee_spell = true;
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+            sp->School = SCHOOL_HOLY;
+        }break;
+
+        // Illumination
+        case 20210:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 18350;
+            sp->procChance = 20;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 20212:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 18350;
+            sp->procChance = 40;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 20213:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 18350;
+            sp->procChance = 60;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 20214:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 18350;
+            sp->procChance = 80;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 20215:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 18350;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        // Heart of the Crusader rank 1
+        case 20335:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 21183;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 8388608;
+        }break;
+
+        // Heart of the Crusader rank 2
+        case 20336:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54498;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 8388608;
+        }break;
+
+        // Heart of the Crusader rank 3
+        case 20337:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54499;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 8388608;
+        }break;
+
+        // Pursuit of Justice rank 1
+        case 26022:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED;
+            sp->EffectImplicitTargetA[1] = 1;
+            sp->EffectBasePoints[1] = 8;
+        }break;
+
+        // Pursuit of Justice rank 2
+        case 26023:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED;
+            sp->EffectImplicitTargetA[1] = 1;
+            sp->EffectBasePoints[1] = 15;
+        }break;
+
+        // Righteous Vengeance
+        case 53380:
+        case 53381:
+        case 53382:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 61840;
+            sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+            sp->EffectSpellClassMask[0][0] = 0xE14BFF42;
+        }break;
+
+        // Sheat of Light (Hot Effect)
+        case 53501:
+        case 53502:
+        case 53503:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 54203;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        // Sacred Shield
+        case 53601:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
+            sp->EffectTriggerSpell[0] = 58597;
+            sp->proc_interval = 6000;
+        }break;
+
+        // SoC/SoV Dot's
+        case 31803:
+        case 53742:
+        {
+            sp->School = SCHOOL_HOLY;
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+            //sp->Unique = true;
+        }break;
+
+        // Judgement of righteousness
+        case 20187:
+            // Judgement of command
+        case 20467:
+            // Judgement of Justice/Wisdom/Light
+        case 53733:
+            // Judgement of Blood
+        case 31898:
+            // Judgement of Martyr
+        case 53726:
+            // Judgement of Corruption/Vengeance
+        case 31804:
+        {
+            sp->School = SCHOOL_HOLY;
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+        }break;
+
+        // Shield of Righteousness
+        case 53600:
+        case 61411:
+        {
+            sp->School = SCHOOL_HOLY;
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+        }break;
+
+        // Beacon of the Light (Dummy Aura)
+        case 53563:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            sp->c_is_flags = SPELL_FLAG_IS_FORCEDBUFF;
+        }break;
+
+        //////////////////////////////////////////
+        // HUNTER                               //
+        //////////////////////////////////////////
+
+        //Hunter - Go for the Throat
+        case 34950:
+        case 34954:
+        {
+            sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
+        }break;
+        case 34952:
+        case 34953:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        //Ranged Weapon Specialization
+        case 19507:
+        case 19508:
+        case 19509:
+        case 19510:
+        case 19511:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+            sp->EffectMiscValue[0] = 1;
+        }break;
+        //Two Handed Weapon Specialization and One Handed Weapon Specializacion
+        //Warrior and Paladin and Death Knight - this will change on 3.1.0
+        case 20111:
+        case 20112:
+        case 20113:
+        case 12163:
+        case 12711:
+        case 12712:
+        case 16538:
+        case 16539:
+        case 16540:
+        case 16541:
+        case 16542:
+        case 20196:
+        case 20197:
+        case 20198:
+        case 20199:
+        case 20200:
+        case 55107:
+        case 55108:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+            sp->EffectMiscValue[0] = 2;
+        }break;
+        //Frost Trap
+        case 13809:
+        {
+            sp->procFlags = PROC_ON_TRAP_TRIGGER;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        //Snakes from Snake Trap cast this, shouldn't stack
+        case 25810:
+        case 25809:
+        {
+            sp->maxstack = 1;
+        }break;
+
+        case 27065:
+        case 20904:
+        case 20903:
+        case 20902:
+        case 20901:
+        case 20900:
+        case 19434:
+        {
+            // sp->Unique = true;
+        }break;
+
+        //Hunter : Entrapment
+        case 19184:
+        case 19387:
+        case 19388:
+        {
+            sp->procFlags = PROC_ON_TRAP_TRIGGER;
+        }break;
+        // Hunter - Arcane Shot  - Rank 6 to 11
+        case 14285:
+        case 14286:
+        case 14287:
+        case 27019:
+        case 49044:
+        case 49045:
+        {
+            sp->Effect[0] = 2;
+            sp->Effect[1] = 0;
+            sp->EffectBasePoints[0] = sp->EffectBasePoints[1];
+            sp->EffectBasePoints[1] = 0;
+            sp->EffectImplicitTargetA[0] = 6;
+            sp->EffectImplicitTargetA[1] = 0;
+        }break;
+
+        // Misdirection
+        case 34477:
+        {
+            sp->MaxTargets = 1;
+            //sp->Unique = true;
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_MOD_MAX_AFFECTED_TARGETS;
+        }break;
+
+        // Misdirection proc
+        case 35079:
+        {
+            sp->MaxTargets = 1;
+            //sp->Unique = true;
+        }break;
+        // Aspect of the Viper
+        case 34074:
+        {
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[2] = 34075;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+        }break;
+        // Viper String
+        case 3034:
+        {
+            sp->EffectMultipleValue[0] = 3;
+        }break;
+        // Improved Steady Shot
+        case 53221:
+        case 53222:
+        case 53224:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+            sp->EffectSpellClassMask[0][1] = 0x0;
+        }break;
+
+
+        // Lock and Load
+        case 56342:
+        case 56343:
+        case 56344:
+        {
+            sp->procFlags = PROC_ON_TRAP_TRIGGER;
+            sp->procChance = sp->EffectBasePoints[0] + 1;
+        }break;
+
+        // Lock and load proc
+        case 56453:
+        {
+            sp->DurationIndex = 9;
+        }break;
+
+        // Master's Call
+        case 53271:
+        {
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54216;
+            sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 54216;
+        }break;
+
+        // Haunting party
+        case 53290:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 57669;
+            sp->EffectImplicitTargetA[0] = 1;
+            sp->procChance = 33;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 53291:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 57669;
+            sp->EffectImplicitTargetA[0] = 1;
+            sp->procChance = 66;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 53292:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 57669;
+            sp->EffectImplicitTargetA[0] = 1;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        // Flare
+        case 1543:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF | SPELL_FLAG_IS_TARGETINGSTEALTHED;
+        }break;
+
+
+        //////////////////////////////////////////
+        // ROGUE                                    //
+        //////////////////////////////////////////
+
+        // Cheat Death
+        case 31228:
+        case 31229:
+        case 31230:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Cloack of shadows
+        // Cloack of shadows PROC
+        case 31224:
+        case 35729:
+        {
+            sp->DispelType = DISPEL_MAGIC;
+            sp->AttributesEx |= 1024;
+        }break;
+
+        // Honor Among Thieves PROC
+        case 52916:
+        {
+            sp->proc_interval = 4000; //workaround
+            sp->procFlags = PROC_ON_CRIT_ATTACK | PROC_ON_RANGED_CRIT_ATTACK | PROC_ON_SPELL_CRIT_HIT;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectImplicitTargetA[1] = 38;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 51699;
+        }break;
+
+        // Shadow Dance
+        case 51713:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Let's hack   the entire cheating death   effect to   damage perc resist ;)
+        case 45182: // Cheating Death   buff
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+            sp->EffectMiscValue[0] = uint32(-91);
+        }break;
+
+        // Wound Poison Stuff
+        case 27189:
+        case 13224:
+        case 13223:
+        case 13222:
+        case 13218:
+        {
+            //sp->Unique = true;
+        }break;
+
+        // Killing Spree
+        case 51690:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->Effect[1] = 0;
+            sp->Effect[2] = 0;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+        }break;
+
+        // Focused Attacks
+        case 51634:
+        case 51635:
+        case 51636:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+
+        // Setup
+        case 13983:
+        {
+            sp->proc_interval = 1000;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->procFlags = PROC_ON_RESIST_RECEIVED;
+            sp->procChance = 33;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+        case 14070:
+        {
+            sp->proc_interval = 1000;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->procFlags = PROC_ON_RESIST_RECEIVED;
+            sp->procChance = 66;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+        case 14071:
+        {
+            sp->proc_interval = 1000;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->procFlags = PROC_ON_RESIST_RECEIVED;
+            sp->procChance = 100;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Setup PROC
+        case 15250:
+        {
+            sp->proc_interval = 1000;
+        }break;
+
+        // Mutilate
+        case 1329:
+        case 34411:
+        case 34412:
+        case 34413:
+        case 48663:
+        case 48666:
+        {
+            sp->Effect[1] = 0;
+            sp->procChance = 0;
+            sp->ATTRIBUTESEX2 &= ~ATTRIBUTESEX2_REQ_BEHIND_TARGET;
+        }break;
+
+        case 35541:
+        case 35550:
+        case 35551:
+        case 35552:
+        case 35553:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->procChance = 20;
+        }break;
+
+        //////////////////////////////////////////
+        // PRIEST                                   //
+        //////////////////////////////////////////
+
+        // Dispersion (org spell)
+        case 47585:
+        {
+            sp->AdditionalAura = 47218;
+        }break;
+
+        // Dispersion (remove im effects, in 3.1 there is a spell for this)
+        case 47218:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MECHANIC_IMMUNITY;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MECHANIC_IMMUNITY;
+            sp->EffectMiscValue[0] = 7;
+            sp->EffectMiscValue[1] = 11;
+            sp->EffectImplicitTargetA[0] = 1;
+            sp->EffectImplicitTargetA[1] = 1;
+        }break;
+
+        // Mass dispel
+        case 32375:
+        case 32592:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+            sp->EffectImplicitTargetA[1] = 1;
+        }break;
+
+        // Power Infusion
+        case 10060:
+        {
+            sp->c_is_flags = SPELL_FLAG_IS_FORCEDBUFF;
+        }break;
+
+        // Prayer of mending (tricky one :() rank 1
+        case 33076:
+        {
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 41635;
+            sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PARTY_MEMBER;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PARTY_MEMBER;
+            sp->EffectImplicitTargetB[0] = 0;
+            sp->EffectImplicitTargetB[1] = 0;
+        }break;
+
+        // Prayer of mending (tricky one :() rank 2
+        case 48112:
+        {
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 48110;
+            sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PARTY_MEMBER;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PARTY_MEMBER;
+            sp->EffectImplicitTargetB[0] = 0;
+            sp->EffectImplicitTargetB[1] = 0;
+        }break;
+
+        // Prayer of mending (tricky one :() rank 3
+        case 48113:
+        {
+            sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 48111;
+            sp->Effect[1] = SPELL_EFFECT_DUMMY;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PARTY_MEMBER;
+            sp->EffectImplicitTargetA[1] = EFF_TARGET_PARTY_MEMBER;
+            sp->EffectImplicitTargetB[0] = 0;
+            sp->EffectImplicitTargetB[1] = 0;
+        }break;
+
+        // triggered spell, rank 1
+        case 41635:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 41637;
+            sp->EffectBasePoints[0] = 800;
+            sp->procCharges = 0;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+
+        // triggered spell, rank 2
+        case 48110:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 41637;
+            sp->EffectBasePoints[0] = 905;
+            sp->procCharges = 0;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+
+        // triggered spell, rank 3
+        case 48111:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 41637;
+            sp->EffectBasePoints[0] = 1043;
+            sp->procCharges = 0;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+
+        // triggered on hit, this   is the spell that   does the healing/jump
+        case 41637:
+        {
+            sp->Effect[0] = SPELL_EFFECT_DUMMY;
+            sp->EffectBasePoints[0] = 5;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+            sp->EffectImplicitTargetB[0] = 0;
+        }break;
+
+        // Inner Focus
+        case 14751:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        // Divine Aegis
+        case 47509:
+        case 47511:
+        case 47515:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[0] = 21;
+            sp->EffectTriggerSpell[0] = 47753;
+        }break;
+
+        // Insert   priest spell fixes here
+
+        //////////////////////////////////////////
+        // SHAMAN                                   //
+        //////////////////////////////////////////
+        case 51466:
+        case 51470: //Elemental Oath
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_FLAT_MODIFIER;
+            sp->EffectMiscValue[1] = SMT_EFFECT_3;
+            sp->EffectSpellClassMask[1][0] = 0;
+            sp->EffectSpellClassMask[1][1] = 0x00004000; // Clearcasting
+        }break;
+        case 51562:
+        case 51563:
+        case 51564:
+        case 51565:
+        case 51566: // Tidal Waves
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x00000100;    // Chain heal
+            sp->EffectSpellClassMask[0][1] = 0x00000000;
+            sp->EffectSpellClassMask[0][2] = 0x00000010;    // Riptide
+        }break;
+        case 53390:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 51940:
+        case 51989:
+        case 52004:
+        case 52005:
+        case 52007:
+        case 52008: // Earthliving Weapon
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 20;
+        }break;
+        case 55198: // Tidal Force
+        {
+            sp->Effect[0] = SPELL_EFFECT_DUMMY;
+            sp->EffectApplyAuraName[0] = 0;
+            sp->EffectTriggerSpell[0] = 55166;
+        }break;
+        case 55166:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case 51525:
+        case 51526:
+        case 51527: // Static Shock
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = sp->Id;
+            sp->EffectSpellClassMask[0][0] = 0;
+        }break;
+        case 16180:
+        case 16196:
+        case 16198: // Improved Water Shield
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x000000C0; // Healing Wave and Lesser Healing Wave
+            sp->EffectSpellClassMask[0][2] = 0x00000010; //Riptide
+            sp->EffectTriggerSpell[0] = sp->Id;
+        }break;
+        case 16187:
+        case 16205:
+        case 16206:
+        case 16207:
+        case 16208: // Restorative Totems
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            sp->EffectMiscValue[0] = SMT_DAMAGE_DONE;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
+        }break;
+        case 31616: // Nature's Guardian
+        {
+            sp->spell_can_crit = false;
+        }break;
+
+        // Improved firenova totem
+        case 16086:
+        case 16544:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        //////////////////////////////////////////
+        // MAGE                                 //
+        //////////////////////////////////////////
+
+        // Insert   mage spell fixes here
+
+        // Invisibility
+        case 66:
+        {
+            sp->EffectTriggerSpell[1] = 32612;
+            sp->EffectAmplitude[1] = 3000;
+        }break;
+
+        // Invisibility part    2
+        case 32612:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->Effect[2] = 0;
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL | AURA_INTERRUPT_ON_START_ATTACK | AURA_INTERRUPT_ON_HOSTILE_SPELL_INFLICTED;
+        }break;
+
+        //improved blink
+        case 31569:
+        case 31570:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Magic Absorption
+        case 29441:
+        case 29444:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 29442;
+        }break;
+
+        //Missile Barrage
+        case 44404:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 4;
+        }break;
+        case 54486:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 8;
+        }break;
+        case 54488:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 12;
+        }break;
+        case 54489:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 16;
+        }break;
+        case 54490:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 20;
+        }break;
+        //Fiery Payback
+        case 44440:
+        case 44441:
+        {
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+
+        //Fingers of Frost
+        case 44543:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 7;
+        }break;
+        case 44545:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 15;
+        }break;
+
+        //Conjure Refreshment table
+        case 43985:
+        case 58661:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_DYNAMIC_OBJECT;
+        }break;
+
+        // Ritual of Refreshment
+        case 43987:
+        case 58659:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
+        }break;
+
+        // Living bomb
+        case 44457:
+        case 55359:
+        case 55360:
+        {
+            // sp->c_is_flags |= SPELL_FLAG_ON_ONLY_ONE_TARGET;
+        }break;
+
+        // Arcane Potency proc
+        case 57529:
+        case 57531:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        // Burnout
+        case 44449:
+        case 44469:
+        case 44470:
+        case 44471:
+        case 44472:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 44450;
+            sp->EffectImplicitTargetA[1] = 1;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        //////////////////////////////////////////
+        // WARLOCK                                  //
+        //////////////////////////////////////////
+
+        // Insert   warlock spell   fixes   here
+    // Demonic Knowledge
+        case 35691:
+        case 35692:
+        case 35693:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectImplicitTargetA[1] = 5;
+            sp->EffectTriggerSpell[1] = 35696;
+        }break;
+
+        // Demonic Knowledge PROC
+        case 35696:
+        {
+            sp->EffectImplicitTargetA[0] = 1;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Demonic Pact AA
+        case 48090:
+        {
+            //sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
+            //sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_RAID_AREA_AURA;
+        }break;
+
+        // Demonic Pact
+        case 53646:
+        {
+            sp->procChance = 100;
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        // Unstable Affliction
+        case 30108:
+        case 30404:
+        case 30405:
+        case 47841:
+        case 47843:
+        {
+            sp->procFlags = PROC_ON_PRE_DISPELL_AURA_RECEIVED;
+            sp->procChance = 100;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[1] = 6;
+            sp->EffectTriggerSpell[1] = 31117;
+        }break;
+
+        // Death's Embrace
+        case 47198:
+        case 47199:
+        case 47200:
+        {
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+            sp->EffectImplicitTargetA[2] = 1;
+        }break;
+
+        // Everlasting affliction
+        case 47201:
+        case 47202:
+        case 47203:
+        case 47204:
+        case 47205:
+        {
+            sp->procFlags = PROC_ON_SPELL_HIT;
+        }break;
+
+        //warlock - Molten Core
+        case 47245:
+        case 47246:
+        case 47247:
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
+        }break;
+
+        // pandemic
+        case 58435:
+        case 58436:
+        case 58437:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 58691;
+            sp->EffectImplicitTargetA[0] = 6;
+        }break;
+
+        // Mana Feed
+        case 30326:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 32554;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+        }break;
+
+        // Fel Synergy
+        case 47230:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54181;
+        }break;
+        case 47231:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 54181;
+        }break;
+
+        //////////////////////////////////////////
+        // DRUID                                    //
+        //////////////////////////////////////////
+
+        // Insert   druid   spell   fixes   here
+        case 22570:
+        case 49802: // Maim
+        {
+            sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN;
+            sp->Attributes |= ATTRIBUTES_STOP_ATTACK;
+        }break;
+
+        // RAVAGE
+        case 6785:
+        {
+            sp->EffectBasePoints[0] = 162;              //r1
+        }break;
+        case 6787:
+        {
+            sp->EffectBasePoints[0] = 239;              //r2
+        }break;
+        case 9866:
+        {
+            sp->EffectBasePoints[0] = 300;              //r3
+        }break;
+        case 9867:
+        {
+            sp->EffectBasePoints[0] = 377;              //r4
+        }break;
+        case 27005:
+        {
+            sp->EffectBasePoints[0] = 566;              //r5
+        }break;
+        case 48578:
+        {
+            sp->EffectBasePoints[0] = 1405;             //r6
+        }break;
+        case 48579:
+        {
+            sp->EffectBasePoints[0] = 1770;             //r7
+        }break;
+
+        //SHRED
+        case 5221:
+        {
+            sp->EffectBasePoints[0] = 54;               //r1
+        }break;
+        case 6800:
+        {
+            sp->EffectBasePoints[0] = 72;               //r2
+        }break;
+        case 8992:
+        {
+            sp->EffectBasePoints[0] = 99;               //r3
+        }break;
+        case 9829:
+        {
+            sp->EffectBasePoints[0] = 144;              //r4
+        }break;
+        case 9830:
+        {
+            sp->EffectBasePoints[0] = 180;              //r5
+        }break;
+        case 27001:
+        {
+            sp->EffectBasePoints[0] = 236;              //r6
+        }break;
+        case 27002:
+        {
+            sp->EffectBasePoints[0] = 405;              //r7
+        }break;
+        case 48571:
+        {
+            sp->EffectBasePoints[0] = 630;              //r8
+        }break;
+        case 48572:
+        {
+            sp->EffectBasePoints[0] = 742;              //r9
+        }break;
+
+        // Natural reaction
+        case 57878:
+        case 57880:
+        case 57881:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->procFlags = 0;
+            sp->procChance = 0;
+            sp->EffectTriggerSpell[1] = 0;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Dash
+        case 1850:
+        case 9821:
+        case 33357:
+        {
+            sp->RequiredShapeShift = 1;
+        }break;
+
+        // Totem of Wrath
+        case 30708:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectImplicitTargetA[0] = 22;
+            sp->EffectImplicitTargetB[0] = 15;
+            sp->EffectRadiusIndex[0] = 10;
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_ENEMY_AREA_AURA;
+        }break;
+
+        // Mangle - Cat
+        case 33876:
+        {
+            sp->EffectBasePoints[0] = 198; //rank 1
+        }break;
+        case 33982:
+        {
+            sp->EffectBasePoints[0] = 256; //rank 2
+        }break;
+        case 33983:
+        {
+            sp->EffectBasePoints[0] = 330; //rank 3
+        }break;
+        case 48565:
+        {
+            sp->EffectBasePoints[0] = 536; //rank 4
+        }break;
+        case 48566:
+        {
+            sp->EffectBasePoints[0] = 634; //rank 5
+        }break;
+        // Mangle - Bear
+        case 33878:
+        {
+            sp->EffectBasePoints[0] = 86; //rank 1
+        }break;
+        case 33986:
+        {
+            sp->EffectBasePoints[0] = 120; //rank 2
+        }break;
+        case 33987:
+        {
+            sp->EffectBasePoints[0] = 155; //rank 3
+        }break;
+        case 48563:
+        {
+            sp->EffectBasePoints[0] = 251; //rank 4
+        }break;
+        case 48564:
+        {
+            sp->EffectBasePoints[0] = 299; //rank 5
+        }break;
+
+        //Druid - Master Shapeshifter
+        case 48411:
+        case 48412:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            sp->Effect[1] = 0;
+            sp->Effect[2] = 0;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+        }break;
+        case 48418:
+        {
+            sp->RequiredShapeShift = (uint32)(1 << (FORM_BEAR - 1)) | (1 << (FORM_DIREBEAR - 1));
+        }break;
+        case 48420:
+        {
+            sp->RequiredShapeShift = (uint32)(1 << (FORM_CAT - 1));
+        }break;
+        case 48421:
+        {
+            sp->RequiredShapeShift = (uint32)1 << (FORM_MOONKIN - 1);
+        }break;
+        case 48422:
+        {
+            sp->RequiredShapeShift = (uint32)1 << (FORM_TREE - 1);
+        }break;
+        //Owlkin Frenzy
+        case 48389:
+        case 48392:
+        case 48393:
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+        // Infected Wounds
+        case 48483:
+        case 48484:
+        case 48485:
+        {
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_MELEE_ATTACK;
+        }break;
+        // Swipe (cat) max targets, fixed in 3.1
+        case 62078:
+        {
+            sp->MaxTargets = 10;
+        }break;
+        // faerie fire (feral dmg)
+        case 16857:
+        {
+            sp->Effect[1] = SPELL_EFFECT_SCHOOL_DAMAGE;
+            sp->EffectBasePoints[1] = 1;
+            sp->EffectImplicitTargetA[1] = 6;
+        }break;
+
+        // King of the jungle dmg buff
+        case 51185:
+        {
+            sp->DurationIndex = 1;
+            sp->RequiredShapeShift = (uint32)(1 << (FORM_BEAR - 1)) | (1 << (FORM_DIREBEAR - 1));
+        }break;
+        case 60200:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+
+        // Eclipse
+        case 48516:
+        case 48521:
+        case 48525:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 48517;
+            sp->EffectTriggerSpell[1] = 48518;
+        }break;
+
+        // Living Seed
+        case 48496:
+        case 48499:
+        case 48500:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[0] = 21;
+            sp->EffectTriggerSpell[0] = 48503;
+        }break;
+
+        // Healing way
+        case 29203:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = 108; //ADD PCT MOD
+            sp->EffectMiscValue[0] = 0;
+            sp->EffectSpellClassMask[0][0] = 64;
+            sp->EffectSpellClassMask[0][1] = 0;
+            sp->EffectSpellClassMask[0][2] = 0;
+        }break;
+
+        case 50334:
+        {
+            sp->AdditionalAura = 58923;
+        }break;
+
+        case 17002:
+        {
+            sp->AdditionalAura = 24867;
+        }break;
+        case 24866:
+        {
+            sp->AdditionalAura = 24864;
+        }break;
+
+        case 24867:
+        case 24864:
+        {
+            sp->apply_on_shapeshift_change = true;
+        }break;
+
+        case 24905:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+
+        case 33881:
+        case 33882:
+        case 33883:
+        {
+            sp->procFlags = PROC_ON_CRIT_HIT_RECEIVED;
+        }break;
+
+        case 22842:
+        case 22895:
+        case 22896:
+        case 26999:
+        {
+            sp->Effect[0] = 6;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 22845;
+        }break;
+
+        case 16850:
+        {
+            sp->procChance = 3;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 16923:
+        {
+            sp->procChance = 6;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 16924:
+        {
+            sp->procChance = 9;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        case 24932:
+        {
+            sp->Effect[1] = 0;
+            sp->Effect[2] = 0; //removing strange effects.
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
+        }break;
+
+        case 34299:
+        {
+            sp->proc_interval = 6000;//6 secs
+        }break;
+        case 49376:
+        {
+            sp->Effect[1] = 41;
+            sp->EffectImplicitTargetA[1] = 6;
+        }break;
+
+        //////////////////////////////////////////
+        // DEATH KNIGHT                         //
+        //////////////////////////////////////////
+
+        // Merciless Combat
+        case 49024:
+        case 49538:
+        {
+            sp->EffectMiscValue[0] = 7278;
+        }break;
+
+        case 46619:
+        {
+            sp->Effect[0] = SPELL_EFFECT_NULL;
+        }break;
+
+        //Desecration
+        case 55666:
+        case 55667:
+        {
+            sp->proc_interval = 15000;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        case 50397:
+        {
+            sp->NameHash = 0;
+        }break;
+
+        //////////////////////////////////////////
+        // BOSSES                               //
+        //////////////////////////////////////////
+
+        // Insert   boss spell fixes here
+
+        // War Stomp
+        case 20549:
+        {
+            sp->RequiredShapeShift = 0;
+        }break;
+
+        // Dark Glare
+        case 26029:
+        {
+            sp->cone_width = 15.0f; // 15   degree cone
+        }break;
+
+        // Commendation of Kael'thas
+        case 45057:
+        {
+            sp->proc_interval = 30000;
+        }break;
+
+        // Recently Dropped Flag
+        case 42792:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
+        }break;
+
+        case 43958:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            sp->DurationIndex = 6; //   10 minutes.
+            sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
+            sp->EffectMiscValue[1] = SMT_RESIST_DISPEL;
+            sp->EffectBasePoints[1] = 90;
+        }break;
+
+        // Recently Dropped Flag
+        case 43869:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
+        }break;
+
+        case 48978:
+        case 61216:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->EffectMiscValue[1] = 1;
+        }break;
+
+        case 49390:
+        case 61221:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->EffectMiscValue[1] = 2;
+        }break;
+
+        case 49391:
+        case 61222:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->EffectMiscValue[1] = 3;
+        }break;
+
+        case 49392:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->EffectMiscValue[1] = 4;
+        }break;
+
+        case 49393:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            sp->EffectMiscValue[1] = 5;
+        }break;
+
+        // Furious Attacks
+        case 46910:
+        {
+            sp->EffectTriggerSpell[0] = 56112;
+            sp->procChance = 50;
+            sp->procFlags |= PROC_ON_MELEE_ATTACK;
+        }break;
+
+        case 46911:
+        {
+            sp->EffectTriggerSpell[0] = 56112;
+            sp->procChance = 100;
+            sp->procFlags |= PROC_ON_MELEE_ATTACK;
+        }break;
+
+        // Rogue:   Hunger for Blood!
+        case 51662:
+        {
+            sp->Effect[1] = SPELL_EFFECT_DUMMY;
+        }break;
+
+        // Mage: Focus Magic
+        case 54646:
+        {
+            //sp->c_is_flags = SPELL_FLAG_ON_ONLY_ONE_TARGET;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->procChance = 100;
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[1] = 54648;
+        }break;
+
+        // Mage: Hot Streak
+        case 44445:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 48108;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->procChance = 33;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+        case 44446:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 48108;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->procChance = 66;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+        case 44448:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 48108;
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+            sp->procChance = 100;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+        }break;
+
+        case 1122:
+        {
+            sp->EffectBasePoints[0] = 0;
+        }break;
+
+        case 1860:
+        case 20719:
+        {
+            sp->Effect[0] = SPELL_EFFECT_DUMMY;
+        }break;
+        // Bloodsurge
+        case 46913:
+        case 46914:
+        case 46915:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_CAST_SPELL;
+        }break;
+        case 46916:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+        //Waylay
+        case 51692:
+        case 51696:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+        // Cold Blood
+        case 14177:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+        // priest   -   mind flay
+        case 15407:
+        case 17311:
+        case 17312:
+        case 17313:
+        case 17314:
+        case 18807:
+        case 25387:
+        case 48155:
+        case 48156:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+        }break;
+
+        // Death and Decay
+        case 43265:
+        case 49936:
+        case 49937:
+        case 49938:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DAMAGE;
+        }break;
+        //Warlock   Chaos   bolt
+        case 50796:
+        case 59170:
+        case 59171:
+        case 59172:
+        {
+            sp->Attributes = ATTRIBUTES_IGNORE_INVULNERABILITY;
+        }break;
+        //Force debuff's
+        // Hypothermia
+        case 41425:
+            // Forbearance
+        case 25771:
+            // Weakened Soul
+        case 6788:
+        {
+            sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
+        }break;
+        // Death Knight spell   fixes
+        //Blade Barrier
+        case 49182:
+        case 49500:
+        case 49501:
+        case 55225:
+        case 55226:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 100;
+        }break;
+        // Killing Machine
+        case 51123:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->ProcsPerMinute = 1;
+        }break;
+        case 51127:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->ProcsPerMinute = 2;
+        }break;
+        case 51128:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->ProcsPerMinute = 3;
+        }break;
+        case 51129:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->ProcsPerMinute = 4;
+        }break;
+        case 51130:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+            sp->ProcsPerMinute = 5;
+        }break;
+        case 49175:
+        case 50031:
+        case 51456: // Improved Icy Touch
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+        }break;
+        case 49143:
+        case 51416:
+        case 51417:
+        case 51418:
+        case 51419:
+        case 55268: // Frost Strike
+        {
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+        }break;
+        case 55090:
+        case 55265:
+        case 55270:
+        case 55271: // Scourge Strike
+        {
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+        }break;
+        case 1843:  // Disarm
+        {
+            sp->Effect[0] = 0;  // to prevent abuse at Arathi
+        }break;
+        // Bone Shield
+        case 49222:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->proc_interval = 3000;
+        }break;
+        // Shadow   of Death
+        case 49157:
+        {
+            sp->Effect[0] = 0;  // don't want   DKs to be   always invincible
+        }break;
+        // Death Grip
+        case 49576:
+        {
+            sp->FacingCasterFlags = 0;
+        }break;
+        // shadow   of death
+        case 54223:
+        {
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+            sp->ATTRIBUTESEX3 |= CAN_PERSIST_AND_CASTED_WHILE_DEAD;
+        }break;
+        case 54749://Burning Determination
+        case 54747:
+        {
+            sp->procFlags = PROC_ON_SPELL_LAND_RECEIVED;
+        }break;
+        case 48266://blood presence
+        {
+            sp->EffectTriggerSpell[1] = 50475;
+            sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_MELEE_ATTACK;
+        }break;
+        case 50475:
+        {
+            sp->Effect[0] = SPELL_EFFECT_NULL;
+        }break;
+        case 48263://Frost Presence
+        {
+            sp->AdditionalAura = 61261;
+        }break;
+        case 48265://Unholy Presence
+        {
+            sp->AdditionalAura = 49772;
+        }break;
+        case 56364:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case 44443://Firestarter
+        case 44442:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+            sp->EffectSpellClassMask[0][1] = 0x0;
+        }break;
+        //Mage - Brain Freeze
+        case 44546:
+        case 44584:
+        case 44549:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x0;
+            sp->EffectSpellClassMask[0][1] = 0x0;
+        }break;
+        case 54741:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+
+        case 56368:
+        {
+            sp->Effect[1] = sp->Effect[0];
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+        case 48020:
+        {
+            sp->Effect[1] = SPELL_EFFECT_DUMMY;
+        }break;
+        case 48018: // Demonic Circle dummy shit.
+        {
+            sp->AdditionalAura = 62388;
+            sp->EffectImplicitTargetA[0] = 1;
+        }break;
+
+        //Noise Machine - Sonic Shield
+        case 54808:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 55019;
+            sp->procFlags = PROC_ON_MELEE_ATTACK_RECEIVED;
+            sp->proc_interval = 60000;
+            sp->procChance = 50;
+        }break;
+        //Pendulum of Telluric Currents
+        case 60482:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 60483;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = 15;
+        }break;
+        //Tears of Bitter Anguish
+        case 58901:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectTriggerSpell[0] = 58904;
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            sp->procChance = 10;
+        }break;
+        case 20578:
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_MOVEMENT | AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN;
+            break;
+        case 51729:
+        {
+            //sp->buffIndexType = 0;
+            //sp->buffType = 0;
+            //sp->AreaGroupId = 0;
+        }break;
+        case 58691://Pandemic
+        {
+            sp->spell_can_crit = false;
+        }break;
+        case 54197:
+        {
+            sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+        //Warlock - Nether Protection
+        case 30299:
+        case 30301:
+        case 30302:
+        {
+            sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED;
+        }break;
+
+        case 71905:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+
+        //////////////////////////////////////////
+        // ITEMSETS                             //
+        //////////////////////////////////////////
+
+        case 70765: // Divine Storm Cooldown Clear
+        {
+            sp->procChance = 20; // Crow: I got a feeling...
+            //sp->procChance = 40; // Current blizzlike settings.
+        }break;
+
+        //////////////////////////////////////////////////////////////////
+        //AREA AURA TARGETS - START
+        //////////////////////////////////////////////////////////////////
+
+        case 57658: // Shaman - totem of the wrath
+        case 57660:
+        case 57662:
+        case 34123: // Druid - tree of life
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_RAID_AREA_AURA;
+        }break;
+
+        //Spells using Aura 109
+        case 50040:
+        case 50041:
+        case 50043:
+        case 64745:
+        case 60675:
+        case 60685:
+        case 60686:
+        case 60687:
+        case 60688:
+        case 60690:
+        case 64936:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procChance = sp->EffectBasePoints[0] + 1;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+
+        // Glyph of hex
+        case 63291:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        }break;
+        }
+
+        switch (sp->NameHash)
+        {
+            //Pal
+        case SPELL_HASH_CONCENTRATION_AURA:
+        case SPELL_HASH_RETRIBUTION_AURA:
+        case SPELL_HASH_DIVINE_GUARDIAN:
+            //Hunter
+        case SPELL_HASH_ASPECT_OF_THE_WILD:
+        case SPELL_HASH_TRUESHOT_AURA:
+            //Death knight
+        case SPELL_HASH_PATH_OF_FROST:
+            //Druid
+        case SPELL_HASH_MOONKIN_AURA:
+        case SPELL_HASH_IMPROVED_MOONKIN_FORM:
+            //Warlock
+        case SPELL_HASH_BLOOD_PACT:
+        case SPELL_HASH_FEL_INTELLIGENCE:
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_RAID_AREA_AURA;
+        }break;
+
+        //Pal
+        case SPELL_HASH_DEVOTION_AURA:
+        case SPELL_HASH_CRUSADER_AURA:
+        case SPELL_HASH_SHADOW_RESISTANCE_AURA:
+        case SPELL_HASH_FROST_RESISTANCE_AURA:
+        case SPELL_HASH_FIRE_RESISTANCE_AURA:
+            //Hunter
+        case SPELL_HASH_ASPECT_OF_THE_PACK:
+            //Shaman
+        case SPELL_HASH_FIRE_RESISTANCE:
+        case SPELL_HASH_FROST_RESISTANCE:
+        case SPELL_HASH_NATURE_RESISTANCE:
+        case SPELL_HASH_STONESKIN:
+        case SPELL_HASH_STRENGTH_OF_EARTH:
+        case SPELL_HASH_WINDFURY_TOTEM:
+        case SPELL_HASH_WRATH_OF_AIR_TOTEM:
+            //Priest
+        case SPELL_HASH_PRAYER_OF_FORTITUDE:
+        case SPELL_HASH_PRAYER_OF_SHADOW_PROTECTION:
+        case SPELL_HASH_PRAYER_OF_SPIRIT:
+            //Warrior
+        case SPELL_HASH_BATTLE_SHOUT:
+        case SPELL_HASH_COMMANDING_SHOUT:
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
+        }break;
+
+        //Hunter
+        case SPELL_HASH_ASPECT_OF_THE_BEAST:
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_PET_AREA_AURA;
+        }break;
+        //Rogue
+        case SPELL_HASH_HONOR_AMONG_THIEVES:
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
+        }break;
+
+        //////////////////////////////////////////////////////
+        // CLASS-SPECIFIC NAMEHASH FIXES                    //
+        //////////////////////////////////////////////////////
+        ////////////// WARRIOR ///////////////////
+
+        case SPELL_HASH_BLADESTORM:
+            //sp->AllowBackAttack = true;
+            break;
+
+        case SPELL_HASH_MORTAL_STRIKE:
+            sp->maxstack = 1; // Healing reduction shouldn't stack
+            break;
+
+        case SPELL_HASH_TRAUMA:
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+            break;
+
+        case SPELL_HASH_SLAM:
+            sp->Effect[0] = SPELL_EFFECT_SCHOOL_DAMAGE;
+            break;
+
+        case SPELL_HASH_HOLY_SHIELD:
+            sp->procFlags = PROC_ON_BLOCK_RECEIVED;
+            break;
+
+            ////////////// PALADIN ///////////////////
+
+        case SPELL_HASH_JUDGEMENT_OF_WISDOM:
+        case SPELL_HASH_JUDGEMENT_OF_LIGHT:
+        case SPELL_HASH_JUDGEMENT_OF_JUSTICE:
+        case SPELL_HASH_HEART_OF_THE_CRUSADER:
+            sp->maxstack = 1;
+            break;
+
+        case SPELL_HASH_SEAL_OF_LIGHT:
+        {
+            sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+            sp->ProcsPerMinute = 10;    /* this will do */
+        }break;
+
+        case SPELL_HASH_SEALS_OF_THE_PURE:
+        {
+            sp->EffectSpellClassMask[0][0] = 8389632 | 4194312 | 512;
+            sp->EffectSpellClassMask[0][1] = 134217728 | 536870912;
+            sp->EffectSpellClassMask[0][2] = 0;
+            sp->EffectSpellClassMask[1][0] = 2048;
+            sp->EffectSpellClassMask[1][1] = 0;
+            sp->EffectSpellClassMask[1][2] = 0;
+        }break;
+
+        case SPELL_HASH_JUDGEMENTS_OF_THE_PURE:
+        {   // Ignore our triggered spells.
+            if (sp->Id != 54153 && sp->Id != 53655 && sp->Id != 53656 && sp->Id != 53657 && sp->Id != 54152)
+            {
+                sp->EffectSpellClassMask[0][0] = 8388608;
+                sp->EffectSpellClassMask[0][1] = 0;
+                sp->EffectSpellClassMask[0][2] = 0;
+                sp->EffectSpellClassMask[1][0] = 8389632 | 4194312 | 512;
+                sp->EffectSpellClassMask[1][1] = 134217728 | 536870912 | 33554432;
+                sp->EffectSpellClassMask[1][2] = 0;
+                sp->EffectSpellClassMask[2][0] = 2048;
+                sp->EffectSpellClassMask[2][1] = 0;
+                sp->EffectSpellClassMask[2][2] = 0;
+                sp->procFlags = PROC_ON_CAST_SPELL;
+            }
+        }break;
+        case SPELL_HASH_DEVOURING_PLAGUE:
+        {
+            sp->MaxTargets = 1;
+        }break;
+        case SPELL_HASH_IMPROVED_DEVOTION_AURA:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HEALING_PCT;
+            sp->EffectBasePoints[1] = 6;
+            sp->EffectMiscValue[1] = 127;
+        }break;
+        case SPELL_HASH_AVENGER_S_SHIELD:
+        {
+            sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
+        }break;
+        case SPELL_HASH_SHIELD_OF_RIGHTEOUSNESS:
+        {
+            sp->EffectChainTarget[0] = 0;
+        }break;
+        case SPELL_HASH_AIMED_SHOT:
+        {
+            sp->maxstack = 1; // Healing reduction shouldn't stack
+        }break;
+        case SPELL_HASH_EXPLOSIVE_SHOT:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DAMAGE;
+        }break;
+        case SPELL_HASH_MORTAL_SHOTS:
+        {
+            sp->EffectSpellClassMask[0][0] += 1;
+        }break;
+        case SPELL_HASH_MEND_PET:
+        {
+            sp->ChannelInterruptFlags = 0;
+        }break;
+        case SPELL_HASH_EAGLE_EYE:
+        {
+            sp->Effect[1] = 0;
+        }break;
+        case SPELL_HASH_ENTRAPMENT:
+        {
+            if (sp->EffectApplyAuraName[0] == SPELL_AURA_MOD_ROOT)
+            {
+                sp->EffectImplicitTargetA[0] = 15;
+                sp->EffectRadiusIndex[0] = 13;
+            }
+        }break;
+        case SPELL_HASH_WILD_QUIVER:
+        {
+            sp->EffectApplyAuraName[1] = 0;
+        }break;
+        case SPELL_HASH_REMORSELESS_ATTACKS:
+        {
+            sp->procFlags = PROC_ON_GAIN_EXPIERIENCE;
+        }break;
+        case SPELL_HASH_UNFAIR_ADVANTAGE:
+        {
+            sp->procFlags = PROC_ON_DODGE_RECEIVED;
+        }break;
+        case SPELL_HASH_COMBAT_POTENCY:
+        {
+            sp->procFlags = PROC_ON_MELEE_ATTACK;
+        }break;
+        case SPELL_HASH_PAIN_AND_SUFFERING:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case SPELL_HASH_FOCUSED_ATTACKS:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+        case SPELL_HASH_SEAL_FATE:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+        case SPELL_HASH_VILE_POISONS:
+        {
+            sp->EffectSpellClassMask[0][0] = 8388608; // envenom
+            sp->EffectSpellClassMask[0][1] = 8;
+            sp->EffectSpellClassMask[1][0] = 8192 | 268435456 | 65536; //poisons
+            sp->EffectSpellClassMask[1][1] = 524288;
+        }break;
+        case SPELL_HASH_STEALTH:
+        {
+            if (!(sp->AuraInterruptFlags & AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN))
+                sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN;
+
+            // fuck this
+            sp->EffectBasePoints[1] = 0;
+        }break;
+        case SPELL_HASH_NERVES_OF_STEEL:
+        {
+            sp->CasterAuraState = 6;
+            sp->EffectBasePoints[0] = -31;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+        }break;
+        case SPELL_HASH_DISARM_TRAP:
+        {
+            sp->Effect[0] = SPELL_EFFECT_DUMMY;
+        }break;
+        case SPELL_HASH_BORROWED_TIME:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
+        }break;
+        case SPELL_HASH_IMPROVED_SPIRIT_TAP:
+        {
+            sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+        }break;
+        case SPELL_HASH_MISERY:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case SPELL_HASH_POWER_INFUSION:
+        case SPELL_HASH_HEROISM:
+        case SPELL_HASH_BLOODLUST:
+        {
+            //sp->buffType = SPELL_TYPE_HASTE;
+        }break;
+        case SPELL_HASH_HEX:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN;
+        }break;
+        case SPELL_HASH_LIGHTNING_SHIELD:
+        {
+            sp->spell_can_crit = false;
+        }break;
+        case SPELL_HASH_FROSTBRAND_WEAPON:
+        {
+            sp->ProcsPerMinute = 9.0f;
+            //sp->Flags3 |= FLAGS3_ENCHANT_OWN_ONLY;
+        }break;
+        case SPELL_HASH_NATURE_S_GUARDIAN:
+        {
+            sp->procFlags = PROC_ON_SPELL_HIT_RECEIVED | PROC_ON_MELEE_ATTACK_RECEIVED | PROC_ON_RANGED_ATTACK_RECEIVED | PROC_ON_ANY_DAMAGE_RECEIVED;
+            sp->proc_interval = 8000;
+            sp->EffectTriggerSpell[0] = 31616;
+        }break;
+        case SPELL_HASH_WINDFURY_WEAPON:
+        case SPELL_HASH_FLAMETONGUE_WEAPON:
+        case SPELL_HASH_ROCKBITER_WEAPON:
+        case SPELL_HASH_EARTHLIVING_WEAPON:
+        {
+            //sp->Flags3 |= FLAGS3_ENCHANT_OWN_ONLY;
+        }break;
+        case SPELL_HASH_STONECLAW_TOTEM_PASSIVE:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+        case SPELL_HASH_FLAMETONGUE_TOTEM:
+        {
+            sp->AreaAuraTarget = SPELL_EFFECT_APPLY_GROUP_AREA_AURA;
+            if (sp->Attributes & ATTRIBUTES_PASSIVE)
+            {
+                sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+                sp->EffectImplicitTargetB[0] = 0;
+                sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+                sp->EffectImplicitTargetB[1] = 0;
+            }
+        }break;
+        case SPELL_HASH_UNLEASHED_RAGE:
+        {
+            sp->procFlags = PROC_ON_CRIT_ATTACK;
+        }break;
+        case SPELL_HASH_HEALING_STREAM_TOTEM:
+        {
+            if (sp->Effect[0] == SPELL_EFFECT_DUMMY)
+            {
+                sp->EffectRadiusIndex[0] = 10; // 30 yards
+                sp->Effect[0] = SPELL_EFFECT_HEAL;
+            }
+        }break;
+        case SPELL_HASH_MANA_SPRING_TOTEM:
+        {
+            if (sp->Effect[0] == SPELL_EFFECT_DUMMY)
+            {
+                sp->Effect[0] = SPELL_EFFECT_ENERGIZE;
+                sp->EffectMiscValue[0] = POWER_TYPE_MANA;
+            }
+        }break;
+        case SPELL_HASH_FAR_SIGHT:
+        {
+            sp->Effect[1] = 0;
+        }break;
+        case SPELL_HASH_HYPOTHERMIA:
+        {
+            sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
+        }break;
+        case SPELL_HASH_IMPROVED_COUNTERSPELL:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectSpellClassMask[0][0] = 0x00004000;    // Proc on counterspell only
+        }break;
+        case SPELL_HASH_SHADOW_WEAVING:
+        {
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procChance = sp->EffectBasePoints[0] + 1;
+        }break;
+        case SPELL_HASH_SHADOW_TRANCE:
+        {
+            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+        }break;
+        case SPELL_HASH_ERADICATION:
+        {
+            sp->EffectTriggerSpell[0] = 54370;
+            sp->procFlags = PROC_ON_SPELL_HIT;
+        }break;
+        case SPELL_HASH_INFECTED_WOUNDS:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case SPELL_HASH_POUNCE:
+        {
+            sp->always_apply = true;
+        }break;
+        case SPELL_HASH_OWLKIN_FRENZY:
+        {
+            sp->procFlags = PROC_ON_ANY_DAMAGE_RECEIVED;
+        }break;
+        case SPELL_HASH_EARTH_AND_MOON:
+        {
+            sp->procFlags = PROC_ON_CAST_SPELL;
+        }break;
+        case SPELL_HASH_STARFALL:
+        {
+            if (sp->Effect[1] == SPELL_EFFECT_TRIGGER_SPELL)
+            {//we can only attack one target with main star
+                sp->MaxTargets = 1;
+            }
+        }break;
+        case SPELL_HASH_SHRED:
+        {
+            sp->MechanicsType = MECHANIC_BLEEDING;
+        }break;
+        case SPELL_HASH_NURTURING_INSTINCT:
+        {
+            sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+        case SPELL_HASH_PRIMAL_TENACITY:
+        {
+            sp->DurationIndex = 21;
+            sp->EffectBasePoints[1] = 0;
+            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        }break;
+        case SPELL_HASH_PROWL:
+        {
+            sp->EffectBasePoints[0] = 0;
+        }break;
+        }
+
+        if (sp->EquippedItemClass == 2 && sp->EquippedItemSubClass & 262156) // 4 + 8 + 262144 ( becomes item classes 2, 3 and 18 which correspond to bow, gun and crossbow respectively)
+            sp->is_ranged_spell = true;
+
+        //////////////////////////////////////////////////////////////////
+        //AREA AURA TARGETS - END
+        //////////////////////////////////////////////////////////////////
+
+        if (sp->ATTRIBUTESEX2 & ATTRIBUTESEX2_CANT_CRIT) //I can haz hacky? :O
+            sp->spell_can_crit = false;
+    }
 
 	/* Ritual of Summoning summons a GameObject that triggers an inexistant spell.
 	 * This will copy an existant Summon Player spell used for another Ritual Of Summoning

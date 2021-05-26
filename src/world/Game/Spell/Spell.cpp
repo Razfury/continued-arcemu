@@ -2907,6 +2907,8 @@ void Spell::HandleAddAura(uint64 guid)
 		spellid = 6788;
 	else if(GetProto()->Id == 45438)  // Cast spell Hypothermia
 		spellid = 41425;
+    else if (GetProto()->AdditionalAura)
+        spellid = GetProto()->AdditionalAura;
 	else if(GetProto()->NameHash == SPELL_HASH_HEROISM)
 		spellid = 57723;
 	else if(GetProto()->NameHash == SPELL_HASH_BLOODLUST)

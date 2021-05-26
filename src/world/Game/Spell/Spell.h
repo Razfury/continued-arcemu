@@ -323,6 +323,11 @@ enum procFlags
     PROC_TARGET_SELF					= 0x80000000,	//-2147483648 our custom flag to decide if proc target is self or victim
 };
 
+enum procFlags2
+{
+	PROC_NULL_2 = 0x0,
+	PROC2_ON_PARRY_RECEIVED = 0x1,
+};
 
 enum CastInterruptFlags
 {
@@ -1041,6 +1046,8 @@ enum SpellIsFlags
     SPELL_FLAG_IS_FORCEDBUFF			= 0x00002000, // forced to be a buff
     SPELL_FLAG_IS_INHERITING_LEVEL		= 0x00004000, // summons to inherit caster level or not
     SPELL_FLAG_IS_MAXSTACK_FOR_DEBUFF	= 0x00008000, // summons to inherit caster level or not
+    SPELL_FLAG_CANNOT_PROC_ON_SELF      = 0x00010000,
+    //SPELL_FLAG_ON_ONLY_ONE_TARGET       = 0x00020000,
 };
 
 enum SpellCoefficientsFlags
