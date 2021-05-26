@@ -247,6 +247,7 @@ Unit::Unit()
 	m_noInterrupt = 0;
 	m_modlanguage = -1;
 	m_magnetcaster = 0;
+    JudgementSpell = 0;
 
 	m_CombatResult_Dodge = 0;
 	m_CombatResult_Parry = 0;
@@ -299,6 +300,8 @@ Unit::Unit()
 	BaseDamage[1] = 0;
 	BaseOffhandDamage[1] = 0;
 	BaseRangedDamage[1] = 0;
+
+    HealDoneBonusBySpell.clear();
 
 	m_CombatUpdateTimer = 0;
 	for(i = 0; i < SCHOOL_COUNT; i++)
@@ -3810,6 +3813,15 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
 						hit_status |= HITSTATUS_BLOCK;
 				}
 				CALL_SCRIPT_EVENT(this, OnHit)(pVictim, realdamage);
+
+                if (realdamage > 0) // Make sure it is a DAMAGING attack
+                {
+                    if (IsPlayer())
+                    {
+                        this->HandleSealProcs(pVictim->GetGUID());
+                    }
+                }
+
 			}
 			break;
 	}
@@ -4860,6 +4872,61 @@ bool Unit::RemoveAuraByNameHash(uint32 namehash)
 	return false;
 }
 
+void Unit::HandleSealProcs(uint64 targetGUID)
+{
+    if (!IsPlayer())
+        return;
+
+    if (getClass() != PALADIN)
+        return;
+
+    uint32 spellid = 0;
+    uint32 procchance = 100;
+
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_RIGHTEOUSNESS))
+    {
+        CastSpell(targetGUID, 25742, true);
+        sLog.Error("PLayer", "MADE");
+    }
+
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_JUSTICE))
+    {
+        procchance = 37;
+        if (procchance <= urand(0, 100))
+        CastSpell(targetGUID, 20170, true);
+    }
+
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_LIGHT))
+    {
+        procchance = 37;
+        if (procchance <= urand(0, 100))
+            CastSpell(targetGUID, 20167, true);
+    }
+
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_WISDOM))
+    {
+        procchance = 37;
+        if (procchance <= urand(0, 100))
+            CastSpell(targetGUID, 20168, true);
+    }
+
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_COMMAND))
+    {
+        procchance = 37;
+        if (procchance <= urand(0, 100))
+            CastSpell(targetGUID, 20424, true);
+    }
+
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_VENGEANCE))
+    {
+        CastSpell(targetGUID, 31803, true);
+    }
+    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_CORRUPTION))
+    {
+        CastSpell(targetGUID, 53742, true);
+    }
+}
+
 bool Unit::RemoveAllAuras(uint32 spellId, uint64 guid)
 {
 	bool res = false;
@@ -5151,6 +5218,9 @@ int32 Unit::GetSpellDmgBonus(Unit* pVictim, SpellEntry* spellInfo, int32 base_dm
 	// do not execute this if plus dmg is 0 or lower
 	if( plus_damage > 0.0f )
 	{
+        if (spellInfo->SP_coef_override > 0.0f)
+            plus_damage = plus_damage * spellInfo->SP_coef_override;
+
 		if( spellInfo->Dspell_coef_override >= 0.0f && !isdot )
 			plus_damage = plus_damage * spellInfo->Dspell_coef_override;
 		else if( spellInfo->OTspell_coef_override >= 0.0f && isdot )

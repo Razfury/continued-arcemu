@@ -804,6 +804,9 @@ struct SpellEntry
 	float  fixed_hotdotcoef;                //!!! CUSTOM, fixed HOT-DOT coefficient for some spells
 	float  Dspell_coef_override;            //!!! CUSTOM, overrides any spell coefficient calculation and use this value in DD&DH
 	float  OTspell_coef_override;           //!!! CUSTOM, overrides any spell coefficient calculation and use this value in HOT&DOT
+    float SP_coef_override;             //!!! CUSTOM, overrides any spell coefficient calculation and use this value
+    float AP_coef_override;             //!!! CUSTOM, Additional coef from ap
+    float RAP_coef_override;            //!!! CUSTOM, Additional coef from RAP
 	int    ai_target_type;
     uint32 AreaAuraTarget;
 

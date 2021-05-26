@@ -46,6 +46,7 @@ bool SERVER_DECL Rand(float);
 #define UF_TARGET_DIED  1
 #define UF_ATTACKING	2 // this unit is attacking it's selection
 #define SPELL_GROUPS	96//This is actually on 64 bits !
+#define SPELL_MODIFIERS 30
 #define DIMINISHING_GROUP_COUNT 15
 
 #define UNIT_TYPE_HUMANOID_BIT (1 << (UNIT_TYPE_HUMANOID-1)) //should get computed by precompiler ;)
@@ -1108,6 +1109,9 @@ class SERVER_DECL Unit : public Object
 		uint32 FindAuraCountByHash(uint32 HashName, uint32 maxcount = 0);
 		uint32 GetAuraCountWithDispelType(uint32 dispel_type, uint64 guid);
 
+        //SM
+        int32 * SM[SPELL_MODIFIERS][2]; // 0 = flat, 1 = percent
+
 		void AddAura(Aura* aur);
 		bool RemoveAura(Aura* aur);
 		bool RemoveAura(uint32 spellId);
@@ -1216,6 +1220,10 @@ class SERVER_DECL Unit : public Object
 		void RemoveProcTriggerSpell(uint32 spellId, uint64 casterGuid = 0, uint64 misc = 0);
 
 		bool IsPoisoned();
+
+        void HandleSealProcs(uint64 targetGUID);
+
+        uint32 JudgementSpell;
 
 		void GiveGroupXP(Unit* pVictim, Player* PlayerInGroup);
 
@@ -1514,6 +1522,26 @@ class SERVER_DECL Unit : public Object
 		void setcanparry(bool newstatus) {can_parry = newstatus;}
 
 		std::map<uint32, Aura*> tmpAura;
+        map<uint32, uint32> HealDoneBonusBySpell;
+
+        /// Fastest Method of float2int32
+        static inline int float2int32(const float value)
+        {
+            #if !defined(_WIN64) && COMPILER == COMPILER_MICROSOFT
+            int i;
+            __asm {
+                fld value
+                frndint
+                fistp i
+            }
+            return i;
+            #else
+            union { int asInt[2]; double asDouble; } n;
+            n.asDouble = value + 6755399441055744.0;
+
+            return n.asInt[0];
+            #endif
+        }
 
 		uint32 BaseResistance[SCHOOL_COUNT]; //there are resistances for silence, fear, mechanics ....
 		uint32 BaseStats[5];

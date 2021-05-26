@@ -1932,8 +1932,8 @@ void Aura::EventPeriodicDamage(uint32 amount)
 
 void Aura::SpellAuraDummy(bool apply)
 {
-	if(sScriptMgr.CallScriptedDummyAura(GetSpellId(), mod->i, this, apply))
-		return;
+    if (sScriptMgr.CallScriptedDummyAura(GetSpellId(), mod->i, this, apply))
+        return;
 
 	LOG_ERROR("Spell %u ( %s ) has an apply dummy aura effect, but no handler for it. ", m_spellProto->Id, m_spellProto->Name);
 }
@@ -8869,6 +8869,30 @@ void AbsorbAura::SpellAuraSchoolAbsorb(bool apply)
 			SM_FIValue(caster->SM_FMiscEffect, &val, GetSpellProto()->SpellGroupType);
 			SM_PIValue(caster->SM_PMiscEffect, &val, GetSpellProto()->SpellGroupType);
 		}
+
+        float coefmod0 = 0.0f;
+        if (m_spellProto->SP_coef_override > 0)
+        {
+            float spcoefmod = m_spellProto->SP_coef_override;
+            SM_FFValue(TO_PLAYER(caster)->SM[SMT_PENALTY][0], &coefmod0, m_spellProto->SpellGroupType);
+            SM_FFValue(TO_PLAYER(caster)->SM[SMT_PENALTY][1], &coefmod0, m_spellProto->SpellGroupType);
+            spcoefmod += coefmod0 / 100.0f;
+            int32 spellpower = 0;
+
+            if (IsHealingSpell(m_spellProto))
+                spellpower = caster->HealDoneMod[m_spellProto->School];
+            else
+                spellpower = caster->GetDamageDoneMod(m_spellProto->School);
+
+            spellpower += caster->HealDoneBonusBySpell[m_spellProto->Id];
+            val += caster->float2int32(float(spellpower) * spcoefmod);
+        }
+
+        if (m_spellProto->AP_coef_override > 0)
+            val += caster->float2int32(caster->GetAP() * m_spellProto->AP_coef_override);
+
+        if (m_spellProto->RAP_coef_override > 0)
+            val += caster->float2int32(caster->GetAP() * m_spellProto->RAP_coef_override);
 
 		//This will fix talents that affects damage absorbed.
 		int flat = 0;

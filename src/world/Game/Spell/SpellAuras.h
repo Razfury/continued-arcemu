@@ -855,6 +855,9 @@ class SERVER_DECL Aura : public EventableObject
 		void SendChannelUpdate(uint32 time, Object* m_caster);
 		void SendTickImmune(Unit* target, Unit* caster);
 
+        static void CreateProcTriggerSpell(Unit* target, uint64 m_caster, uint32 origid, uint32 spellid, uint32 procChance, uint32 procFlags,
+            uint32 procFlags2, int32 procCharges = 0, uint32 wdtype = 0, uint32 SCM1 = 0, uint32 SCM2 = 0, uint32 SCM3 = 0, int32 procValue = 0);
+
 	public:
 		bool m_temporary;	// Skip saving
 		bool m_deleted;
