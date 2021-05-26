@@ -862,10 +862,12 @@ bool Player::Create(WorldPacket & data)
 
 void Player::CheckAuraUpdates()
 {
-	if (HasAura(AURA_ID_JUGGERNAUT))
-	{
-		SendAuraUpdate(FindAura(AURA_ID_JUGGERNAUT)->m_auraSlot, false);
-	}
+    if (HasAura(AURA_ID_JUGGERNAUT))
+    {
+        SendAuraUpdate(FindAura(AURA_ID_JUGGERNAUT)->m_auraSlot, false);
+    }
+    else
+        return;
 }
 
 void Player::Update(uint32 p_time)
