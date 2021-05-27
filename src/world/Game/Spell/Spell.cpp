@@ -1161,6 +1161,28 @@ void Spell::cast(bool check)
 
 	if(cancastresult == SPELL_CANCAST_OK)
 	{
+        if (GetProto()->NameHash == SPELL_HASH_ROCKBITER_WEAPON)
+        {
+            if (u_caster->IsPlayer())
+            {
+                Item* item_e_mh = TO_PLAYER(u_caster)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+                Item* item2 = TO_PLAYER(u_caster)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+                if (item2)
+                {
+                    if (item2->GetProto()->Class == 4 && item2->GetProto()->SubClass == 6) // Shield/Buckler
+                    {
+                        if (item_e_mh && item_e_mh->HasEnchantmentOnSlot(1)) // Check if the Mainhand weapon is enchanted if it is that means we are trying to enchant the offhand which would be the shield.
+                        {
+                            SendInterrupted(SPELL_FAILED_ON_USE_ENCHANT);
+                            SendCastResult(SPELL_FAILED_ON_USE_ENCHANT);
+                            finish(false);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
 		if(hasAttribute(ATTRIBUTE_ON_NEXT_ATTACK))
 		{
 			if(!m_triggeredSpell)
