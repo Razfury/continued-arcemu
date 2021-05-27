@@ -4807,7 +4807,6 @@ int32 Spell::DoCalculateEffect(uint32 i, Unit* target, int32 value)
 		handled = true;
 		switch(GetProto()->Id)
 		{
-
 			case 34123:  //Druid - Tree of Life
 				{
 					if(p_caster != NULL && i == 0)

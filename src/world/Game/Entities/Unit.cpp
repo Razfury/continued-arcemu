@@ -1078,8 +1078,7 @@ uint32 Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell, boo
 		if(this->IsPlayer() && (
 		            spe->NameHash == SPELL_HASH_MAGTHERIDON_MELEE_TRINKET ||
 		            spe->NameHash == SPELL_HASH_ROMULO_S_POISON ||
-		            spe->NameHash == SPELL_HASH_BLACK_TEMPLE_MELEE_TRINKET ||
-		            spe->NameHash == SPELL_HASH_FROSTBRAND_ATTACK || spellId == 16870))
+		            spe->NameHash == SPELL_HASH_BLACK_TEMPLE_MELEE_TRINKET || spellId == 16870))
 		{
 			float ppm = 1.0f;
 			
@@ -3819,6 +3818,7 @@ void Unit::Strike(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability,
                     if (IsPlayer())
                     {
                         this->HandleSealProcs(pVictim->GetGUID());
+                        this->HandleEnchantmentProcs(pVictim, TO_PLAYER(this));
                     }
                 }
 
@@ -4872,6 +4872,140 @@ bool Unit::RemoveAuraByNameHash(uint32 namehash)
 	return false;
 }
 
+void Unit::HandleEnchantmentProcs(Unit* target, Player*  plr)
+{
+    if (!IsPlayer())
+        return;
+
+    //sLog.Error("HEP", "EnchantmentID: %u", item->GetEnchantment(1)->Enchantment->Id);
+
+    Item* item = plr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+    uint32 damage = 0;
+    if (item)
+    {
+        if (!item->GetEnchantment(1)) // If no enchantment is on the weapon don't bother continuing.
+            return;
+
+        // Frostbrand Weapon Ranks 1-9
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 2)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 8034, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 12)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 8037, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 524)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 10458, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 1667)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 16352, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 1668)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 16353, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 2635)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 25501, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3782)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 58797, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3783)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 58798, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3784)
+        {
+            if (urand(0, 100) <= 10)
+                if (target && plr)
+                    plr->CastSpell(target, 58799, true);
+        }
+
+        //Flametongue Flame attack.
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 5)
+        {
+            damage = urand(4, 13) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, damage, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 4)
+        {
+            damage = urand(6, 20) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3)
+        {
+            damage = urand(9, 28) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 523)
+        {
+            damage = urand(15, 46) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 1665)
+        {
+            damage = urand(24, 75) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 1666)
+        {
+            damage = urand(32, 100) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 2634)
+        {
+            damage = urand(40, 125) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3779)
+        {
+            damage = urand(65, 201) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3780)
+        {
+            damage = urand(78, 240) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+        if (item->GetEnchantment(1) && item->GetEnchantment(1)->Enchantment->Id == 3781)
+        {
+            damage = urand(88, 274) * item->GetProto()->Delay / 100000;
+            if (target && plr)
+                plr->CastSpell(target, 10444, true);
+        }
+    }
+}
+
 void Unit::HandleSealProcs(uint64 targetGUID)
 {
     if (!IsPlayer())
@@ -5724,7 +5858,7 @@ uint8 Unit::CastSpell(Unit* Target, SpellEntry* Sp, uint32 forced_basepoints, bo
 		return SPELL_FAILED_UNKNOWN;
 
 	Spell* newSpell = sSpellFactoryMgr.NewSpell(this, Sp, triggered, 0);
-	newSpell->forced_basepoints[0] = forced_basepoints;
+	newSpell->GetProto()->EffectBasePoints[0] = forced_basepoints;
 	SpellCastTargets targets(0);
 	if(Target != NULL)
 	{

@@ -1233,22 +1233,6 @@ void ApplyNormalFixes()
 		if(sp->Id == 781)
 			sp->CustomFlags = CUSTOM_FLAG_SPELL_REQUIRES_COMBAT;
 
-		// Insert shaman spell fixes here
-		// Frostbrand Weapon - 10% spd coefficient
-		if(sp->NameHash == SPELL_HASH_FROSTBRAND_ATTACK)
-			sp->fixed_dddhcoef = 0.1f;
-
-		// Fire Nova - 0% spd coefficient
-		if(sp->NameHash == SPELL_HASH_FIRE_NOVA)
-			sp->fixed_dddhcoef = 0.0f;
-
-		// Searing Totem - 8% spd coefficient
-		if(sp->NameHash == SPELL_HASH_ATTACK)
-			sp->fixed_dddhcoef = 0.08f;
-
-		// Healing Stream Totem - 8% healing coefficient
-		if(sp->NameHash == SPELL_HASH_HEALING_STREAM)
-			sp->OTspell_coef_override = 0.08f;
 	}
 	// END OF LOOP
 
@@ -1524,7 +1508,7 @@ void ApplyNormalFixes()
         case 16246:
         {
             sp->procFlags = PROC_ON_CAST_SPELL;
-            sp->procCharges++; //   first   charge gets lost when   it gets procced
+            //sp->procCharges++; //   first   charge gets lost when   it gets procced
         }break;
 
         //shaman - Stormstrike
@@ -1677,7 +1661,7 @@ void ApplyNormalFixes()
         case 16280:
         {
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->procCharges++; //   first   charge gets lost when   it gets procced
+            //sp->procCharges++; //   first   charge gets lost when   it gets procced
         }break;
 
         //Minor Glyph Research + Northrend Inscription Research
@@ -2614,6 +2598,7 @@ void ApplyNormalFixes()
             sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
             sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
             sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
+            sp->maxstack = 4;
         }break;
 
         //rogue - Prey on the weak
@@ -3527,66 +3512,76 @@ void ApplyNormalFixes()
         }break;
 
         // Flametongue weapon
-        case 58792:
+        /*case 58792:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 58788;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 58791:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 58787;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 58784:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 58786;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 16313:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 25488;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 16312:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 16344;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 16311:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 16343;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 15569:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 10445;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 15568:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 8029;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 15567:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 8028;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
         }break;
         case 10400:
         {
             sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             sp->procFlags = PROC_ON_MELEE_ATTACK;
-            sp->EffectTriggerSpell[0] = 8026;
-        }break;
+            sp->EffectTriggerSpell[0] = 10444;
+            sp->procChance = 100;
+        }break;*/
 
         //windfury weapon
         case 33757:

@@ -1222,6 +1222,7 @@ class SERVER_DECL Unit : public Object
 		bool IsPoisoned();
 
         void HandleSealProcs(uint64 targetGUID);
+        void HandleEnchantmentProcs(Unit* target, Player* plr);
 
         uint32 JudgementSpell;
 

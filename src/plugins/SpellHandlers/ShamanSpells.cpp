@@ -23,22 +23,6 @@
 /* Spell Defs                                                           */
 /************************************************************************/
 
-bool FlametongueWeaponPassive(uint32 i, Aura* pAura, bool apply)
-{
-	Unit* target = pAura->GetTarget();
-
-	if(apply)
-	{
-		// target is always a player
-		Item* item = TO_PLAYER(target)->GetItemInterface()->GetItemByGUID(pAura->itemCasterGUID);
-		target->AddProcTriggerSpell(10444, pAura->GetSpellProto()->Id, pAura->m_casterGuid, pAura->GetSpellProto()->procChance, PROC_ON_MELEE_ATTACK, 0, NULL, NULL, item);
-	}
-	else
-		target->RemoveProcTriggerSpell(10444, pAura->m_casterGuid, pAura->itemCasterGUID);
-
-	return true;
-}
-
 bool SkyShatterRegalia(uint32 i, Spell* s)
 {
 	// Shaman - Skyshatter Regalia - Two Piece Bonus
@@ -107,9 +91,6 @@ bool Reincarnation(uint32 i, Aura* a, bool apply)
 
 void SetupShamanSpells(ScriptMgr* mgr)
 {
-	uint32 FlametongueWeaponPassiveIds[] = { 10400, 15567, 15568, 15569, 16311, 16312, 16313, 58784, 58791, 58792, 0 };
-	mgr->register_dummy_aura(FlametongueWeaponPassiveIds, &FlametongueWeaponPassive);
-
 	mgr->register_dummy_spell(38443, &SkyShatterRegalia);
 
 	mgr->register_dummy_spell(39610, &ManaTide);
