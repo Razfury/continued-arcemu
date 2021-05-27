@@ -2139,8 +2139,7 @@ class SERVER_DECL Spell : public EventableObject
 		bool duelSpell;
 
 
-        void SetSpellFailure(uint8 result, uint32 spellId); // This is a hackfix with the clear cooldown since with some spells the finish doesn't work?
-        void SetSpellFailureWithFinish(uint8 result);
+        void SetSpellFailure(uint8 result, uint32 spellId, bool addFinish = false);
 
 		////////////////////////////////////////////////////////////////////////////////
 		//bool DuelSpellNoMoreValid()

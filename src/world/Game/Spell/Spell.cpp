@@ -1928,21 +1928,17 @@ void Spell::finish(bool successful)
 	DecRef();
 }
 
-void Spell::SetSpellFailure(uint8 result, uint32 spellId)
+void Spell::SetSpellFailure(uint8 result, uint32 spellId, bool addFinish)
 {
     if (p_caster != NULL)
     {
-        SendInterrupted(SPELL_FAILED_BAD_TARGETS);
-        SendCastResult(SPELL_FAILED_BAD_TARGETS);
-        p_caster->ClearCooldownForSpell(spellId);
+        SendInterrupted(result);
+        SendCastResult(result);
+        if (addFinish)
+            finish(false);
+        else
+            p_caster->ClearCooldownForSpell(spellId);
     }
-}
-
-void Spell::SetSpellFailureWithFinish(uint8 result)
-{
-    SendInterrupted(SPELL_FAILED_BAD_TARGETS);
-    SendCastResult(SPELL_FAILED_BAD_TARGETS);
-    finish(false);
 }
 
 void Spell::SendCastResult(uint8 result)
