@@ -5020,7 +5020,6 @@ void Unit::HandleSealProcs(uint64 targetGUID)
     if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_RIGHTEOUSNESS))
     {
         CastSpell(targetGUID, 25742, true);
-        sLog.Error("PLayer", "MADE");
     }
 
     if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_JUSTICE))
