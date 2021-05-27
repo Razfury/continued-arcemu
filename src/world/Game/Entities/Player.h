@@ -972,6 +972,38 @@ class SERVER_DECL Player : public Unit
 
 		ArenaTeam* m_arenaTeams[NUM_ARENA_TEAM_TYPES];
 
+        /************************************************************************/
+        /* Totem Stuff                                                          */
+        /************************************************************************/
+        bool HasActiveFireTotem() // dbcSummonProperties.LookupEntry(63)
+        { 
+            if (getClass() == SHAMAN && summonhandler.HasSummonInSlot(0))
+                return true;
+            else
+                return false; 
+        }
+        bool HasActiveWaterTotem() // dbcSummonProperties.LookupEntry(82)
+        {
+            if (getClass() == SHAMAN && summonhandler.HasSummonInSlot(2))
+                return true;
+            else
+                return false;
+        }
+        bool HasActiveAirTotem() //dbcSummonProperties.LookupEntry(83)
+        {
+            if (getClass() == SHAMAN && summonhandler.HasSummonInSlot(3))
+                return true;
+            else
+                return false;
+        }
+        bool HasActiveEarthTotem() // dbcSummonProperties.LookupEntry(81)
+        {
+            if (getClass() == SHAMAN && summonhandler.HasSummonInSlot(1))
+                return true;
+            else
+                return false;
+        }
+
 		/************************************************************************/
 		/* Taxi                                                                 */
 		/************************************************************************/

@@ -1613,21 +1613,6 @@ void ApplyNormalFixes()
             }
         }break;
 
-        // Fire Nova Totem visual   fix
-        case 8349:
-        case 8502:
-        case 8503:
-        case 11306:
-        case 11307:
-        case 25535:
-        case 25537:
-        case 61650:
-        case 61654:
-        {
-            sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-            sp->EffectTriggerSpell[1] = 19823;
-        }break;
-
         case 64395:
         {
             sp->School = SCHOOL_ARCANE;
@@ -2595,7 +2580,7 @@ void ApplyNormalFixes()
         //Mage - Arcane Blast
         case 36032:
         {
-            sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+            //sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
             sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
             sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
             sp->maxstack = 4;

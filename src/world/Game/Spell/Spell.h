@@ -2138,6 +2138,10 @@ class SERVER_DECL Spell : public EventableObject
 
 		bool duelSpell;
 
+
+        void SetSpellFailure(uint8 result, uint32 spellId); // This is a hackfix with the clear cooldown since with some spells the finish doesn't work?
+        void SetSpellFailureWithFinish(uint8 result);
+
 		////////////////////////////////////////////////////////////////////////////////
 		//bool DuelSpellNoMoreValid()
 		//  Tells if the Spell was being casted while dueling but now the duel is over

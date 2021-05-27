@@ -144,6 +144,12 @@ class SERVER_DECL SummonHandler
 		//
 		///////////////////////////////////////////////////////////////////////////
 		void GetSummonSlotSpellIDs(std::vector< uint32 > &spellids);
+        
+        Unit* GetSummonInSlot(uint32 slot)
+        {
+            return summonslots[slot];
+        }
+
 
 
 		///////////////////////////////////////////////////////////////////////////

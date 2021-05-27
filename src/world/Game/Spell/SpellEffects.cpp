@@ -838,6 +838,130 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 
 void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 {
+    switch (GetProto()->Id)
+    {
+        if (p_caster != NULL)
+        {
+             case 1535: // Fire Nova Rank 1
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(8349), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 8498: // Fire Nova Rank 2
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(8502), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 8499: // Fire Nova Rank 3
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(8503), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 11314: // Fire Nova Rank 4
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(11306), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 11315: // Fire Nova Rank 5
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(11307), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 25546: // Fire Nova Rank 6
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(25535), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 25547: // Fire Nova Rank 7
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(25537), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 61649: // Fire Nova Rank 8
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(61650), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+             case 61657: // Fire Nova Rank 9
+             {
+                 if (p_caster->HasActiveFireTotem() && p_caster->summonhandler.GetSummonInSlot(0))
+                 {
+                     p_caster->CastSpellAoF(p_caster->summonhandler.GetSummonInSlot(0)->GetPositionX(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionY(), p_caster->summonhandler.GetSummonInSlot(0)->GetPositionZ(), dbcSpell.LookupEntry(61654), true);
+                     return;
+                 }
+                 else
+                 {
+                     SetSpellFailure(SPELL_FAILED_BAD_TARGETS, GetProto()->Id);
+                     return;
+                 }
+             }break;
+        }
+    }
+
 	if(sScriptMgr.CallScriptedDummySpell(m_spellInfo->Id, i, this))
 		return;
 
