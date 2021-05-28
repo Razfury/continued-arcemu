@@ -5323,19 +5323,19 @@ int32 Unit::GetSpellDmgBonus(Unit* pVictim, SpellEntry* spellInfo, int32 base_dm
 	if(spellInfo->c_is_flags & SPELL_FLAG_IS_NOT_USING_DMG_BONUS)
 		return 0;
 
-	if( caster->IsPlayer())
-	{
-		switch( TO< Player* >(this)->getClass() )
-		{
-			case ROGUE:
-			case WARRIOR:
-			case DEATHKNIGHT:
-			case HUNTER:
-				return 0;
-			default:
-				break;
-		}
-	}
+    if (caster->IsPlayer())
+    {
+        switch (TO< Player* >(this)->getClass())
+        {
+        case ROGUE:
+        case WARRIOR:
+        case DEATHKNIGHT:
+        case HUNTER:
+            return 0;
+        default:
+            break;
+        }
+    }
 
 //------------------------------by school---------------------------------------------------
 	plus_damage += static_cast< float >( caster->GetDamageDoneMod(school) );
@@ -5351,9 +5351,6 @@ int32 Unit::GetSpellDmgBonus(Unit* pVictim, SpellEntry* spellInfo, int32 base_dm
 	// do not execute this if plus dmg is 0 or lower
 	if( plus_damage > 0.0f )
 	{
-        if (spellInfo->SP_coef_override > 0.0f)
-            plus_damage = plus_damage * spellInfo->SP_coef_override;
-
 		if( spellInfo->Dspell_coef_override >= 0.0f && !isdot )
 			plus_damage = plus_damage * spellInfo->Dspell_coef_override;
 		else if( spellInfo->OTspell_coef_override >= 0.0f && isdot )
@@ -5394,6 +5391,12 @@ int32 Unit::GetSpellDmgBonus(Unit* pVictim, SpellEntry* spellInfo, int32 base_dm
 
 	if((pVictim->HasAuraWithMechanics(MECHANIC_ENSNARED) || pVictim->HasAuraWithMechanics(MECHANIC_DAZED)) && caster->IsPlayer())
 		plus_damage += static_cast< float >(TO< Player* >(caster)->m_IncreaseDmgSnaredSlowed);
+
+    //---------------------------------------------------------
+    // SP coefficient
+    //---------------------------------------------------------
+    if (spellInfo->SP_coef_override > 0.0f)
+        plus_damage += plus_damage * spellInfo->SP_coef_override;
 
 	if(spellInfo->SpellGroupType)
 	{

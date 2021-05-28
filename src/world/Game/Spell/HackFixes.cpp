@@ -108,6 +108,11 @@ uint32 GetSpellClass(SpellEntry *sp)
     return 0;
 }
 
+void ApplyCoefFixes()
+{
+
+}
+
 void ApplyNormalFixes()
 {
 	//Updating spell.dbc
@@ -6632,6 +6637,12 @@ void ApplyNormalFixes()
     }
 
     //Spell Coef Overrides
+    uint32 acntt = dbcSpell.GetNumRows();
+    for (uint32 zzx = 0; zzx < acntt; zzx++)
+    {
+        // Read every SpellEntry row
+        SpellEntry* sp = dbcSpell.LookupRow(zzx);
+
     switch (sp->Id)
     {
 
@@ -7231,6 +7242,26 @@ void ApplyNormalFixes()
     {
         sp->SP_coef_override = float(0.571400f);
     }break;
+    case 47632: // Death Coil DK - Rank 1
+    {
+        sp->AP_coef_override = float(0.150000f);
+    }break;
+    case 49892: // Death Coil DK - Rank 2
+    {
+        sp->AP_coef_override = float(0.150000f);
+    }break;
+    case 49893: // Death Coil DK - Rank 3
+    {
+        sp->AP_coef_override = float(0.150000f);
+    }break;
+    case 49894: // Death Coil DK - Rank 4
+    {
+        sp->AP_coef_override = float(0.150000f);
+    }break;
+    case 49895: // Death Coil DK - Rank 5
+    {
+        sp->AP_coef_override = float(0.150000f);
+    }break;
     case 6789: // Death Coil - Rank 1
     {
         sp->SP_coef_override = float(0.214000f);
@@ -7786,6 +7817,26 @@ void ApplyNormalFixes()
     {
         sp->SP_coef_override = float(0.070000f);
         sp->AP_coef_override = float(0.070000f);
+    }break;
+    case 52212:
+    {
+        sp->AP_coef_override = float(0.048050f);
+    }break;
+    case 43265:    // Death and Decay Rank 1
+    {
+        sp->AP_coef_override = float(0.048050f);
+    }break;
+    case 49936:    // Death and Decay Rank 2
+    {
+        sp->AP_coef_override = float(0.048050f);
+    }break;
+    case 49937:    // Death and Decay Rank 3
+    {
+        sp->AP_coef_override = float(0.048050f);
+    }break;
+    case 49938:    // Death and Decay Rank 4
+    {
+        sp->AP_coef_override = float(0.048050f);
     }break;
     case 10328: // Holy Light - Rank 7
     {
@@ -10835,13 +10886,7 @@ void ApplyNormalFixes()
     {
         sp->AP_coef_override = float(0.250000f);
     }break;
-
-    default:
-    {
-        sp->SP_coef_override = 0.0f;
-        sp->AP_coef_override = 0.0f;
-        sp->RAP_coef_override = 0.0f;
-    }break;
+    }
     }
 
 	/* Ritual of Summoning summons a GameObject that triggers an inexistant spell.

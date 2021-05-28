@@ -4869,19 +4869,6 @@ int32 Spell::DoCalculateEffect(uint32 i, Unit* target, int32 value)
 		}
 	}
 
-    if (u_caster != NULL)
-    {
-        if (GetProto()->AP_coef_override > 0.0f)
-        {
-            value += int(value * GetProto()->AP_coef_override);
-        }
-
-        if (GetProto()->RAP_coef_override > 0.0f)
-        {
-            value += int(value * GetProto()->RAP_coef_override);
-        }
-    }
-
 	return value;
 }
 

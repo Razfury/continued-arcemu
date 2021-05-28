@@ -618,9 +618,6 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					// Deal triple damage to frozen targets or to those in Deep Freeze
 					if(unitTarget->HasFlag(UNIT_FIELD_AURASTATE, AURASTATE_FLAG_FROZEN) || unitTarget->HasAura(44572))
 						dmg *= 3;
-					//	if (dmg>300)   //dirty bugfix.
-					//		dmg = (int32)(damage >> 1);
-
 				}
 				break;
 			case SPELL_HASH_INCINERATE:	// Incinerate -> Deals x-x extra damage if the target is affected by immolate
@@ -633,22 +630,9 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					}
 				}
 				break;
-			case SPELL_HASH_ARCANE_SHOT: //hunter - arcane shot
-				{
-					if(u_caster)
-						dmg += int(u_caster->GetRAP() * 0.15f);
-					dmg = int(dmg * (0.9f + RandomFloat(0.2f)));      // randomized damage
-				}
-				break;
 			case SPELL_HASH_GORE: // boar/ravager: Gore (50% chance of double damage)
 				{
 					dmg *= Rand(50) ? 2 : 1;
-				}
-				break;
-			case SPELL_HASH_THUNDER_CLAP: // Thunderclap
-				{
-					if(u_caster)
-						dmg = (GetProto()->EffectBasePoints[0] + 1) + int(u_caster->GetAP() * 0.12f);
 				}
 				break;
 			case SPELL_HASH_INTERCEPT: // Warrior - Intercept
@@ -744,9 +728,6 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 				{
 					if(p_caster != NULL)
 					{
-						uint32 sph = p_caster->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + 1);
-						int32 ap = p_caster->GetAP();
-						dmg += int((0.15f * sph) + (0.15f * ap));
 						if(unitTarget && unitTarget->IsCreature())
 						{
 							uint32 type = TO_CREATURE(unitTarget)->GetCreatureInfo()->Type;
@@ -797,6 +778,18 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		}
 	}
 
+    if (p_caster != NULL)
+    {
+        if (GetProto()->AP_coef_override > 0.0f)
+        {
+            dmg += p_caster->GetAP() * GetProto()->AP_coef_override;
+        }
+
+        if (GetProto()->RAP_coef_override > 0.0f)
+        {
+            dmg += p_caster->GetAP() * GetProto()->RAP_coef_override;
+        }
+    }
 
 	// check for no more damage left (chains)
 	if(!dmg)
