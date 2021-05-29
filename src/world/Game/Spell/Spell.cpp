@@ -1059,6 +1059,75 @@ uint8 Spell::prepare(SpellCastTargets* targets)
 	return ccr;
 }
 
+void Spell::resultcancel(uint8 result, bool sendInterrupted)
+{
+    if (m_spellState == SPELL_STATE_FINISHED)
+        return;
+
+    if (sendInterrupted)
+    {
+        SendInterrupted(result);
+        SendCastResult(result);
+    }
+
+    if (m_spellState == SPELL_STATE_CASTING)
+    {
+        if (u_caster != NULL)
+            u_caster->RemoveAura(GetProto()->Id);
+
+        if (m_timer > 0 || m_Delayed)
+        {
+            if (p_caster && p_caster->IsInWorld())
+            {
+                Unit* pTarget = p_caster->GetMapMgr()->GetUnit(p_caster->GetChannelSpellTargetGUID());
+                if (!pTarget)
+                    pTarget = p_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+
+                if (pTarget)
+                {
+                    pTarget->RemoveAura(GetProto()->Id, m_caster->GetGUID());
+                }
+                if (m_AreaAura)//remove of blizz and shit like this
+                {
+                    uint64 guid = p_caster->GetChannelSpellTargetGUID();
+
+                    DynamicObject* dynObj = m_caster->GetMapMgr()->GetDynamicObject(Arcemu::Util::GUID_LOPART(guid));
+                    if (dynObj)
+                        dynObj->Remove();
+                }
+
+                if (p_caster->GetSummonedObject())
+                {
+                    if (p_caster->GetSummonedObject()->IsInWorld())
+                        p_caster->GetSummonedObject()->RemoveFromWorld(true);
+                    // for now..
+                    ARCEMU_ASSERT(p_caster->GetSummonedObject()->IsGameObject());
+                    delete p_caster->GetSummonedObject();
+                    p_caster->SetSummonedObject(NULL);
+                }
+
+                if (m_timer > 0)
+                {
+                    p_caster->delayAttackTimer(-m_timer);
+                    RemoveItems();
+                }
+                //				p_caster->setAttackTimer(1000, false);
+            }
+        }
+    }
+
+    SendChannelUpdate(0);
+
+    //m_spellState = SPELL_STATE_FINISHED;
+
+    // prevent memory corruption. free it up later.
+    // if this is true it means we are currently in the cast() function somewhere else down the stack
+    // (recursive spells) and we don't wanna have this class deleted when we return to it.
+    // at the end of cast() it will get freed anyway.
+    if (!m_isCasting)
+        finish(false);
+}
+
 void Spell::cancel(bool sendInterrupted)
 {
 	if(m_spellState == SPELL_STATE_FINISHED)
@@ -1279,6 +1348,18 @@ void Spell::cast(bool check)
 
 		if(p_caster)
 		{
+            // Arcane Missiles
+            // Check if we have missile barrage talents
+            if (GetProto()->NameHash == SPELL_HASH_ARCANE_MISSILE)
+            {
+
+            }
+            //Arcane Blast Buff
+            // "Effect stacks up to 4 times and lasts 6 sec or until any Arcane damage spell except Arcane Blast is cast."
+            if (GetProto()->School == SCHOOL_ARCANE && GetProto()->NameHash != SPELL_HASH_ARCANE_BLAST && GetProto()->NameHash != SPELL_HASH_ARCANE_MISSILES)
+            {
+                p_caster->RemoveAuraSpecial(36032);
+            }
 			if(GetProto()->NameHash == SPELL_HASH_SLAM)
 			{
 				/* slam - reset attack timer */
@@ -1877,8 +1958,10 @@ void Spell::finish(bool successful)
 	*/
 	if(u_caster != NULL)
 	{
-		if(!m_triggeredSpell && (GetProto()->ChannelInterruptFlags || m_castTime > 0))
-			u_caster->SetCurrentSpell(NULL);
+        if (!m_triggeredSpell && (GetProto()->ChannelInterruptFlags || m_castTime > 0))
+        {
+            u_caster->SetCurrentSpell(NULL);
+        }
 	}
 
 	// Send Spell cast info to QuestMgr
@@ -2416,8 +2499,18 @@ void Spell::SendChannelStart(uint32 duration)
 
 	m_castTime = m_timer = duration;
 
-	if(u_caster != NULL)
-		u_caster->SetChannelSpellId(GetProto()->Id);
+    if (u_caster != NULL)
+    {
+        if (u_caster->IsPlayer())
+        {
+            p_caster->SetChannelSpellId(GetProto()->Id);
+            sEventMgr.AddEvent(p_caster, &Player::InterruptSpell, EVENT_UNK, duration + 700 / 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT); // This is a hack but the only way i found to stop spell channeling.
+        }
+        else
+        {
+            u_caster->SetChannelSpellId(GetProto()->Id);
+        }
+    }
 
 	/*
 	Unit* target = objmgr.GetCreature( TO< Player* >( m_caster )->GetSelection());

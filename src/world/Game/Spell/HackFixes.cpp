@@ -291,6 +291,7 @@ void ApplyNormalFixes()
         sp->SP_coef_override = 0;
         sp->AP_coef_override = 0;
         sp->RAP_coef_override = 0;
+        sp->aura_remove_flags = 0;
 
 		talentSpellIterator = talentSpells.find(sp->Id);
 		if(talentSpellIterator == talentSpells.end())
@@ -1177,29 +1178,6 @@ void ApplyNormalFixes()
 				sp->fixed_hotdotcoef *= 0.5f;
 		}
 
-		//Standard spells
-		else if((sp->spell_coef_flags & SPELL_FLAG_IS_DD_OR_DH_SPELL) && !(sp->spell_coef_flags & SPELL_FLAG_IS_DOT_OR_HOT_SPELL))
-		{
-			sp->fixed_dddhcoef = sp->casttime_coef;
-			if(sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT)
-				sp->fixed_dddhcoef *= 0.95f;
-			if(sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL)
-				sp->fixed_dddhcoef *= 0.5f;
-		}
-
-		//Over-time spells
-		else if(!(sp->spell_coef_flags & SPELL_FLAG_IS_DD_OR_DH_SPELL) && (sp->spell_coef_flags & SPELL_FLAG_IS_DOT_OR_HOT_SPELL))
-		{
-			float Duration = float(GetDuration(dbcSpellDuration.LookupEntry(sp->DurationIndex)));
-			sp->fixed_hotdotcoef = (Duration / 15000.0f);
-
-			if(sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT)
-				sp->fixed_hotdotcoef *= 0.95f;
-			if(sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL)
-				sp->fixed_hotdotcoef *= 0.5f;
-
-		}
-
 		//Combined standard and over-time spells
 		else if(sp->spell_coef_flags & SPELL_FLAG_IS_DD_DH_DOT_SPELL)
 		{
@@ -1209,17 +1187,6 @@ void ApplyNormalFixes()
 
 			sp->fixed_dddhcoef = sp->casttime_coef * Portion_to_Standard;
 			sp->fixed_hotdotcoef = (Duration / 15000.0f) * Portion_to_Over_Time;
-
-			if(sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT)
-			{
-				sp->fixed_dddhcoef *= 0.95f;
-				sp->fixed_hotdotcoef *= 0.95f;
-			}
-			if(sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL)
-			{
-				sp->fixed_dddhcoef *= 0.5f;
-				sp->fixed_hotdotcoef *= 0.5f;
-			}
 		}
 
 		//////////////////////////////////////////////////////
@@ -1238,28 +1205,6 @@ void ApplyNormalFixes()
 		if(sp->Id == 781)
 			sp->CustomFlags = CUSTOM_FLAG_SPELL_REQUIRES_COMBAT;
 
-	}
-	// END OF LOOP
-
-	//Settings for special cases
-	QueryResult* resultx = WorldDatabase.Query("SELECT * FROM spell_coef_override");
-	if(resultx != NULL)
-	{
-		do
-		{
-			Field* f;
-			f = resultx->Fetch();
-			sp = dbcSpell.LookupEntryForced(f[0].GetUInt32());
-			if(sp != NULL)
-			{
-				sp->Dspell_coef_override = f[2].GetFloat();
-				sp->OTspell_coef_override = f[3].GetFloat();
-			}
-			else
-				Log.Error("SpellCoefOverride", "Has nonexistent spell %u.", f[0].GetUInt32());
-		}
-		while(resultx->NextRow());
-		delete resultx;
 	}
 
 	//Fully loaded coefficients, we must share channeled coefficient to its triggered spells
@@ -2585,10 +2530,10 @@ void ApplyNormalFixes()
         //Mage - Arcane Blast
         case 36032:
         {
-            //sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
             sp->procFlags |= static_cast<uint32>(PROC_TARGET_SELF);
             sp->c_is_flags = SPELL_FLAG_IS_FORCEDDEBUFF;
             sp->maxstack = 4;
+            sp->aura_remove_flags = CUSTOM_AURA_REMOVE_SPECIAL;
         }break;
 
         //rogue - Prey on the weak
@@ -6563,7 +6508,7 @@ void ApplyNormalFixes()
         }break;
         case SPELL_HASH_IMPROVED_COUNTERSPELL:
         {
-            sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
             sp->EffectSpellClassMask[0][0] = 0x00004000;    // Proc on counterspell only
         }break;
         case SPELL_HASH_SHADOW_WEAVING:
@@ -10887,6 +10832,27 @@ void ApplyNormalFixes()
         sp->AP_coef_override = float(0.250000f);
     }break;
     }
+    }
+
+    //Settings for special cases
+    // This is unused anymore but until we remove it completely just set the values.
+    QueryResult* resultx = WorldDatabase.Query("SELECT * FROM spell_coef_override");
+    if (resultx != NULL)
+    {
+        do
+        {
+            Field* f;
+            f = resultx->Fetch();
+            sp = dbcSpell.LookupEntryForced(f[0].GetUInt32());
+            if (sp != NULL)
+            {
+                sp->Dspell_coef_override = f[2].GetFloat();
+                sp->OTspell_coef_override = f[3].GetFloat();
+            }
+            else
+                Log.Error("SpellCoefOverride", "Has nonexistent spell %u.", f[0].GetUInt32());
+        } while (resultx->NextRow());
+        delete resultx;
     }
 
 	/* Ritual of Summoning summons a GameObject that triggers an inexistant spell.

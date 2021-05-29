@@ -341,6 +341,12 @@ enum CastInterruptFlags
 
 };
 
+enum CustomAuraRemoveFlags
+{
+    CUSTOM_AURA_NULL = 0x0,
+    CUSTOM_AURA_REMOVE_SPECIAL = 0x1,
+};
+
 enum AuraInterruptFlags
 {
     AURA_INTERRUPT_NULL 						= 0x00000000,
@@ -1669,6 +1675,8 @@ class SERVER_DECL Spell : public EventableObject
 		uint8 DidHit(uint32 effindex, Unit* target);
 		// Prepares the spell that's going to cast to targets
 		uint8 prepare(SpellCastTargets* targets);
+        // Cancels the current spell with results.
+        void resultcancel(uint8 result, bool sendInterrupted = true);
 		// Cancels the current spell
 		void cancel(bool sendInterrupted = true);
 		// Update spell state based on time difference

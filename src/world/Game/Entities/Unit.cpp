@@ -4680,10 +4680,25 @@ void Unit::AddAura(Aura* aur)
 	SetFlag(UNIT_FIELD_AURASTATE, flag);
 }
 
+bool Unit::RemoveAuraSpecial(uint32 spellId)
+{
+    for (uint32 x = MAX_TOTAL_AURAS_START; x < MAX_TOTAL_AURAS_END; x++)
+        if (m_auras[x] && m_auras[x]->GetSpellId() == spellId)
+        {
+            m_auras[x]->Remove();
+            return true;
+        }
+    return false;
+}
+
 bool Unit::RemoveAura(Aura* aur)
 {
 	if(aur == NULL)
 		return false;
+
+    // Check for custom/special aura removal if aura has it don't remove it.
+    if (aur->GetSpellProto()->aura_remove_flags & CUSTOM_AURA_REMOVE_SPECIAL)
+        return false;
 
 	aur->Remove();
 	return true;
@@ -4695,6 +4710,10 @@ bool Unit::RemoveAura(uint32 spellId)
 	for(uint32 x = MAX_TOTAL_AURAS_START; x < MAX_TOTAL_AURAS_END; x++)
 		if(m_auras[x] && m_auras[x]->GetSpellId() == spellId)
 		{
+            // Check for custom/special aura removal if aura has it don't remove it.
+            if (m_auras[x]->GetSpellProto()->aura_remove_flags & CUSTOM_AURA_REMOVE_SPECIAL)
+                return false;
+
 			m_auras[x]->Remove();
 			return true;  // sky: yes, only one, see bug charges/auras queues
 		}
@@ -4716,8 +4735,16 @@ bool Unit::RemoveAuras(uint32* SpellIds)
 			{
 				if(m_auras[x] && m_auras[x]->GetSpellId() == SpellIds[y])
 				{
-					m_auras[x]->Remove();
-					res = true;
+                    // Check for custom/special aura removal if aura has it don't remove it.
+                    if (m_auras[x]->GetSpellProto()->aura_remove_flags & CUSTOM_AURA_REMOVE_SPECIAL)
+                    {
+                        res = false;
+                    }
+                    else
+                    {
+                        m_auras[x]->Remove();
+                        res = true;
+                    }
 				}
 			}
 		}
@@ -4767,6 +4794,11 @@ bool Unit::RemoveAurasByHeal()
 					}
 					break;
 			}
+
+            // Check for custom/special aura removal if aura has it don't remove it.
+            if (m_auras[x]->GetSpellProto()->aura_remove_flags & CUSTOM_AURA_REMOVE_SPECIAL)
+                res = false;
+
 		}
 	}
 
@@ -5421,6 +5453,30 @@ float Unit::CalcSpellDamageReduction(Unit* victim, SpellEntry* spell, float res)
 	reduced_damage += res * victim->DamageTakenPctMod[spell->School];
 	reduced_damage += res * victim->ModDamageTakenByMechPCT[spell->MechanicsType];
 	return reduced_damage;
+}
+
+void Unit::InterruptChanneledSpell()
+{
+    Player* p_caster = TO_PLAYER(this);
+
+    if (m_currentSpell)
+    {
+        m_currentSpell->SendInterrupted(SPELL_FAILED_DONT_REPORT);
+        m_currentSpell->SendCastResult(SPELL_FAILED_INTERRUPTED);
+        SetChannelSpellTargetGUID(0);
+        SetChannelSpellId(0);
+        sLog.Error("", "Made it 1");
+
+        if (p_caster)
+        {
+            WorldPacket data(MSG_CHANNEL_UPDATE, 18);
+            data << p_caster->GetNewGUID();
+            data << 0;
+
+            p_caster->SendMessageToSet(&data, true);
+            sLog.Error("", "Made it 2");
+        }
+    }
 }
 
 void Unit::InterruptSpell()
@@ -6157,6 +6213,8 @@ void Unit::Deactivate(MapMgr* mgr)
 void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 {
 	Aura* a;
+    Unit* m_Unit = this;
+
 	for(uint32 x = MAX_TOTAL_AURAS_START; x < MAX_TOTAL_AURAS_END; x++)
 	{
 		a = m_auras[x];
@@ -6171,62 +6229,122 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 			{
 				switch(a->GetSpellProto()->Id)
 				{
-						//priest - surge of light
-					case 33151:
-						{
-							//our luck. it got triggered on smite..we do not remove it just yet
-							if(m_currentSpell && m_currentSpell->GetProto()->NameHash == SPELL_HASH_SMITE)
-								continue;
+                    // priest - holy conc
+                case 34754:
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL &&
+                        !(m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_FLASH_HEAL ||
+                            m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_BINDING_HEAL ||
+                            m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_GREATER_HEAL))
+                        continue;
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_FLASH_HEAL && spi->NameHash != SPELL_HASH_BINDING_HEAL && spi->NameHash != SPELL_HASH_GREATER_HEAL)
+                        continue;
+                }break;
+                //Arcane Potency
+                case 57529:
+                case 57531:
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL && !(m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_PRESENCE_OF_MIND
+                        || m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_CLEARCASTING))
+                        continue;
 
-							//this spell gets removed only when casting smite
-							SpellEntry* spi = dbcSpell.LookupEntryForced(skip);
-							if(spi && spi->NameHash != SPELL_HASH_SMITE)
-								continue;
-						}
-						break;
-					case 34936:	// Backlash
-						{
-							if(m_currentSpell && m_currentSpell->GetProto()->NameHash == SPELL_HASH_SHADOW_BOLT)
-								continue;
-							if(m_currentSpell && m_currentSpell->GetProto()->NameHash == SPELL_HASH_INCINERATE)
-								continue;
-							SpellEntry* spi = dbcSpell.LookupEntryForced(skip);
-							if(spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT && spi->NameHash != SPELL_HASH_INCINERATE)
-								continue;
-						}
-						break;
-					case 59578: // Art of War
-					case 53489:
-						{
-							if(m_currentSpell && m_currentSpell->m_spellInfo->NameHash == SPELL_HASH_FLASH_OF_LIGHT)
-								continue;
-							SpellEntry* spi = dbcSpell.LookupEntryForced(skip);
-							if(spi && spi->NameHash != SPELL_HASH_FLASH_OF_LIGHT)
-								continue;
-						}
-						break;
-					case 17941: //Shadow Trance
-						{
-							if(m_currentSpell && m_currentSpell->GetProto()->NameHash == SPELL_HASH_SHADOW_BOLT)
-								continue;
-							SpellEntry* spi = dbcSpell.LookupEntryForced(skip);
-							if(spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT)
-								continue;
-						}
-						break;
-					case 16166: // [Shaman] Elemental Mastery
-						{
-							SpellEntry* spi = dbcSpell.LookupEntryForced(skip);
-							if(spi && !(spi->School == SCHOOL_FIRE || spi->School == SCHOOL_FROST || spi->School == SCHOOL_NATURE))
-								continue;
-						}
-						break;
-					case 48108: // Hot Streak
-						{
-							if(m_currentSpell && m_currentSpell->GetProto()->NameHash != SPELL_HASH_PYROBLAST)
-								continue;
-						}
-						break;
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL || !(spi->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+                        continue;
+
+                }break;
+                //paladin - Art of war
+                case 53489:
+                case 59578:
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL && m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_FLASH_OF_LIGHT)
+                        continue;
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_FLASH_OF_LIGHT)
+                        continue;
+                }break;
+                //paladin - Infusion of light
+                case 53672:
+                case 54149:
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL && !(m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_FLASH_OF_LIGHT
+                        || m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_HOLY_LIGHT))
+                        continue;
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_FLASH_OF_LIGHT && spi->NameHash != SPELL_HASH_HOLY_LIGHT)
+                        continue;
+                }break;
+                //Mage - Firestarter
+                case 54741:
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL && m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_FLAMESTRIKE)
+                        continue;
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_FLAMESTRIKE)
+                        continue;
+                }break;
+                case 34936:     // Backlash
+                {
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_SHADOW_BOLT && spi->NameHash != SPELL_HASH_INCINERATE)
+                        continue;
+                }break;
+
+                case 17941: //Shadow Trance
+                {
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_SHADOW_BOLT)
+                        continue;
+                }break;
+                // Glyph of Revenge Proc
+                case 58363:
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL && m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_HEROIC_STRIKE)
+                        continue;
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_HEROIC_STRIKE)
+                        continue;
+                }break;
+                case 18708: //Fel Domination
+                {
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_SUMMON_IMP &&
+                        spi->NameHash != SPELL_HASH_SUMMON_VOIDWALKER &&
+                        spi->NameHash != SPELL_HASH_SUMMON_SUCCUBUS &&
+                        spi->NameHash != SPELL_HASH_SUMMON_FELHUNTER &&
+                        spi->NameHash != SPELL_HASH_SUMMON_FELGUARD)
+                        continue;
+                }break;
+                case 46916: // Bloodsurge
+                {
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_SLAM)
+                        continue;
+                }break;
+                case 14177: // Cold Blood
+                {
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && !(spi->c_is_flags & SPELL_FLAG_IS_DAMAGING) && spi->NameHash != SPELL_HASH_MUTILATE)
+                        continue;
+                }break;
+                case 31834: // Light's Grace
+                {
+                    if (m_Unit->GetCurrentSpell() != NULL && m_Unit->GetCurrentSpell()->GetProto()->NameHash == SPELL_HASH_HOLY_LIGHT)
+                        continue;
+
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && spi->NameHash != SPELL_HASH_HOLY_LIGHT)
+                        continue;
+                }break;
+                // Shadowstep
+                case 44373:
+                case 36563:
+                {
+                    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+                    if (spi != NULL && !(spi->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+                        continue;
+                }break;
 				}
 			}
 			a->Remove();

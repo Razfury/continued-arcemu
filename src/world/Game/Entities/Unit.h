@@ -1120,6 +1120,7 @@ class SERVER_DECL Unit : public Object
 		bool RemoveAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 		bool RemoveAuras(uint32* SpellIds);
 		bool RemoveAurasByHeal();
+        bool RemoveAuraSpecial(uint32 spellId);
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		//bool AuraActionIf( AuraAction *a, AuraCondition *c )
@@ -1241,6 +1242,7 @@ class SERVER_DECL Unit : public Object
 
 		void castSpell(Spell* pSpell);
 		void InterruptSpell();
+        void InterruptChanneledSpell();
 
 		//caller is the caster
 		int32 GetSpellDmgBonus(Unit* pVictim, SpellEntry* spellInfo, int32 base_dmg, bool isdot);
