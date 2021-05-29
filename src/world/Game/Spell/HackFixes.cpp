@@ -1524,6 +1524,17 @@ void ApplyNormalFixes()
             sp->procFlags = PROC_ON_CAST_SPELL;
         }break;
 
+        //Improved Fire Nova
+        case 16086:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_FLAT_MODIFIER;
+        }break;
+        //Improved Fire Nova
+        case 16544:
+        {
+            sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_FLAT_MODIFIER;
+        }break;
+
         // Astral   Shift
         case 52179:
         {
@@ -5116,13 +5127,6 @@ void ApplyNormalFixes()
         case 31616: // Nature's Guardian
         {
             sp->spell_can_crit = false;
-        }break;
-
-        // Improved firenova totem
-        case 16086:
-        case 16544:
-        {
-            sp->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
         }break;
 
         //////////////////////////////////////////
