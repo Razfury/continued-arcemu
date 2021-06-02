@@ -1067,6 +1067,8 @@ class SERVER_DECL Player : public Unit
 		
 		void EventTimedQuestExpire( uint32 questid );
 
+        void InterruptSpell();
+
 
 		/////////////////////////////////////////////////////
 		//bool HasTimedQuest()

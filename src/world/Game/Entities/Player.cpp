@@ -9405,6 +9405,14 @@ void Player::SetShapeShift(uint8 ss)
 	UpdateChances();
 }
 
+void Player::InterruptSpell()
+{
+    if (m_currentSpell)
+    {
+        m_currentSpell->resultcancel(SPELL_FAILED_DONT_REPORT);
+    }
+}
+
 void Player::CalcDamage()
 {
 	float delta;

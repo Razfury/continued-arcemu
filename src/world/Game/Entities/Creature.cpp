@@ -1352,6 +1352,13 @@ bool Creature::Load(CreatureSpawn* spawn, uint32 mode, MapInfo* info)
 	{
 		GetAIInterface()->SetAllowedToEnterCombat(false);
 		GetAIInterface()->SetAIType(AITYPE_PASSIVE);
+
+        if (IsVehicle() && GetPowerType() != POWER_TYPE_ENERGY) // If we don't have energy then we are not a "real" vehicle so don't disable combat.
+        {
+            GetAIInterface()->SetAllowedToEnterCombat(true);
+            GetAIInterface()->SetAIType(AITYPE_LONER);
+        }
+
 	}
 
 	// load formation data
@@ -1430,8 +1437,15 @@ bool Creature::Load(CreatureSpawn* spawn, uint32 mode, MapInfo* info)
 
 	if( IsVehicle() ){
 		AddVehicleComponent( proto->Id, proto->vehicleid );
-		SetFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK );
-		setAItoUse( false );
+        if (GetPowerType() != POWER_TYPE_ENERGY)
+        {
+            setAItoUse(true);
+        }
+        else
+        {
+            SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            setAItoUse(false);
+        }
 	}
 
 	if( proto->rooted != 0 )
@@ -1457,6 +1471,12 @@ void Creature::Load(CreatureProto* proto_, float x, float y, float z, float o)
 	{
 		GetAIInterface()->SetAllowedToEnterCombat(false);
 		GetAIInterface()->SetAIType(AITYPE_PASSIVE);
+
+        if (IsVehicle() && GetPowerType() != POWER_TYPE_ENERGY) // If we don't have energy then we are not a "real" vehicle so don't disable combat.
+        {
+            GetAIInterface()->SetAllowedToEnterCombat(true);
+            GetAIInterface()->SetAIType(AITYPE_LONER);
+        }
 	}
 
 	m_walkSpeed = m_base_walkSpeed = proto->walk_speed; //set speeds
@@ -1611,8 +1631,15 @@ void Creature::Load(CreatureProto* proto_, float x, float y, float z, float o)
 
 	if( IsVehicle() ){
 		AddVehicleComponent( proto->Id, proto->vehicleid );
-		SetFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK );
-		setAItoUse( false );
+        if (GetPowerType() != POWER_TYPE_ENERGY)
+        {
+            setAItoUse(true);
+        }
+        else
+        {
+            SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            setAItoUse(false);
+        }
 	}
 
 	if( proto->rooted != 0 )
@@ -2021,6 +2048,12 @@ void Creature::DealDamage(Unit* pVictim, uint32 damage, uint32 targetEvent, uint
 			pVictim->SetHealth(1);
 			return;
 		}
+
+        if (IsVehicle() && GetPowerType() == POWER_TYPE_ENERGY)
+        {
+            sQuestMgr.OnPlayerKill(GetMapMgr()->GetInterface()->GetPlayerNearestCoords(GetPositionX(), GetPositionY(), GetPositionZ()), TO_CREATURE(pVictim), true);
+        }
+
 
 		pVictim->Die(this, damage, spellId);
 	}
