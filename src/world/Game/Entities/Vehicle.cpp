@@ -307,7 +307,7 @@ void Vehicle::EjectPassengerFromSeat( uint32 seatid ){
 		}else{
 			// The passenger summoned the vehicle, and we have no script to remove it, so we remove it here
 			if( ( passengercount == 0 ) && ( c->GetSummonedByGUID() == passenger->GetGUID() ) )
-				c->Despawn( 1 * 1000, 0 );
+				c->Despawn( 180000, 0 );
 		}
 	}
 }
@@ -516,7 +516,8 @@ void Vehicle::RemoveAccessories(){
 			u->GetVehicleComponent()->EjectAllPassengers();
 
 		EjectPassenger( u );
-		u->Delete();
+        if (u->GetPowerType() == POWER_TYPE_ENERGY)
+		    u->Delete();
 	}
 	
 	installed_accessories.clear();
