@@ -73,6 +73,8 @@ Object::Object() : m_position(0, 0, 0, 0), m_spawnLocation(0, 0, 0, 0)
 	m_oppFactsInRange.clear();
 	m_sameFactsInRange.clear();
 
+    m_portalNumber = 0;
+
 	Active = false;
 }
 
@@ -164,7 +166,7 @@ bool Object::SetPosition(float newX, float newY, float newZ, float newOrientatio
 	{
 		m_lastMapUpdatePosition.ChangeCoords(newX, newY, newZ, newOrientation);
         m_mapMgr->ChangeObjectLocation(this);
-        m_mapMgr->VisitCoords(newX + urand(20, 100), newY + urand(20, 100), this); // This is our mapcell "helper" helps us visit cells past the limit until we come up with a better solution
+        //m_mapMgr->VisitCoords(newX, newY, this); // This is our mapcell "helper" helps us visit cells past the limit until we come up with a better solution
 
 		if(IsPlayer() && TO< Player* >(this)->GetGroup() && TO< Player* >(this)->m_last_group_position.Distance2DSq(m_position) > 25.0f)       // distance of 5.0
 		{

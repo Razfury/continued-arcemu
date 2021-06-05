@@ -544,8 +544,17 @@ void MapMgr::VisitCoords(uint32 x, uint32 y, Object* obj)
         return;
     }
 
-    uint32 cellX = GetPosX(x);
-    uint32 cellY = GetPosY(y);
+    uint32 trueX = x + urand(20, 100);
+    uint32 trueY = y + urand(20, 100);
+
+    if (trueX >= _maxX || trueX <= _minX ||
+        trueY >= _maxY || trueY <= _minY)
+    {
+        return;
+    }
+
+    uint32 cellX = GetPosX(trueX);
+    uint32 cellY = GetPosY(trueY);
 
     if (cellX >= _sizeX || cellY >= _sizeY)
     {
@@ -1227,6 +1236,7 @@ void MapMgr::_UpdateObjects()
 			plyr->ProcessPendingUpdates();
 	}
 }
+
 void MapMgr::LoadAllCells()
 {
 	// eek
