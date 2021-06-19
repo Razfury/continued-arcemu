@@ -1047,6 +1047,17 @@ class SERVER_DECL Unit : public Object
 		int32 GetAP();
 		int32 GetRAP();
 
+        void DespawnCombatSummons();
+        uint32 combatSummon1GUID;
+        uint32 combatSummon2GUID;
+        uint32 combatSummon3GUID;
+        uint32 combatSummon4GUID;
+        uint32 combatSummon5GUID;
+        uint32 combatSummon6GUID;
+
+        uint32 getDungeonMode();
+        uint32 getRaidMode();
+
 		uint8 CastSpell(Unit* Target, uint32 SpellID, bool triggered);
 		uint8 CastSpell(Unit* Target, SpellEntry* Sp, bool triggered);
 		uint8 CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered);

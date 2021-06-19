@@ -387,6 +387,13 @@ Unit::Unit()
 	m_parryfromspell		= 0;
 	m_BlockModPct			= 0;
 
+    combatSummon1GUID = 0;
+    combatSummon2GUID = 0;
+    combatSummon3GUID = 0;
+    combatSummon4GUID = 0;
+    combatSummon5GUID = 0;
+    combatSummon6GUID = 0;
+
 	m_damageShields.clear();
 	m_reflectSpellSchool.clear();
 	m_procSpells.clear();
@@ -4260,6 +4267,58 @@ uint8 Unit::FindVisualSlot(uint32 SpellId, bool IsPos)
 	return visualslot;
 }
 
+uint32 Unit::getDungeonMode()
+{
+    if (GetMapMgr() == NULL)
+    {
+        return 0;
+        sLog.Error("Unit::getDungeonMode", "An error while returning dungeon mode was found at GetMapMgr is NULL!");
+    }
+
+    //First check if the modes are higher or lower then 1 and 0 (this should never happen in a dungeon)
+    if (GetMapMgr()->iInstanceMode > 1)
+        return MODE_HEROIC;
+
+    if (GetMapMgr()->iInstanceMode < 0)
+        return MODE_NORMAL;
+
+    if (GetMapMgr()->iInstanceMode == MODE_NORMAL)
+        return MODE_NORMAL;
+
+    if (GetMapMgr()->iInstanceMode == MODE_HEROIC)
+        return MODE_HEROIC;
+
+    return MODE_NORMAL; // If for some reason a mode cannot be found return normal and send the console an error
+    sLog.Error("Unit::getDungeonMode", "An error returning dungeon mode was found.");
+}
+
+uint32 Unit::getRaidMode()
+{
+    if (GetMapMgr() == NULL)
+    {
+        return 0;
+        sLog.Error("Unit::getRaidMode", "An error while returning raid mode was found at GetMapMgr is NULL!");
+    }
+
+    //First check if the modes are higher or lower then 3 and 0 (this should never happen in a dungeon)
+    if (GetMapMgr()->iInstanceMode > 3)
+        return MODE_HEROIC_25MEN;
+    if (GetMapMgr()->iInstanceMode < 0)
+        return MODE_NORMAL_10MEN;
+
+    if (GetMapMgr()->iInstanceMode == MODE_NORMAL_10MEN)
+        return MODE_NORMAL_10MEN;
+    if (GetMapMgr()->iInstanceMode == MODE_NORMAL_25MEN)
+        return MODE_NORMAL_25MEN;
+    if (GetMapMgr()->iInstanceMode == MODE_HEROIC_10MEN)
+        return MODE_HEROIC_10MEN;
+    if (GetMapMgr()->iInstanceMode == MODE_HEROIC_25MEN)
+        return MODE_HEROIC_25MEN;
+
+    return MODE_NORMAL_10MEN; // If for some reason a mode cannot be found return normal and send the console an error
+    sLog.Error("Unit::getRaidMode", "An error returning raid mode was found.");
+}
+
 void Unit::AddAura(Aura* aur)
 {
 	if(aur == NULL)
@@ -4678,6 +4737,47 @@ void Unit::AddAura(Aura* aur)
 		flag |= AURASTATE_FLAG_JUDGEMENT;
 
 	SetFlag(UNIT_FIELD_AURASTATE, flag);
+}
+
+void Unit::DespawnCombatSummons()
+{
+    if (combatSummon1GUID > 0)
+    {
+        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon1GUID))
+            cr->Despawn(1000, 0);
+    }
+    if (combatSummon2GUID > 0)
+    {
+        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon2GUID))
+            cr->Despawn(1000, 0);
+    }
+    if (combatSummon3GUID > 0)
+    {
+        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon3GUID))
+            cr->Despawn(1000, 0);
+    }
+    if (combatSummon4GUID > 0)
+    {
+        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon4GUID))
+            cr->Despawn(1000, 0);
+    }
+    if (combatSummon5GUID > 0)
+    {
+        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon5GUID))
+            cr->Despawn(1000, 0);
+    }
+    if (combatSummon6GUID > 0)
+    {
+        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon6GUID))
+            cr->Despawn(1000, 0);
+    }
+
+    combatSummon1GUID = 0;
+    combatSummon2GUID = 0;
+    combatSummon3GUID = 0;
+    combatSummon4GUID = 0;
+    combatSummon5GUID = 0;
+    combatSummon6GUID = 0;
 }
 
 bool Unit::RemoveAuraSpecial(uint32 spellId)
