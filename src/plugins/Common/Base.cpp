@@ -718,6 +718,14 @@ void AICreatureScript::Emote(EmoteDesc* pEmote)
 	if(pEmote) Emote(pEmote->mText.c_str(), pEmote->mType, pEmote->mSoundId);
 }
 
+uint32 AICreatureScript::DUNGEON_MODE(uint32 normal5, uint32 heroic5)
+{
+    if (IsHeroic())
+        return heroic5;
+    else
+        return normal5;
+}
+
 void AICreatureScript::Emote(const char* pText, TextType pType, uint32 pSoundId)
 {
 	if(pText && strlen(pText) > 0)

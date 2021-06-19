@@ -756,6 +756,8 @@ class AICreatureScript : public CreatureAIScript
 		void					TriggerCooldownOnAllSpells();
 		void					CancelAllCooldowns();
 
+        uint32 DUNGEON_MODE(uint32 normal5, uint32 heroic5);
+
 		//Emotes
 		EmoteDesc*				AddEmote(EventType pEventType, const char* pText, TextType pType, uint32 pSoundId = 0);
 		void					RemoveEmote(EventType pEventType, EmoteDesc* pEmote);
