@@ -1687,6 +1687,8 @@ void Creature::OnPushToWorld()
 	if(_myScriptClass)
 		_myScriptClass->OnLoad();
 
+    updateModeStatus();
+
 	if(m_spawn)
 	{
 		if(m_aiInterface->m_formationLinkSqlId)

@@ -1058,6 +1058,8 @@ class SERVER_DECL Unit : public Object
         uint32 getDungeonMode();
         uint32 getRaidMode();
 
+        void updateModeStatus();
+
 		uint8 CastSpell(Unit* Target, uint32 SpellID, bool triggered);
 		uint8 CastSpell(Unit* Target, SpellEntry* Sp, bool triggered);
 		uint8 CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered);

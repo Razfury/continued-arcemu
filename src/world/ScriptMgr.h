@@ -581,6 +581,11 @@ class SERVER_DECL HookInterface : public Singleton<HookInterface>
 
 enum InstanceMaps
 {
+    MAP_EASTERN_KINGDOMS = 0,
+    MAP_KALIMDOR = 1,
+    MAP_OUTLANDS = 530,
+    MAP_NORTHREND = 571,
+
 	MAP_SHADOWFANG_KEEP = 33,   //Shadowfang Keep
 	MAP_THE_STOCKADE = 34,   //Stormwind Stockade
 	MAP_DEADMINES = 36,   //Deadmines

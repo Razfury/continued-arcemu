@@ -4292,6 +4292,114 @@ uint32 Unit::getDungeonMode()
     sLog.Error("Unit::getDungeonMode", "An error returning dungeon mode was found.");
 }
 
+void Unit::updateModeStatus()
+{
+    if ((GetMapMgr()->GetMapInfo()->mapid == MAP_EASTERN_KINGDOMS) | (GetMapMgr()->GetMapInfo()->mapid == MAP_KALIMDOR) | (GetMapMgr()->GetMapInfo()->mapid == MAP_OUTLANDS) | (GetMapMgr()->GetMapInfo()->mapid == MAP_NORTHREND))
+        return;
+
+    if (IsPlayer())
+        return;
+
+    switch (GetMapMgr()->GetMapInfo()->playerlimit)
+    {
+    case 5:
+        if (getDungeonMode() == MODE_NORMAL)
+            return;
+        break;
+    case 25:
+        if (getRaidMode() == MODE_NORMAL_10MEN)
+            return;
+        break;
+    }
+
+    uint32 diffentry1 = 0;
+    uint32 diffentry2 = 0;
+    uint32 diffentry3 = 0;
+
+    CreatureProto* proto = CreatureProtoStorage.LookupEntry(GetEntry());
+    if (proto == NULL)
+        return;
+
+    QueryResult* result = WorldDatabase.Query("SELECT * FROM creature_modes WHERE creature_modes.Entry = %u", GetEntry());
+    if (result == NULL)
+        return; // Razfury: Creature does not have a heroic entry or not in creature_modes table.
+
+    do
+    {
+        Field* fields = result->Fetch();
+        diffentry1 = fields[1].GetUInt32();
+        diffentry2 = fields[2].GetUInt32();
+        diffentry3 = fields[3].GetUInt32();
+
+        if (GetMapMgr()->GetMapInfo()->playerlimit == 5) // Dungeons
+        {
+            switch (getDungeonMode())
+            {
+            case MODE_HEROIC:
+                proto = CreatureProtoStorage.LookupEntry(diffentry1);
+                if (proto)
+                {
+                    setLevel(urand(proto->MinLevel, proto->MaxLevel));
+                    SetMaxHealth(proto->MaxHealth);
+                    SetHealth(proto->MaxHealth);
+                    SetBaseMana(proto->Mana);
+                    SetMinDamage(proto->MinDamage);
+                    SetMaxDamage(proto->MaxDamage);
+                    return;
+                }
+                break;
+            }
+
+            if (GetMapMgr()->GetMapInfo()->playerlimit == 25) // raids
+            {
+                switch (getRaidMode())
+                {
+                case MODE_NORMAL_25MEN:
+                    proto = CreatureProtoStorage.LookupEntry(diffentry1);
+                    if (proto)
+                    {
+                        setLevel(urand(proto->MinLevel, proto->MaxLevel));
+                        SetMaxHealth(proto->MaxHealth);
+                        SetHealth(proto->MaxHealth);
+                        SetBaseMana(proto->Mana);
+                        SetMinDamage(proto->MinDamage);
+                        SetMaxDamage(proto->MaxDamage);
+                        return;
+                    }
+                    break;
+                case MODE_HEROIC_10MEN:
+                    proto = CreatureProtoStorage.LookupEntry(diffentry2);
+                    if (proto)
+                    {
+                        setLevel(urand(proto->MinLevel, proto->MaxLevel));
+                        SetMaxHealth(proto->MaxHealth);
+                        SetHealth(proto->MaxHealth);
+                        SetBaseMana(proto->Mana);
+                        SetMinDamage(proto->MinDamage);
+                        SetMaxDamage(proto->MaxDamage);
+                        return;
+                    }
+                    break;
+                case MODE_HEROIC_25MEN:
+                    proto = CreatureProtoStorage.LookupEntry(diffentry3);
+                    if (proto)
+                    {
+                        setLevel(urand(proto->MinLevel, proto->MaxLevel));
+                        SetMaxHealth(proto->MaxHealth);
+                        SetHealth(proto->MaxHealth);
+                        SetBaseMana(proto->Mana);
+                        SetMinDamage(proto->MinDamage);
+                        SetMaxDamage(proto->MaxDamage);
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+
+    } while (result->NextRow());
+}
+
 uint32 Unit::getRaidMode()
 {
     if (GetMapMgr() == NULL)

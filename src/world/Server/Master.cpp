@@ -21,7 +21,7 @@
 #include "StdAfx.h"
 #include "Master.h"
 
-#define BANNER "ArcEmu %s %s/%s-%s-%s (%s@%s):: World Server"
+#define BANNER "Continued-ArcEmu %s %s/%s-%s-%s (%s@%s):: World Server"
 
 #ifndef WIN32
 #include <sched.h>
@@ -553,7 +553,7 @@ bool Master::Run(int argc, char** argv)
 }
 
 static const char *REQUIRED_CHAR_DB_VERSION  = "2011-11-16_22-00_saved_mail";
-static const char *REQUIRED_WORLD_DB_VERSION = "2012-08-14_21-25_worldmap_info";
+static const char *REQUIRED_WORLD_DB_VERSION = "2021_06_20_creature_modes";
 
 bool Master::CheckDBVersion()
 {
@@ -576,7 +576,7 @@ bool Master::CheckDBVersion()
 		
 		if( result < 0 ){
 			Log.Error("Database", "You need to apply the world update queries that are newer than %s. Exiting.", WorldDBVersion);
-			Log.Error( "Database", "You can find the world update queries in the sql/world_updates sub-directory of your Arcemu source directory." );
+			Log.Error( "Database", "You can find the world update queries at https://github.com/c-arcemu/CDB." );
 		}else
 			Log.Error("Database", "Your world database is probably too new for this Arcemu version, you need to update your server. Exiting.");
 
