@@ -430,18 +430,12 @@ LfgMgr::LfgMgr()
 		queues[ i ] = NULL;
 	}
 
-	if( Config.OptionalConfig.GetBoolDefault( "Experimental", "lfg", false ) )
-	{
-		sEventMgr.AddEvent( this, &LfgMgr::eventUpdate, EVENT_LFG_QUEUE_UPDATE, 5 * 1000, 0, 0 );
-	}
+	sEventMgr.AddEvent( this, &LfgMgr::eventUpdate, EVENT_LFG_QUEUE_UPDATE, 5 * 1000, 0, 0 );
 }
 
 LfgMgr::~LfgMgr()
 {
-	if( Config.OptionalConfig.GetBoolDefault( "Experimental", "lfg", false ) )
-	{
-		sEventMgr.RemoveEvents( this );
-	}
+	sEventMgr.RemoveEvents( this );
 
 	playerToDungeons.clear();
 

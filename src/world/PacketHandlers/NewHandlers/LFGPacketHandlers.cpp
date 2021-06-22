@@ -30,12 +30,6 @@ DEFINE_PACKET_HANDLER_METHOD( LFGProposalResultPacketHandler )
 
 	LOG_DEBUG( "Received proposal result" );
 
-	/// If experimental LFG is not enabled, don't do anything
-	if( !Config.OptionalConfig.GetBoolDefault( "Experimental", "lfg", false ) )
-	{
-		return;
-	}
-
 	sLfgMgr.updateProposal( result.proposalId, _player->GetLowGUID(), result.result );
 }
 
@@ -97,20 +91,14 @@ DEFINE_PACKET_HANDLER_METHOD( LFGJoinHandler )
 
 	LOG_DEBUG( "Received LFG join request. Roles: %u Dungeon1: %u Type1: %u", packet.roles, packet.dungeons[ 0 ].dungeon, packet.dungeons[ 0 ].unk2 );
 
-	// If experimental LFG is not enabled, just send an internal LFG error message
-	if( !Config.OptionalConfig.GetBoolDefault( "Experimental", "lfg", false ) )
-	{
-		PacketBuffer buffer;
-		Arcemu::GamePackets::LFG::SLFGJoinResult response;
-		response.result = Arcemu::GamePackets::LFG::SLFGJoinResult::LFG_JOIN_INTERNAL_ERROR;
-		response.state = 0;
-		response.serialize( buffer );
-		_player->SendPacket( &buffer );
+	PacketBuffer buffer;
+	Arcemu::GamePackets::LFG::SLFGJoinResult response;
+	response.result = Arcemu::GamePackets::LFG::SLFGJoinResult::LFG_JOIN_INTERNAL_ERROR;
+	response.state = 0;
+	response.serialize( buffer );
+	_player->SendPacket( &buffer );
 		
-		LOG_DEBUG( "Sent LFG join result" );
-
-		return;
-	}
+	LOG_DEBUG( "Sent LFG join result" );
 
 	std::vector< uint32 > dungeons;
 	std::vector< Arcemu::GamePackets::LFG::CLFGJoin::LFGDungeon >::const_iterator itr = packet.dungeons.begin();
@@ -130,12 +118,6 @@ DEFINE_PACKET_HANDLER_METHOD( LFGLeaveHandler )
 
 	LOG_DEBUG( "Received LFG leave request." );
 
-	/// If experimental LFG is not enabled, don't do anything
-	if( !Config.OptionalConfig.GetBoolDefault( "Experimental", "lfg", false ) )
-	{
-		return;
-	}
-
 	sLfgMgr.removePlayer( _player->GetLowGUID() );
 }
 
@@ -148,13 +130,6 @@ DEFINE_PACKET_HANDLER_METHOD( LFGTeleportHandler )
 	packet.deserialize( recv_data );
 
 	LOG_DEBUG( "Received LFG teleport request." );
-
-
-	/// If experimental LFG is not enabled, don't do anything
-	if( !Config.OptionalConfig.GetBoolDefault( "Experimental", "lfg", false ) )
-	{
-		return;
-	}
 
 	if( packet.out == 1 )
 		sLfgMgr.teleportPlayer( _player->GetLowGUID(), true );
