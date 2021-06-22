@@ -7240,14 +7240,14 @@ void Unit::CombatStatusHandler_ResetPvPTimeout()
 		{
 			if(!itr->second->deleted)
 			{
-				itr->second->currTime = 5000;
+				itr->second->currTime = 15000;
 				m_lock.Release();
 				return;
 			}
 		}
 	}
 
-	sEventMgr.AddEvent(this, &Unit::CombatStatusHandler_UpdatePvPTimeout, EVENT_ATTACK_TIMEOUT, 5000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	sEventMgr.AddEvent(this, &Unit::CombatStatusHandler_UpdatePvPTimeout, EVENT_ATTACK_TIMEOUT, 15000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	m_lock.Release();
 }
 
