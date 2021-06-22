@@ -93,7 +93,7 @@ DEFINE_PACKET_HANDLER_METHOD( LFGJoinHandler )
 
 	PacketBuffer buffer;
 	Arcemu::GamePackets::LFG::SLFGJoinResult response;
-	response.result = Arcemu::GamePackets::LFG::SLFGJoinResult::LFG_JOIN_INTERNAL_ERROR;
+	response.result = Arcemu::GamePackets::LFG::SLFGJoinResult::LFG_JOIN_OK;
 	response.state = 0;
 	response.serialize( buffer );
 	_player->SendPacket( &buffer );
