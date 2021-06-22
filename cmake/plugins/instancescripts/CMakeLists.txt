@@ -8,6 +8,7 @@ PROJECT(InstanceScripts)
 SET( prefix ${SCRIPTS_PATH}/InstanceScripts )
 
 set(sources
+CreatureSpells.cpp
 Instance_Ahnkahet.cpp
 Instance_Arcatraz.cpp 
 Instance_AuchenaiCrypts.cpp 

@@ -2834,10 +2834,10 @@ void Unit::DoCastAOE(uint32 spellId, bool triggered)
 
 void Unit::DoCastVictim(uint32 spellId, bool triggered)
 {
-	if (!GetVictim() || IsCasting() && !triggered)
+	if (!GetAIInterface()->getNextTarget() || IsCasting() && !triggered)
 		return;
 
-	CastSpell(GetVictim(), spellId, triggered);
+	CastSpell(GetAIInterface()->getNextTarget(), spellId, triggered);
 }
 
 uint32 Unit::GetSpellDidHitResult(Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability)
@@ -4345,6 +4345,7 @@ void Unit::updateModeStatus()
                     SetBaseMana(proto->Mana);
                     SetMinDamage(proto->MinDamage);
                     SetMaxDamage(proto->MaxDamage);
+                    delete result;
                     return;
                 }
                 break;
@@ -4364,6 +4365,7 @@ void Unit::updateModeStatus()
                         SetBaseMana(proto->Mana);
                         SetMinDamage(proto->MinDamage);
                         SetMaxDamage(proto->MaxDamage);
+                        delete result;
                         return;
                     }
                     break;
@@ -4377,6 +4379,7 @@ void Unit::updateModeStatus()
                         SetBaseMana(proto->Mana);
                         SetMinDamage(proto->MinDamage);
                         SetMaxDamage(proto->MaxDamage);
+                        delete result;
                         return;
                     }
                     break;
@@ -4390,6 +4393,7 @@ void Unit::updateModeStatus()
                         SetBaseMana(proto->Mana);
                         SetMinDamage(proto->MinDamage);
                         SetMaxDamage(proto->MaxDamage);
+                        delete result;
                         return;
                     }
                     break;
@@ -7749,6 +7753,9 @@ void Unit::setAttackTimer(int32 time, bool offhand)
 
 bool Unit::isAttackReady(bool offhand)
 {
+    if (GetAIInterface()->getAIState() == STATE_CASTING) // Attack is not ready if we are casting a spell.
+        return false;
+
 	if(offhand)
 		return (Arcemu::Shared::Util::getMSTime() >= m_attackTimer_1) ? true : false;
 	else

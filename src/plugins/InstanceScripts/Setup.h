@@ -84,6 +84,8 @@ void SetupMagtheridonsLair(ScriptMgr* mgr);
 void SetupSunwellPlateau(ScriptMgr* pScriptMgr);
 void SetupWorldBosses(ScriptMgr* mgr);
 void SetupZulAman(ScriptMgr* mgr);
+
+void SetupCreatureSpells(ScriptMgr* mgr);
 //other
 //void SetupGenericAI(ScriptMgr * mgr);
 
