@@ -1024,6 +1024,19 @@ uint8 Spell::prepare(SpellCastTargets* targets)
 			}
 		}
 
+        if (!u_caster->IsPlayer()) //If caster is not a player we'll prevent movement
+        {
+            if (m_castTime > 0) // If casttime is higher then zero stop movement (if it's zero its insta cast)
+            {
+                if (!u_caster->isRooted()) // If we are not already rooted, root us.
+                {
+                    u_caster->GetAIInterface()->StopMovement(0); // Stop movement first
+                    u_caster->GetAIInterface()->SetAIState(STATE_CASTING);
+                    u_caster->Root(); // Prevent movement during a spellcast.
+                }
+            }
+        }
+
 		SendSpellStart();
 
 		// start cooldown handler
@@ -1715,6 +1728,9 @@ void Spell::AddTime(uint32 type)
 			return; //spells can only be delayed twice as of 3.0.2
 		if(m_spellState == SPELL_STATE_PREPARING)
 		{
+            //no pushback for creatures
+            if (u_caster && !u_caster->IsPlayer())
+                return;
 			// no pushback for some spells
 			if((GetProto()->InterruptFlags & CAST_INTERRUPT_PUSHBACK) == 0)
 				return;
@@ -1846,6 +1862,22 @@ void Spell::finish(bool successful)
 	if(u_caster != NULL)
 	{
 		CALL_SCRIPT_EVENT(u_caster, OnCastSpell)(GetProto()->Id);
+
+        if (!u_caster->IsPlayer()) //If caster is not a player we'll enable movement again
+        {
+            if (u_caster->isRooted()) // Check if we cannot move before removing it.
+            {
+                if (u_caster->CombatStatus.IsInCombat())
+                {
+                    u_caster->GetAIInterface()->SetAIState(STATE_ATTACKING);
+                }
+                else
+                {
+                    u_caster->GetAIInterface()->SetAIState(STATE_IDLE);
+                }
+                u_caster->Unroot();
+            }
+        }
 
 		u_caster->m_canMove = true;
 		// mana           channeled                                                     power type is mana                             if spell wasn't cast successfully, don't delay mana regeneration
