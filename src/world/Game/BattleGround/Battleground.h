@@ -75,6 +75,11 @@ class SERVER_DECL CBattleground : public EventableObject
 		bool m_isWeekend;
 
 	public:
+
+        bool m_bgHasFlag_A;
+        bool m_bgHasFlag_H;
+
+
 		void AddHonorToTeam( uint32 team, uint32 amount );
 
 		void CastSpellOnTeam( uint32 team, uint32 spell );

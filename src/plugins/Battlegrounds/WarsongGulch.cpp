@@ -74,6 +74,9 @@ WarsongGulch::WarsongGulch(MapMgr* mgr, uint32 id, uint32 lgroup, uint32 t) : CB
 
 	m_zoneid = 3277;
 
+    m_bgHasFlag_A = false;
+    m_bgHasFlag_H = false;
+
 }
 
 WarsongGulch::~WarsongGulch()
@@ -106,6 +109,14 @@ WarsongGulch::~WarsongGulch()
 
 	m_resurrectMap.clear();
 
+}
+
+void WarsongGulch::AddFocusedAssaultTimer(Player* plr)
+{
+}
+
+void WarsongGulch::AddBrutalAssaultTimer(Player* plr)
+{
 }
 
 void WarsongGulch::HookOnAreaTrigger(Player* plr, uint32 id)
@@ -165,6 +176,18 @@ void WarsongGulch::HookOnAreaTrigger(Player* plr, uint32 id)
 			return;
 		}
 
+        if (plr->m_bgHasFlag)
+        {
+            if (plr->GetTeam() == TEAM_ALLIANCE)
+            {
+                m_bgHasFlag_A = false;
+            }
+            else
+            {
+                m_bgHasFlag_H = false;
+            }
+        }
+
 		/* remove the bool from the player so the flag doesn't drop */
 		m_flagHolders[plr->GetTeam()] = 0;
 		plr->m_bgHasFlag = 0;
@@ -220,10 +243,22 @@ void WarsongGulch::HookOnAreaTrigger(Player* plr, uint32 id)
 			CastSpellOnTeam( m_winningteam, 69497 );
 			CastSpellOnTeam( m_winningteam, 69498 );
 
-			if( m_winningteam == TEAM_ALLIANCE )
-				AddHonorToTeam( TEAM_HORDE, 1 * 185 );
-			else
-				AddHonorToTeam( TEAM_ALLIANCE, 1 * 185 );
+            if (m_winningteam == TEAM_HORDE)
+            {
+                AddHonorToTeam(TEAM_HORDE, 1 * 185);
+                if (plr->wasRandomBG)
+                {
+                    plr->SetRBGWinner(true);
+                }
+            }
+            else
+            {
+                AddHonorToTeam(TEAM_ALLIANCE, 1 * 185);
+                if (plr->wasRandomBG)
+                {
+                    plr->SetRBGWinner(true);
+                }
+            }
 
 			m_mainLock.Release();
 		}
@@ -242,8 +277,8 @@ void WarsongGulch::EventReturnFlags()
 		if(m_homeFlags[x] != NULL)
 			m_homeFlags[x]->PushToWorld(m_mapMgr);
 	}
-	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Alliance's flag is now placed at her base.");
-	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Horde's flag is now placed at her base.");
+	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Alliance flag is now placed at the base.");
+	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Horde flag is now placed at the base.");
 }
 
 void WarsongGulch::HookOnFlagDrop(Player* plr)
@@ -322,6 +357,12 @@ void WarsongGulch::HookFlagDrop(Player* plr, GameObject* obj)
 	m_flagHolders[plr->GetTeam()] = plr->GetLowGUID();
 	plr->m_bgHasFlag = true;
 
+    if (plr->GetTeam() == TEAM_ALLIANCE)
+        m_bgHasFlag_A = true;
+    else
+        m_bgHasFlag_H = true;
+
+
 	/* This is *really* strange. Even though the A9 create sent to the client is exactly the same as the first one, if
 	 * you spawn and despawn it, then spawn it again it will not show. So we'll assign it a new guid, hopefully that
 	 * will work.
@@ -335,9 +376,9 @@ void WarsongGulch::HookFlagDrop(Player* plr, GameObject* obj)
 	sp->prepare(&targets);
 	SetWorldState(plr->IsTeamHorde() ? WORLDSTATE_WSG_ALLIANCE_FLAG_DISPLAY : WORLDSTATE_WSG_HORDE_FLAG_DISPLAY, 2);
 	if(plr->IsTeamHorde())
-		SendChatMessage(CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "The Alliance's flag has been taken by %s !", plr->GetName());
+		SendChatMessage(CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "The Alliance flag was picked up by %s !", plr->GetName());
 	else
-		SendChatMessage(CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "The Horde's flag has been taken by %s !", plr->GetName());
+		SendChatMessage(CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "The Horde flag was picked up by %s !", plr->GetName());
 }
 
 void WarsongGulch::ReturnFlag(uint32 team)
@@ -424,7 +465,20 @@ void WarsongGulch::OnRemovePlayer(Player* plr)
 	if(plr->m_bgHasFlag)
 		HookOnMount(plr);
 
+    if (plr->m_bgHasFlag)
+    {
+        if (plr->GetTeam() == TEAM_ALLIANCE)
+        {
+            m_bgHasFlag_A = false;
+        }
+        else
+        {
+            m_bgHasFlag_H = false;
+        }
+    }
+
 	plr->RemoveAura(BG_PREPARATION);
+    plr->wasRandomBG = false;
 }
 
 LocationVector WarsongGulch::GetStartingCoords(uint32 Team)
@@ -438,6 +492,18 @@ LocationVector WarsongGulch::GetStartingCoords(uint32 Team)
 void WarsongGulch::HookOnPlayerDeath(Player* plr)
 {
 	plr->m_bgScore.Deaths++;
+
+    if (plr->m_bgHasFlag)
+    {
+        if (plr->GetTeam() == TEAM_ALLIANCE)
+        {
+            m_bgHasFlag_A = false;
+        }
+        else
+        {
+            m_bgHasFlag_H = false;
+        }
+    }
 
 	/* do we have the flag? */
 	if(plr->m_bgHasFlag)
@@ -597,8 +663,8 @@ void WarsongGulch::OnStart()
 			m_homeFlags[i]->PushToWorld(m_mapMgr);
 	}
 
-	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Alliance's flag is now placed at her base.");
-	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Horde's flag is now placed at her base.");
+	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Alliance flag is now placed at the base.");
+	SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The Horde flag is now placed at the base.");
 
 	/* correct? - burlex */
 	PlaySoundToAll(SOUND_BATTLEGROUND_BEGIN);

@@ -880,10 +880,14 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 		CastSpellOnTeam( m_winningteam, 43477 );
 		CastSpellOnTeam( m_winningteam, 69156 );
 
-		if( m_winningteam == TEAM_ALLIANCE )
-			AddHonorToTeam( TEAM_HORDE, 1 * 185 );
-		else
-			AddHonorToTeam( TEAM_ALLIANCE, 1 * 185 );
+        if (m_winningteam == TEAM_HORDE)
+        {
+            AddHonorToTeam(TEAM_HORDE, 1 * 185);
+        }
+        else
+        {
+            AddHonorToTeam(TEAM_ALLIANCE, 1 * 185);
+        }
 
 		m_mainLock.Release();
 		SetWorldState(WORLDSTATE_EOTS_ALLIANCE_VICTORYPOINTS + team, m_points[team]);

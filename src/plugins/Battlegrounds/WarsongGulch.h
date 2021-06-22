@@ -33,6 +33,9 @@ class WarsongGulch : public CBattleground
 		WarsongGulch(MapMgr* mgr, uint32 id, uint32 lgroup, uint32 t);
 		~WarsongGulch();
 
+
+        void AddFocusedAssaultTimer(Player* plr);
+        void AddBrutalAssaultTimer(Player* plr);
 		void HookOnPlayerDeath(Player* plr);
 		void HookFlagDrop(Player* plr, GameObject* obj);
 		void HookFlagStand(Player* plr, GameObject* obj);

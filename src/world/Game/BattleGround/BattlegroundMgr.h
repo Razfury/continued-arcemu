@@ -63,6 +63,16 @@ enum BattleGroundTypes
     BATTLEGROUND_NUM_TYPES			= 33, //Based on BattlemasterList.dbc, make the storage arrays big enough! On 3.1.3 the last one was 11 The Ring of Valor, so 12 was enough here, but on 3.2.0 there is 32 All Battlegrounds!
 };
 
+enum BattleGroundRandomRewards
+{
+	BG_REWARD_WINNER_HONOR_FIRST = 30,
+	BG_REWARD_WINNER_ARENA_FIRST = 25,
+	BG_REWARD_WINNER_HONOR_LAST = 15,
+	BG_REWARD_WINNER_ARENA_LAST = 0,
+	BG_REWARD_LOOSER_HONOR_FIRST = 5,
+	BG_REWARD_LOOSER_HONOR_LAST = 5
+};
+
 #define IS_ARENA(x) ( (x) >= BATTLEGROUND_ARENA_2V2 && (x) <= BATTLEGROUND_ARENA_5V5 )
 
 enum BattleGroundMasterTypes

@@ -855,6 +855,15 @@ class SERVER_DECL Player : public Unit
 
 		void EventGroupFullUpdate();
 
+        inline float hk_honor_at_level(uint32 level, uint32 count = 1)
+        {
+            return (float)ceil(count * (-0.53177f + 0.59357f * exp((level + 23.54042f) / 26.07859f)));
+        }
+
+        bool m_IsRBGWinner;
+        bool getRBGWinner() { return m_IsRBGWinner; }
+        void SetRBGWinner(bool isWinner);
+
 		/************************************************************************/
 		/* Skill System															*/
 		/************************************************************************/
@@ -1647,6 +1656,8 @@ class SERVER_DECL Player : public Unit
 		CBattleground* m_pendingBattleground;
 		
 		EntryPoint m_entryPoint;
+
+        bool wasRandomBG;
 
 		bool m_bgHasFlag;
 		bool m_bgIsQueued;

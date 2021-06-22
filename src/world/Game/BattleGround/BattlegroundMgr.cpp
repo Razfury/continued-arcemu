@@ -77,6 +77,12 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession* m_session,
 {
 	WorldPacket data(SMSG_BATTLEFIELD_LIST, 18);
 
+	uint32 win_kills = m_session->GetPlayer()->getRBGWinner() ? BG_REWARD_WINNER_HONOR_LAST : BG_REWARD_WINNER_HONOR_FIRST;
+	uint32 win_arena = m_session->GetPlayer()->getRBGWinner() ? BG_REWARD_WINNER_ARENA_LAST : BG_REWARD_WINNER_ARENA_FIRST;
+	uint32 loss_kills = m_session->GetPlayer()->getRBGWinner() ? BG_REWARD_LOOSER_HONOR_LAST : BG_REWARD_LOOSER_HONOR_FIRST;
+	win_kills = (uint32)m_session->GetPlayer()->hk_honor_at_level(m_session->GetPlayer()->getLevel(), win_kills * 4);
+	loss_kills = (uint32)m_session->GetPlayer()->hk_honor_at_level(m_session->GetPlayer()->getLevel(), loss_kills * 4);
+
 	// Send 0 instead of GUID when using the BG UI instead of Battlemaster
 	if(from == 0)
 		data << uint64(m_session->GetPlayer()->GetGUID());
@@ -89,10 +95,10 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession* m_session,
 	data << uint8(0);                                      // unk
 
 	// Rewards
-	data << uint8(0);                                      // 3.3.3 hasWin
-	data << uint32(0);                                     // 3.3.3 winHonor
-	data << uint32(0);                                     // 3.3.3 winArena
-	data << uint32(0);                                     // 3.3.3 lossHonor
+	data << uint8(m_session->GetPlayer()->getRBGWinner());         // 3.3.3 hasWin
+	data << uint32(win_kills);                                     // 3.3.3 winHonor
+	data << uint32(win_arena);                                     // 3.3.3 winArena
+	data << uint32(loss_kills);                                    // 3.3.3 lossHonor
 
 	uint8 isRandom = 0;
 	data << uint8(isRandom);                               // 3.3.3 isRandom
@@ -101,10 +107,10 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession* m_session,
 	if(isRandom == 1)
 	{
 		// rewards
-		data << uint8(0);                                  // win random
-		data << uint32(0);                                 // Reward honor if won
-		data << uint32(0);                                 // Reward arena point if won
-		data << uint32(0);                                 // Lost honor if lost
+		data << uint8(m_session->GetPlayer()->getRBGWinner());     // win random
+		data << uint32(win_kills);                                 // Reward honor if won
+		data << uint32(win_arena);                                 // Reward arena point if won
+		data << uint32(loss_kills);                                // Lost honor if lost
 	}
 
 	if(IS_ARENA(BattlegroundType))
@@ -146,12 +152,36 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession* m_session, World
 	uint32 lgroup = GetLevelGrouping(m_session->GetPlayer()->getLevel());
 	uint32 bgtype;
 	uint32 instance;
+    bool _isRandom = false;
 
 	pck >> guid >> bgtype >> instance;
 
-	// Random battlegrounds aren't yet implemented
-	if( bgtype == BATTLEGROUND_RANDOM )
-		return;
+	// Random battlegrounds that are supported right now
+    if (bgtype == BATTLEGROUND_RANDOM)
+    {
+        switch (urand(0, 5))
+        {
+        case 0: // Warsong Gulch
+            bgtype == BATTLEGROUND_WARSONG_GULCH;
+            break;
+        case 1: // Arathi Basin
+            bgtype == BATTLEGROUND_ARATHI_BASIN;
+            break;
+        case 2: // Eye of the Storm
+            bgtype == BATTLEGROUND_EYE_OF_THE_STORM;
+            break;
+        case 3: // Alterac Valley
+            bgtype == BATTLEGROUND_ALTERAC_VALLEY;
+            break;
+        case 4: // Isle of Conquest
+            bgtype == BATTLEGROUND_ISLE_OF_CONQUEST;
+            break;
+        case 5: // Strand of Ancients
+            bgtype == BATTLEGROUND_STRAND_OF_THE_ANCIENT;
+            break;
+        }
+        _isRandom = true;
+    }
 
 	if( ( bgtype >= BATTLEGROUND_NUM_TYPES ) || ( bgtype == 0 ) ||
 		( ( bgMaps.find( bgtype ) == bgMaps.end() ) && bgtype != BATTLEGROUND_RANDOM ) )
@@ -184,13 +214,22 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession* m_session, World
 	Log.Notice("BattlegroundManager", "Player %u is now in battleground queue for instance %u", m_session->GetPlayer()->GetLowGUID(), (instance + 1));
 
 	/* send the battleground status packet */
-	SendBattlefieldStatus(m_session->GetPlayer(), BGSTATUS_INQUEUE, bgtype, instance, 0, bgMaps[bgtype], 0);
+    if (_isRandom) // We have random selection based up top but we need to "trick" the queue so it says random bg instead of what the BG name is
+    {
+        SendBattlefieldStatus(m_session->GetPlayer(), BGSTATUS_INQUEUE, BATTLEGROUND_RANDOM, instance, 0, bgMaps[bgtype], 0);
+    }
+    else
+    {
+        SendBattlefieldStatus(m_session->GetPlayer(), BGSTATUS_INQUEUE, bgtype, instance, 0, bgMaps[bgtype], 0);
+    }
 	m_session->GetPlayer()->m_bgIsQueued = true;
 	m_session->GetPlayer()->m_bgQueueInstanceId = instance;
 	m_session->GetPlayer()->m_bgQueueType = bgtype;
 
 	/* Set battleground entry point */
 	m_session->GetPlayer()->saveEntryPoint();
+
+    _isRandom = false;
 
 	m_queueLock.Release();
 
