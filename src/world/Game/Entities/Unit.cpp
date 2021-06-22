@@ -7753,7 +7753,7 @@ void Unit::setAttackTimer(int32 time, bool offhand)
 
 bool Unit::isAttackReady(bool offhand)
 {
-    if (GetAIInterface()->getAIState() == STATE_CASTING) // Attack is not ready if we are casting a spell.
+    if (!IsPlayer() && (GetAIInterface()->getAIState() == STATE_CASTING) | (IsCasting())) // Attack is not ready if we are casting a spell.
         return false;
 
 	if(offhand)
