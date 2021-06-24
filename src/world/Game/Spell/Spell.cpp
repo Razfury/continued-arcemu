@@ -1024,7 +1024,7 @@ uint8 Spell::prepare(SpellCastTargets* targets)
 			}
 		}
 
-        if (!u_caster->IsPlayer()) //If caster is not a player we'll prevent movement
+        if (u_caster != NULL && !u_caster->IsPlayer()) //If caster is not a player we'll prevent movement
         {
             if (m_castTime > 0) // If casttime is higher then zero stop movement (if it's zero its insta cast)
             {
