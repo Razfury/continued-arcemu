@@ -162,22 +162,22 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession* m_session, World
         switch (urand(0, 5))
         {
         case 0: // Warsong Gulch
-            bgtype == BATTLEGROUND_WARSONG_GULCH;
+            bgtype = BATTLEGROUND_WARSONG_GULCH;
             break;
         case 1: // Arathi Basin
-            bgtype == BATTLEGROUND_ARATHI_BASIN;
+            bgtype = BATTLEGROUND_ARATHI_BASIN;
             break;
         case 2: // Eye of the Storm
-            bgtype == BATTLEGROUND_EYE_OF_THE_STORM;
+            bgtype = BATTLEGROUND_EYE_OF_THE_STORM;
             break;
         case 3: // Alterac Valley
-            bgtype == BATTLEGROUND_ALTERAC_VALLEY;
+            bgtype = BATTLEGROUND_ALTERAC_VALLEY;
             break;
         case 4: // Isle of Conquest
-            bgtype == BATTLEGROUND_ISLE_OF_CONQUEST;
+            bgtype = BATTLEGROUND_ISLE_OF_CONQUEST;
             break;
         case 5: // Strand of Ancients
-            bgtype == BATTLEGROUND_STRAND_OF_THE_ANCIENT;
+            bgtype = BATTLEGROUND_STRAND_OF_THE_ANCIENT;
             break;
         }
         _isRandom = true;
