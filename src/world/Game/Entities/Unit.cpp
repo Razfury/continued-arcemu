@@ -7227,6 +7227,20 @@ bool CombatStatusHandler::IsInCombat() const
 	}
 }
 
+void Unit::awardAchievement(uint32 achievementid)
+{
+    for (PlayerStorageMap::iterator itr = GetMapMgr()->m_PlayerStorage.begin(); itr != GetMapMgr()->m_PlayerStorage.end(); ++itr)
+    {
+        if ((*itr).second->GetAchievementMgr().HasCompleted(achievementid))
+            return;
+
+        if ((*itr).second->GetInstanceID() == GetInstanceID())
+        {
+            (*itr).second->GetAchievementMgr().GMCompleteAchievement(NULL, achievementid);
+        }
+    };
+}
+
 void Unit::CombatStatusHandler_ResetPvPTimeout()
 {
 	if(!IsPlayer())
@@ -7753,7 +7767,7 @@ void Unit::setAttackTimer(int32 time, bool offhand)
 
 bool Unit::isAttackReady(bool offhand)
 {
-    if (!IsPlayer() && (GetAIInterface()->getAIState() == STATE_CASTING) | (IsCasting())) // Attack is not ready if we are casting a spell.
+    if (!IsPlayer() && IsCasting()) // Attack is not ready if we are casting a spell.
         return false;
 
 	if(offhand)

@@ -1085,6 +1085,8 @@ class SERVER_DECL Unit : public Object
 		void stopAttack(Unit* pVictim);
 		void stopAttack(uint64 victimGuid);
 
+        void awardAchievement(uint32 achievementid);
+
 		bool IsDazed();
 		//this function is used for creatures to get chance to daze for another unit
 		float get_chance_to_daze(Unit* target);
