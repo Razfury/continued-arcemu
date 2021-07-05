@@ -877,6 +877,10 @@ uint8 Spell::DidHit(uint32 effindex, Unit* target)
 	if(hasAttribute(ATTRIBUTES_IGNORE_INVULNERABILITY))
 		resistchance = 0.0f;
 
+    //If the spell has flags that the spell cannot be resisted.
+    if (GetProto()->spell_cannot_be_resist == true)
+        return SPELL_DID_HIT_SUCCESS;
+
 	if(resistchance >= 100.0f)
 		return SPELL_DID_HIT_RESIST;
 	else
@@ -1023,6 +1027,17 @@ uint8 Spell::prepare(SpellCastTargets* targets)
 				p_caster->m_stealth = 0;
 			}
 		}
+
+        //Spell damage overrides
+        if (p_caster != NULL && p_caster->IsPlayer())
+        {
+            uint32 new_dmg = 0;
+            if (GetProto()->Id == 25742)
+            {
+                new_dmg += p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND)->GetProto()->Delay / 1000 * (0.022 * p_caster->GetAP() + 0.044 * p_caster->GetSpellPower(SCHOOL_HOLY));
+                GetProto()->EffectBasePoints[0] = new_dmg;
+            }
+        }
 
         if (u_caster != NULL && !u_caster->IsPlayer()) //If caster is not a player we'll prevent movement
         {

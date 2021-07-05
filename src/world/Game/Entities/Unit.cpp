@@ -2816,6 +2816,29 @@ void Unit::CalculateResistanceReduction(Unit* pVictim, dealdamage* dmg, SpellEnt
 	}
 }
 
+Unit* Unit::getThreatListRandomTarget()
+{
+    vector< uint32 > possible_targets;
+    for (set< Object* >::iterator iter = GetInRangeSetBegin(); iter != GetInRangeSetEnd(); ++iter)
+    {
+        if ((*iter) && (TO< Unit* >(*iter))->isAlive())
+            possible_targets.push_back((uint32)(*iter)->GetGUID());
+    }
+    if (possible_targets.size() > 0)
+    {
+        uint32 random_player = possible_targets[Rand(uint32(possible_targets.size() - 1))];
+        return GetMapMgr()->GetUnit(random_player);
+    }
+
+    if (possible_targets.size() == 0) // Nothing was found still so just get current victim
+    {
+        if (GetAIInterface()->getNextTarget())
+            return GetAIInterface()->getNextTarget();
+    }
+
+    return NULL;
+}
+
 void Unit::DoCast(Unit* victim, uint32 spellId, bool triggered)
 {
 	if (!victim || IsCasting() && !triggered)
@@ -4892,6 +4915,16 @@ void Unit::DespawnCombatSummons()
     combatSummon6GUID = 0;
 }
 
+SpellEntry* Unit::GetSpellInfo(uint32 spellid)
+{
+    if (spellid > 0)
+    {
+        return dbcSpell.LookupEntry(spellid);
+    }
+    else
+        return NULL;
+}
+
 bool Unit::RemoveAuraSpecial(uint32 spellId)
 {
     for (uint32 x = MAX_TOTAL_AURAS_START; x < MAX_TOTAL_AURAS_END; x++)
@@ -5250,6 +5283,14 @@ void Unit::HandleEnchantmentProcs(Unit* target, Player*  plr)
     }
 }
 
+uint32 Unit::GetSpellPower(uint32 school)
+{
+    if (!IsPlayer())
+        return NULL;
+
+    return TO_PLAYER(this)->GetPosDamageDoneMod(school);
+}
+
 void Unit::HandleSealProcs(uint64 targetGUID)
 {
     if (!IsPlayer())
@@ -5260,11 +5301,6 @@ void Unit::HandleSealProcs(uint64 targetGUID)
 
     uint32 spellid = 0;
     uint32 procchance = 100;
-
-    if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_RIGHTEOUSNESS))
-    {
-        CastSpell(targetGUID, 25742, true);
-    }
 
     if (HasAurasWithNameHash(SPELL_HASH_SEAL_OF_JUSTICE))
     {

@@ -1087,6 +1087,12 @@ class SERVER_DECL Unit : public Object
 
         void awardAchievement(uint32 achievementid);
 
+        Unit* getThreatListRandomTarget();
+
+        SpellEntry* GetSpellInfo(uint32 spellid);
+
+        uint32 GetSpellPower(uint32 school);
+
 		bool IsDazed();
 		//this function is used for creatures to get chance to daze for another unit
 		float get_chance_to_daze(Unit* target);
@@ -1105,6 +1111,62 @@ class SERVER_DECL Unit : public Object
 		bool m_invisible;
 		uint8 m_invisFlag;
 		int32 m_invisDetect[INVIS_FLAG_TOTAL];
+
+        uint32 cstarget0 = 0;
+        uint32 cstarget1 = 0;
+        uint32 cstarget2 = 0;
+        uint32 cstarget3 = 0;
+        uint32 cstarget4 = 0;
+        uint32 cstarget5 = 0;
+        uint32 cstarget6 = 0;
+
+        uint32 startcd_min0 = 0;
+        uint32 startcd_min1 = 0;
+        uint32 startcd_min2 = 0;
+        uint32 startcd_min3 = 0;
+        uint32 startcd_min4 = 0;
+        uint32 startcd_min5 = 0;
+        uint32 startcd_min6 = 0;
+
+        uint32 startcd_max0 = 0;
+        uint32 startcd_max1 = 0;
+        uint32 startcd_max2 = 0;
+        uint32 startcd_max3 = 0;
+        uint32 startcd_max4 = 0;
+        uint32 startcd_max5 = 0;
+        uint32 startcd_max6 = 0;
+
+        uint32 combatcd_min0 = 0;
+        uint32 combatcd_min1 = 0;
+        uint32 combatcd_min2 = 0;
+        uint32 combatcd_min3 = 0;
+        uint32 combatcd_min4 = 0;
+        uint32 combatcd_min5 = 0;
+        uint32 combatcd_min6 = 0;
+
+        uint32 combatcd_max0 = 0;
+        uint32 combatcd_max1 = 0;
+        uint32 combatcd_max2 = 0;
+        uint32 combatcd_max3 = 0;
+        uint32 combatcd_max4 = 0;
+        uint32 combatcd_max5 = 0;
+        uint32 combatcd_max6 = 0;
+
+        uint32 csspellid0 = 0;
+        uint32 csspellid1 = 0;
+        uint32 csspellid2 = 0;
+        uint32 csspellid3 = 0;
+        uint32 csspellid4 = 0;
+        uint32 csspellid5 = 0;
+        uint32 csspellid6 = 0;
+
+        uint32 csspellpos0 = 0;
+        uint32 csspellpos1 = 0;
+        uint32 csspellpos2 = 0;
+        uint32 csspellpos3 = 0;
+        uint32 csspellpos4 = 0;
+        uint32 csspellpos5 = 0;
+        uint32 csspellpos6 = 0;
 
 		//************************************************************************************************************************
 		// AURAS

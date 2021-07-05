@@ -292,6 +292,7 @@ void ApplyNormalFixes()
         sp->AP_coef_override = 0;
         sp->RAP_coef_override = 0;
         sp->aura_remove_flags = 0;
+        sp->spell_cannot_be_resist = false;
 
 		talentSpellIterator = talentSpells.find(sp->Id);
 		if(talentSpellIterator == talentSpells.end())
@@ -2139,6 +2140,11 @@ void ApplyNormalFixes()
 
         case 20154: // Seal of Righteousness
         case 21084: // Seal of Righteousness
+        {
+            sp->Effect[0] = sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            sp->EffectApplyAuraName[0] = sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+            sp->spell_cannot_be_resist = true;
+        }break;
         case 20164: // Seal of Justice
         case 20165: // Seal of Light
         case 20166: // Seal of Wisdom
