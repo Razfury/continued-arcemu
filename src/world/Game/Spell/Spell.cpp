@@ -1032,7 +1032,7 @@ uint8 Spell::prepare(SpellCastTargets* targets)
         if (p_caster != NULL && p_caster->IsPlayer())
         {
             uint32 new_dmg = 0;
-            if (GetProto()->Id == 25742)
+            if (GetProto()->Id == 25742) // Seal of Righteousness (dmg effect)
             {
                 new_dmg += p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND)->GetProto()->Delay / 1000 * (0.022 * p_caster->GetAP() + 0.044 * p_caster->GetSpellPower(SCHOOL_HOLY));
                 GetProto()->EffectBasePoints[0] = new_dmg;
