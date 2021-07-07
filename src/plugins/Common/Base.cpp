@@ -90,6 +90,7 @@ AICreatureScript::AICreatureScript(Creature* pCreature) : CreatureAIScript(pCrea
 	mAIUpdateFrequency = DEFAULT_UPDATE_FREQUENCY;
 	mBaseAttackTime = _unit->GetBaseAttackTime(MELEE);
 	mDespawnWhenInactive = false;
+    _AIPhase = 0;
 }
 
 AICreatureScript::~AICreatureScript()
@@ -1092,6 +1093,7 @@ void AICreatureScript::EnterCombat(Unit* pTarget)
 void AICreatureScript::OnCombatStop(Unit* pTarget)
 {
 	events.Reset();
+    _AIPhase = 0;
 	CancelAllSpells();
 	CancelAllTimers();
 	RemoveAllEvents();

@@ -708,6 +708,7 @@ class AICreatureScript : public CreatureAIScript
 
 
 		//Status
+        uint32                  _AIPhase;
 		void					ClearHateList();
 		void					WipeHateList();
 		int32					GetHealthPercent();
