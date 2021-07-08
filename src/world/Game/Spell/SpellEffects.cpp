@@ -731,8 +731,8 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 						if(unitTarget && unitTarget->IsCreature())
 						{
 							uint32 type = TO_CREATURE(unitTarget)->GetCreatureInfo()->Type;
-							if(type == UNIT_TYPE_UNDEAD || type == UNIT_TYPE_DEMON)
-								force_crit = true;
+                            if (type == UNIT_TYPE_UNDEAD || type == UNIT_TYPE_DEMON)
+                                GetProto()->spell_special_always_critical = true;
 						}
 					}
 				}

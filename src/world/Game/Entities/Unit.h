@@ -1336,6 +1336,7 @@ class SERVER_DECL Unit : public Object
 		SummonHandler summonhandler;
 
 		Unit* GetVictim() const { return m_attacking; }
+        Unit* GetCurrentVictim();
 		void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
 		void DoCastAOE(uint32 spellId, bool triggered = false);
 		void DoCastVictim(uint32 spellId, bool triggered = false);

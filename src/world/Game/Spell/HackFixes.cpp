@@ -293,6 +293,7 @@ void ApplyNormalFixes()
         sp->RAP_coef_override = 0;
         sp->aura_remove_flags = 0;
         sp->spell_cannot_be_resist = false;
+        sp->spell_special_always_critical = false;
 
 		talentSpellIterator = talentSpells.find(sp->Id);
 		if(talentSpellIterator == talentSpells.end())

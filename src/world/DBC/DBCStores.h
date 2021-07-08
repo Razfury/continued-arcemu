@@ -821,6 +821,8 @@ struct SpellEntry
 	bool   is_ranged_spell;                 //!!! CUSTOM,
     bool   spell_can_crit;                //!!! CUSTOM
 	bool   noproc;
+    bool   spell_cannot_be_resist;
+    bool   spell_special_always_critical;
 
 	uint32 SchoolMask;                      // Custom
 	uint32 CustomFlags;						// Custom

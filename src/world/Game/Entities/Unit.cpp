@@ -5283,6 +5283,12 @@ void Unit::HandleEnchantmentProcs(Unit* target, Player*  plr)
     }
 }
 
+Unit* Unit::GetCurrentVictim()
+{
+    if (GetAIInterface()->getNextTarget())
+        return GetAIInterface()->getNextTarget();
+}
+
 uint32 Unit::GetSpellPower(uint32 school)
 {
     if (!IsPlayer())
@@ -8484,6 +8490,13 @@ bool Unit::IsCriticalDamageForSpell(Object* victim, SpellEntry* spell)
 		if( !HasAura(55447) )	// Glyph of Flame Shock
 			fs->Remove();
 	}
+
+    //If a spell is always a critical. This is already handled before getting here.
+    if (spell->spell_special_always_critical)
+    {
+        result = true;
+        spell->spell_special_always_critical = false; // Set back to false.
+    }
 
     // If a spell has custom spellflags that cannot crit result is always false.
     if (spell->spell_can_crit == false)
