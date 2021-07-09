@@ -1073,7 +1073,6 @@ class SERVER_DECL Unit : public Object
 
 		bool IsCasting();
 		bool IsInInstance();
-		void CalculateResistanceReduction(Unit* pVictim, dealdamage* dmg, SpellEntry* ability, float ArmorPctReduce) ;
 		void RegenerateHealth();
 		void RegeneratePower(bool isinterrupted);
 		void setHRegenTimer(uint32 time) {m_H_regenTimer = static_cast<uint16>(time); }
@@ -1334,6 +1333,9 @@ class SERVER_DECL Unit : public Object
 		uint32 m_countHelper;
 
 		SummonHandler summonhandler;
+
+        double GetResistanceReducion(Unit* pVictim, uint32 type, float armorReducePct);
+        void CalculateResistanceReduction(Unit* pVictim, dealdamage *dmg, SpellEntry* ability, float armorreducepct);
 
 		Unit* GetVictim() const { return m_attacking; }
         Unit* GetCurrentVictim();
