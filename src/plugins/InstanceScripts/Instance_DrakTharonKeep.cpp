@@ -215,7 +215,7 @@ class TrollgoreAI : public AICreatureScript
 		events.ScheduleEvent(EVENT_CONSUME, 15000);
 		events.ScheduleEvent(EVENT_CRUSH, urand(1000, 5000));
 		events.ScheduleEvent(EVENT_INFECTED_WOUND, urand(10000, 60000));
-		events.ScheduleEvent(EVENT_CORPSE_EXPLODE, 3000);
+		//events.ScheduleEvent(EVENT_CORPSE_EXPLODE, 3000);
 		events.ScheduleEvent(EVENT_SPAWN, urand(30000, 40000));
 		ParentClass::EnterCombat(pTarget);
 	};
@@ -229,6 +229,12 @@ class TrollgoreAI : public AICreatureScript
 	void JustDied(Unit* pKiller)
 	{
 		Emote("Braaaagh!", Text_Yell, 13183);
+
+        if (IsHeroic() && _consumptionJunction)
+        {
+            _unit->awardAchievement(2151);
+        }
+
 		ParentClass::JustDied(pKiller);
 	}
 
@@ -240,9 +246,30 @@ class TrollgoreAI : public AICreatureScript
 		ParentClass::OnCombatStop(pTarget);
 	};
 
+    void CheckSummonStatus()
+    {
+        if (ForceCreatureFind(27709))
+        {
+            if (ForceCreatureFind(27709)->CombatStatus.IsInCombat() == false)
+                ForceCreatureFind(27709)->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1);
+        }
+        if (ForceCreatureFind(27753))
+        {
+            if (ForceCreatureFind(27753)->CombatStatus.IsInCombat() == false)
+                ForceCreatureFind(27753)->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1);
+        }
+        if (ForceCreatureFind(27754))
+        {
+            if (ForceCreatureFind(27754)->CombatStatus.IsInCombat() == false)
+                ForceCreatureFind(27754)->GetAIInterface()->AttackReaction(GetRandomPlayerTarget(), 1);
+        }
+    }
+
 	void UpdateAI()
 	{
 		events.Update(1000);
+
+        CheckSummonStatus();
 
 		if (_unit->IsCasting())
 			return;
@@ -269,13 +296,23 @@ class TrollgoreAI : public AICreatureScript
 				DoCastAOE(SPELL_CORPSE_EXPLODE);
 				events.ScheduleEvent(EVENT_CORPSE_EXPLODE, urand(15000, 19000));
 				break;*/
-			/*case EVENT_SPAWN:
-				for (uint8 i = 0; i < 3; ++i)
-					if (Creature* trigger = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TROLLGORE_INVADER_SUMMONER_1 + i)))
-						trigger->CastSpell(trigger, RAND(SPELL_SUMMON_INVADER_A, SPELL_SUMMON_INVADER_B, SPELL_SUMMON_INVADER_C), true, NULL, NULL, me->GetGUID());
-
+			case EVENT_SPAWN:
+                switch (urand(0, 2))
+                {
+                case 0:
+                    _unit->CastSpell(_unit, SPELL_SUMMON_INVADER_A, true);
+                    break;
+                case 1:
+                    _unit->CastSpell(_unit, SPELL_SUMMON_INVADER_B, true);
+                    break;
+                case 2:
+                    _unit->CastSpell(_unit, SPELL_SUMMON_INVADER_C, true);
+                    break;
+                default:
+                    break;
+                }
 				events.ScheduleEvent(EVENT_SPAWN, urand(30000, 40000));
-				break;*/
+				break;
 			default:
 				break;
 			}
@@ -360,9 +397,6 @@ class NovosTheSummonerAI : public AICreatureScript
 		_unit->CastSpell(_unit, SPELL_BEAM_CHANNEL, true);
 		_unit->CastSpell(_unit, 47346, false);
 		SpawnCreature(NPC_CRYSTAL_CHANNEL_TARGET, -378.40f, -813.13f, 59.74f, 0.0f);
-
-		_unit->SetUInt64Value(UNIT_FIELD_TARGET, 0);
-		//_unit->RemoveAllAuras();
 		_unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
@@ -808,12 +842,14 @@ class npc_drakkari_gutripper : public AICreatureScript
 
 		void JustDied(Unit* killer) override
 		{
-			if (Creature* Dred = _unit->GetMapMgr()->GetCreature(instance->GetInstance()->m_BossGUID3))
-				Dred->GetAIInterface()->DoAction(ACTION_RAPTOR_KILLED);
+            if (GetInstanceScript())
+            {
+                Creature* Dred = _unit->GetMapMgr()->GetCreature(GetInstanceScript()->GetInstance()->m_BossGUID3);
+                if (Dred && Dred->CombatStatus.IsInCombat())
+                    Dred->GetAIInterface()->DoAction(ACTION_RAPTOR_KILLED);
+            }
 			ParentClass::JustDied(killer);
 		}
-private:
-	InstanceScript* instance;
 };
 
 class npc_drakkari_scytheclaw : public AICreatureScript
@@ -850,12 +886,14 @@ public:
 
 	void JustDied(Unit* killer) override
 	{
-		if (Creature* Dred = _unit->GetMapMgr()->GetCreature(instance->GetInstance()->m_BossGUID3))
-			Dred->GetAIInterface()->DoAction(ACTION_RAPTOR_KILLED);
+        if (GetInstanceScript())
+        {
+            Creature* Dred = _unit->GetMapMgr()->GetCreature(GetInstanceScript()->GetInstance()->m_BossGUID3);
+            if (Dred && Dred->CombatStatus.IsInCombat())
+                Dred->GetAIInterface()->DoAction(ACTION_RAPTOR_KILLED);
+        }
 		ParentClass::JustDied(killer);
 	}
-private:
-	InstanceScript* instance;
 };
 
 /*
