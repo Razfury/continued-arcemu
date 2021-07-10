@@ -1087,6 +1087,14 @@ uint8 Spell::prepare(SpellCastTargets* targets)
 	return ccr;
 }
 
+bool Spell::IsBinary(SpellEntry * sp)
+{
+    // Normally, damage spells are only binary if they have an additional non-damage effect
+    // DoTs used to be binary spells, but this was changed. (WoWwiki)
+    return !(sp->Effect[0] == SPELL_EFFECT_SCHOOL_DAMAGE ||
+        sp->EffectApplyAuraName[0] == SPELL_AURA_PERIODIC_DAMAGE);
+}
+
 void Spell::resultcancel(uint8 result, bool sendInterrupted)
 {
     if (m_spellState == SPELL_STATE_FINISHED)

@@ -1991,6 +1991,8 @@ class SERVER_DECL Spell : public EventableObject
 		bool IsAspect();
 		bool IsSeal();
 
+        static bool IsBinary(SpellEntry * sp);
+
 		ARCEMU_INLINE SpellEntry* GetProto() { return (m_spellInfo_override == NULL) ?  m_spellInfo : m_spellInfo_override; }
 		void InitProtoOverride()
 		{
