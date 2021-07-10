@@ -164,7 +164,11 @@ bool Object::SetPosition(float newX, float newY, float newZ, float newOrientatio
 	{
 		m_lastMapUpdatePosition.ChangeCoords(newX, newY, newZ, newOrientation);
         m_mapMgr->ChangeObjectLocation(this);
-        //m_mapMgr->VisitCoords(newX, newY, this); // This is our mapcell "helper" helps us visit cells past the limit until we come up with a better solution
+
+        if (this && this->IsPlayer() && !TO_PLAYER(this)->CombatStatus.IsInCombat())
+        {
+            m_mapMgr->VisitCoords(newX, newY, this); // This is our mapcell "helper" helps us visit cells past the limit until we come up with a better solution
+        }
 
 		if(IsPlayer() && TO< Player* >(this)->GetGroup() && TO< Player* >(this)->m_last_group_position.Distance2DSq(m_position) > 25.0f)       // distance of 5.0
 		{
