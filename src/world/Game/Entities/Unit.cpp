@@ -3018,6 +3018,15 @@ uint32 Unit::GetSpellDidHitResult(Unit* pVictim, uint32 weapon_damage_type, Spel
 		diffAcapped -= (float)(getLevel() * 5);
 	//<SHIT END>
 
+    int32 lvldiff = 0;
+    lvldiff = pVictim->getLevel() - getLevel();
+    if (lvldiff > 5)
+        lvldiff = 5;
+    if (lvldiff < 3)
+        hitchance = 96 - lvldiff;
+    else
+        hitchance = 94 - (lvldiff - 2) * (pVictim->IsPlayer() ? 7 : 11);
+
 	//--------------------------------by victim state-------------------------------------------
 	if(pVictim->IsPlayer() && pVictim->GetStandState()) //every not standing state is >0
 	{
@@ -3038,16 +3047,6 @@ uint32 Unit::GetSpellDidHitResult(Unit* pVictim, uint32 weapon_damage_type, Spel
 		parry = std::max(0.0f, parry - vsk * 0.04f);
 	if(block)
 		block = std::max(0.0f, block - vsk * 0.04f);
-
-	if(vsk > 0)
-		hitchance = std::max(hitchance, 95.0f + vsk * 0.02f + hitmodifier);
-	else
-	{
-		if(pVictim->IsPlayer())
-			hitchance = std::max(hitchance, 95.0f + vsk * 0.1f + hitmodifier);   //wowwiki multiplier - 0.04 but i think 0.1 more balanced
-		else
-			hitchance = std::max(hitchance, 100.0f + vsk * 0.6f + hitmodifier);   //not wowwiki but more balanced
-	}
 
 	if(ability && ability->SpellGroupType)
 	{
