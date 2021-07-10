@@ -2819,6 +2819,13 @@ void ApplyNormalFixes()
             sp->procChance = sp->EffectBasePoints[0];
         }break;
 
+        //Fan of Knives - rogue
+        case 51723:
+        {
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_ENEMY_IN_AREA;
+            sp->EffectImplicitTargetB[0] = EFF_TARGET_NONE;
+
+        }break;
         //rogue-shiv -> add 1   combo   point
         case 5938:
         {
