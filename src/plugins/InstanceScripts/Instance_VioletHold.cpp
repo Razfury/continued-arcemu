@@ -32,6 +32,11 @@ public:
 
     void OnPlayerEnter(Player* pPlayer)
     {
+        if (pPlayer)
+        {
+            // Hack! Load missing cells so the whole instance is spawned some scripts need this DO NOT REMOVE.
+            pPlayer->GetMapMgr()->VisitCoordsInstance(1889.27f, 746.88f, pPlayer);
+        }
     };
 
 };

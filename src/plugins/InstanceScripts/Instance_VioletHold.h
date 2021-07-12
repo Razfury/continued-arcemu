@@ -23,11 +23,6 @@ enum CreatureEntry
 
 };
 
-enum CreatureSpells
-{
-
-};
-
 enum CreatureSay
 {
 
