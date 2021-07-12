@@ -255,6 +255,7 @@ class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,
 		bool IsCombatInProgress() { return (_combatProgress.size() > 0); }
 		void TeleportPlayers();
 
+        void VisitCoordsInstance(uint32 x, uint32 y, Object* obj);
         void VisitCoords(uint32 x, uint32 y, Object* obj);
 
 		uint32 GetInstanceID() { return m_instanceID; }
@@ -277,6 +278,8 @@ class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,
 
 		time_t InactiveMoveTime;
 		uint32 iInstanceMode;
+
+        bool IsInstanceMap;
 
 		void UnloadCell(uint32 x, uint32 y);
 		void EventRespawnCreature(Creature* c, uint16 x, uint16 y);

@@ -311,6 +311,12 @@ void MapCell::Unload()
 		return;
 	}
 
+    if (_mapmgr->IsInstanceMap && _mapmgr->HasPlayers()) // We do not unload instance maps ever if there is players inside
+    {
+        _unloadpending = false;
+        return;
+    }
+
 	_unloadpending = false;
 
 	//in ~MapCell RemoveObjects() can delete an Object without removing it from the MapCell.cpp
