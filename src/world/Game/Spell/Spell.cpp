@@ -1045,8 +1045,9 @@ uint8 Spell::prepare(SpellCastTargets* targets)
             {
                 if (!u_caster->isRooted()) // If we are not already rooted, root us.
                 {
+                    u_caster->setAttackTimer(m_timer + 1000, false);
                     u_caster->GetAIInterface()->StopMovement(0); // Stop movement first
-                    u_caster->GetAIInterface()->SetAIState(STATE_CASTING);
+                    //u_caster->GetAIInterface()->SetAIState(STATE_CASTING);
                     u_caster->Root(); // Prevent movement during a spellcast.
                 }
             }
@@ -1890,14 +1891,14 @@ void Spell::finish(bool successful)
         {
             if (u_caster->isRooted()) // Check if we cannot move before removing it.
             {
-                if (u_caster->CombatStatus.IsInCombat())
+                /*if (u_caster->CombatStatus.IsInCombat())
                 {
                     u_caster->GetAIInterface()->SetAIState(STATE_ATTACKING);
                 }
                 else
                 {
                     u_caster->GetAIInterface()->SetAIState(STATE_IDLE);
-                }
+                }*/
                 u_caster->Unroot();
             }
         }

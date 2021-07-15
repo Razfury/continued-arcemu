@@ -5510,6 +5510,16 @@ void Aura::SpellAuraPeriodicTriggerDummy(bool apply)
 	}
 	else
 	{
+        if (GetSpellId() == 53520) // SUMMON CARRION BEETLES
+        {
+            if (GetUnitCaster())
+            {
+                GetUnitCaster()->CastSpell(GetUnitCaster(), 53521, true);
+                GetUnitCaster()->CastSpell(GetUnitCaster(), 53521, true);
+            }
+            return;
+        }
+
 		if(!sScriptMgr.CallScriptedDummyAura(m_spellProto->Id, mod->i, this, false))
 			LOG_ERROR("Spell %u ( %s ) has an apply periodic trigger dummy aura effect, but no handler for it.", m_spellProto->Id, m_spellProto->Name);
 	}

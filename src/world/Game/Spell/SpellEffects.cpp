@@ -5036,6 +5036,17 @@ void Spell::SpellEffectPlayerPull(uint32 i)
 		return;
 
 	Player* p_target = TO< Player* >(unitTarget);
+	if (sWorld.Collision)
+	{
+		if (u_caster && p_target)
+		{
+			if (!unitTarget->GetMapMgr()->InLineOfSight(u_caster->GetPositionX(), u_caster->GetPositionY(), u_caster->GetPositionZ(), p_target->GetPositionX(), p_target->GetPositionY(), p_target->GetPositionZ()))
+			{
+				// We are not in LOS so do not pull them.
+				return;
+			}
+		}
+	}
 
 	// calculate destination
 	float pullD = p_target->CalcDistance(m_caster) - p_target->GetBoundingRadius() - (u_caster ? u_caster->GetBoundingRadius() : 0) - 1.0f;
