@@ -432,8 +432,8 @@ public:
                 }
                 if ((target == 4) | (target == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid0);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid0);
                     if (combatcd_min >= 0 && combatcd_max > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(1, urand(combatcd_min, combatcd_max));
@@ -441,7 +441,7 @@ public:
                 }
                 if ((target == 5) | (target == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min >= 0 && combatcd_max > 0) // Check if we can cast this again in combat
                         {
@@ -450,9 +450,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid0);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid0);
                         }
 
                         if (combatcd_min >= 0 && combatcd_max > 0) // Check if we can cast this again in combat
@@ -472,9 +472,9 @@ public:
                 }
                 if (target == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid0);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid0);
                     }
 
                     if (combatcd_min >= 0 && combatcd_max > 0) // Check if we can cast this again in combat
@@ -493,7 +493,7 @@ public:
                 }
                 if (target == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
@@ -527,8 +527,8 @@ public:
                 }
                 if ((target1 == 4) | (target1 == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid1);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid1);
                     if (combatcd_min1 >= 0 && combatcd_max1 > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(2, urand(combatcd_min1, combatcd_max1));
@@ -536,7 +536,7 @@ public:
                 }
                 if ((target1 == 5) | (target1 == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min1 >= 0 && combatcd_max1 > 0) // Check if we can cast this again in combat
                         {
@@ -545,9 +545,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid1);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid1);
                         }
 
                         if (combatcd_min1 >= 0 && combatcd_max1 > 0) // Check if we can cast this again in combat
@@ -567,9 +567,9 @@ public:
                 }
                 if (target1 == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid1);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid1);
                     }
 
                     if (combatcd_min1 >= 0 && combatcd_max1 > 0) // Check if we can cast this again in combat
@@ -588,7 +588,7 @@ public:
                 }
                 if (target1 == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
@@ -622,8 +622,8 @@ public:
                 }
                 if ((target2 == 4) | (target2 == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid2);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid2);
                     if (combatcd_min2 >= 0 && combatcd_max2 > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(3, urand(combatcd_min2, combatcd_max2));
@@ -631,7 +631,7 @@ public:
                 }
                 if ((target2 == 5) | (target2 == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min2 >= 0 && combatcd_max2 > 0) // Check if we can cast this again in combat
                         {
@@ -640,9 +640,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid2);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid2);
                         }
 
                         if (combatcd_min2 >= 0 && combatcd_max2 > 0) // Check if we can cast this again in combat
@@ -662,9 +662,9 @@ public:
                 }
                 if (target2 == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid2);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid2);
                     }
 
                     if (combatcd_min2 >= 0 && combatcd_max2 > 0) // Check if we can cast this again in combat
@@ -683,7 +683,7 @@ public:
                 }
                 if (target2 == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
@@ -717,8 +717,8 @@ public:
                 }
                 if ((target3 == 4) | (target3 == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid3);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid3);
                     if (combatcd_min3 >= 0 && combatcd_max3 > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(4, urand(combatcd_min3, combatcd_max3));
@@ -726,7 +726,7 @@ public:
                 }
                 if ((target3 == 5) | (target3 == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min3 >= 0 && combatcd_max3 > 0) // Check if we can cast this again in combat
                         {
@@ -735,9 +735,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid3);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid3);
                         }
 
                         if (combatcd_min3 >= 0 && combatcd_max3 > 0) // Check if we can cast this again in combat
@@ -757,9 +757,9 @@ public:
                 }
                 if (target3 == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid3);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid3);
                     }
 
                     if (combatcd_min3 >= 0 && combatcd_max3 > 0) // Check if we can cast this again in combat
@@ -778,7 +778,7 @@ public:
                 }
                 if (target3 == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
@@ -812,8 +812,8 @@ public:
                 }
                 if ((target4 == 4) | (target4 == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid4);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid4);
                     if (combatcd_min4 >= 0 && combatcd_max4 > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(5, urand(combatcd_min4, combatcd_max4));
@@ -821,7 +821,7 @@ public:
                 }
                 if ((target4 == 5) | (target4 == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min4 >= 0 && combatcd_max4 > 0) // Check if we can cast this again in combat
                         {
@@ -830,9 +830,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid4);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid4);
                         }
 
                         if (combatcd_min4 >= 0 && combatcd_max4 > 0) // Check if we can cast this again in combat
@@ -852,9 +852,9 @@ public:
                 }
                 if (target4 == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid4);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid4);
                     }
 
                     if (combatcd_min4 >= 0 && combatcd_max4 > 0) // Check if we can cast this again in combat
@@ -873,7 +873,7 @@ public:
                 }
                 if (target4 == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
@@ -907,8 +907,8 @@ public:
                 }
                 if ((target5 == 4) | (target5 == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid5);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid5);
                     if (combatcd_min5 >= 0 && combatcd_max5 > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(6, urand(combatcd_min5, combatcd_max5));
@@ -916,7 +916,7 @@ public:
                 }
                 if ((target5 == 5) | (target5 == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min5 >= 0 && combatcd_max5 > 0) // Check if we can cast this again in combat
                         {
@@ -925,9 +925,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid5);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid5);
                         }
 
                         if (combatcd_min5 >= 0 && combatcd_max5 > 0) // Check if we can cast this again in combat
@@ -947,9 +947,9 @@ public:
                 }
                 if (target5 == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid5);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid5);
                     }
 
                     if (combatcd_min5 >= 0 && combatcd_max5 > 0) // Check if we can cast this again in combat
@@ -968,7 +968,7 @@ public:
                 }
                 if (target5 == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
@@ -1002,8 +1002,8 @@ public:
                 }
                 if ((target6 == 4) | (target6 == 8)) // Cast on random target
                 {
-                    if (_unit->getThreatListRandomTarget())
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid6);
+                    if (GetRandomPlayerTarget())
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid6);
                     if (combatcd_min6 >= 0 && combatcd_max6 > 0) // Check if we can cast this again in combat
                     {
                         events.ScheduleEvent(7, urand(combatcd_min6, combatcd_max6));
@@ -1011,7 +1011,7 @@ public:
                 }
                 if ((target6 == 5) | (target6 == 9)) // Cast on random target not current target
                 {
-                    if (_unit->GetVictim() == _unit->getThreatListRandomTarget()) // If the random player is our current target reschedule
+                    if (_unit->GetVictim() == GetRandomPlayerTarget()) // If the random player is our current target reschedule
                     {
                         if (combatcd_min6 >= 0 && combatcd_max6 > 0) // Check if we can cast this again in combat
                         {
@@ -1020,9 +1020,9 @@ public:
                     }
                     else
                     {
-                        if (_unit->getThreatListRandomTarget())
+                        if (GetRandomPlayerTarget())
                         {
-                            _unit->DoCast(_unit->getThreatListRandomTarget(), spellid6);
+                            _unit->DoCast(GetRandomPlayerTarget(), spellid6);
                         }
 
                         if (combatcd_min6 >= 0 && combatcd_max6 > 0) // Check if we can cast this again in combat
@@ -1042,9 +1042,9 @@ public:
                 }
                 if (target6 == 16) // Cast on mana user random
                 {
-                    if (_unit->getThreatListRandomTarget() && _unit->getThreatListRandomTarget()->GetPowerType() == POWER_TYPE_MANA)
+                    if (GetRandomPlayerTarget() && GetRandomPlayerTarget()->GetPowerType() == POWER_TYPE_MANA)
                     {
-                        _unit->DoCast(_unit->getThreatListRandomTarget(), spellid6);
+                        _unit->DoCast(GetRandomPlayerTarget(), spellid6);
                     }
 
                     if (combatcd_min6 >= 0 && combatcd_max6 > 0) // Check if we can cast this again in combat
@@ -1063,7 +1063,7 @@ public:
                 }
                 if (target6 == 18) // Cast damaging ranged spell 
                 {
-                    if (Unit* tar = _unit->getThreatListRandomTarget())
+                    if (Unit* tar = GetRandomPlayerTarget())
                     {
                         float distance = _unit->CalcDistance(tar->GetPositionX(), tar->GetPositionY(), tar->GetPositionZ());
                         if (distance >= 6.0f)
