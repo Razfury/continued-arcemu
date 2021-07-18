@@ -1572,6 +1572,8 @@ class SERVER_DECL Unit : public Object
 			_setFaction();
 		}
 
+		void SetVisible(bool state);
+
 		virtual void SendChatMessage(uint8 type, uint32 lang, const char* msg, uint32 delay = 0) = 0;
 		void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char* msg);
 		void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);

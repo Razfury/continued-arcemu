@@ -4438,6 +4438,30 @@ void Unit::updateModeStatus()
     } while (result->NextRow());
 }
 
+void Unit::SetVisible(bool state)
+{
+	CreatureProto* proto = CreatureProtoStorage.LookupEntry(GetEntry());
+
+	if (CombatStatus.IsInCombat())
+		return;
+
+	if (state == true)
+	{
+		SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		SetDisplayId(11686);
+		SetFaction(35);
+	}
+	else
+	{
+		if (proto)
+		{
+			SetDisplayId(GetNativeDisplayId());
+			SetFaction(proto->Faction);
+			RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		}
+	}
+}
+
 uint32 Unit::getRaidMode()
 {
     if (GetMapMgr() == NULL)
