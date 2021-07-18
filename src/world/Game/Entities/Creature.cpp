@@ -191,6 +191,7 @@ Creature::Creature(uint64 guid)
 	Skinned = false;
 	m_enslaveCount = 0;
 	m_enslaveSpell = 0;
+	m_portalNumber = 0;
 
 	for(uint32 x = 0; x < 7; x++)
 	{
@@ -1268,6 +1269,7 @@ bool Creature::Load(CreatureSpawn* spawn, uint32 mode, MapInfo* info)
 
 	SetFaction(spawn->factionid);
 	SetUInt32Value(UNIT_FIELD_FLAGS, spawn->flags);
+
 	SetEmoteState(spawn->emote_state);
 	SetBoundingRadius(proto->BoundingRadius);
 	SetCombatReach(proto->CombatReach);
@@ -1516,11 +1518,9 @@ void Creature::Load(CreatureProto* proto_, float x, float y, float z, float o)
 	SetMinDamage(proto->MinDamage);
 	SetMaxDamage(proto->MaxDamage);
 
-// m_spawn is invalid here - don't use it!
-// this is loading a CreatureProto, which doesn't have ItemSlotDisplays
-//	SetEquippedItem(MELEE,m_spawn->Item1SlotDisplay);
-//	SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID_1, m_spawn->Item2SlotDisplay);
-//	SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID_2, m_spawn->Item3SlotDisplay);
+	SetEquippedItem(MELEE, proto->weaponslot_1);
+	SetEquippedItem(OFFHAND, proto->weaponslot_2);
+	SetEquippedItem(RANGED, proto->weaponslot_3);
 
 	SetFaction(proto->Faction);
 	SetBoundingRadius(proto->BoundingRadius);

@@ -4154,7 +4154,6 @@ void AIInterface::EventLeaveCombat(Unit* pUnit, uint32 misc1)
 		Creature* creature = TO< Creature* >(m_Unit);
 		if(creature->m_spawn)
 			m_Unit->SetMount(creature->m_spawn->MountedDisplayID);
-		//m_Unit->SetMount(TO< Creature* >( m_Unit )->GetSpawnO->MountedDisplayID );
 	}
 	//Zack : not sure we need to send this. Did not see it in the dumps since mob died eventually but it seems logical to make this
 	m_Unit->stopAttack(pUnit);

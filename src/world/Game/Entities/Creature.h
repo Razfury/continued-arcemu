@@ -173,6 +173,9 @@ struct CreatureProto
 	uint32 spelldataid;
 	uint32 vehicleid;
 	uint32 rooted;
+	uint32 weaponslot_1;
+	uint32 weaponslot_2;
+	uint32 weaponslot_3;
 
 	/* AI Stuff */
 	bool m_canRangedAttack;
@@ -390,6 +393,8 @@ class SERVER_DECL Creature : public Unit
 		bool IsSanctuaryFlagged();
 		void SetSanctuaryFlag();
 		void RemoveSanctuaryFlag();
+
+		uint32 m_portalNumber;
 
 		void SetSpeeds( uint8 type, float speed );
 

@@ -258,6 +258,9 @@ enum WorldStates{
 	WORLDSTATE_WG_NEXT_BATTLE_TIME                                       = 3801, // timer until next battle
 	WORLDSTATE_WG_HORDE_CONTROL                                          = 3802, // horde control
 	WORLDSTATE_WG_ALLY_CONTROL                                           = 3803, // alliance control
+	WORLDSTATE_VH_WAVE_COUNT											 = 3810, // Violet Hold Wave Count
+	WORLDSTATE_VH_PRISON_STATE											 = 3815, // Violet Hold Prison State
+	WORLDSTATE_VH														 = 3816, // Violet Hold
 	WORLDSTATE_SOTA_CHAMBER_GATE                                         = 3849, // Chamber of the ancient relics gate
 	WORLDSTATE_IOC_ALLIANCE_SCORE                                        = 4221,
 	WORLDSTATE_IOC_HORDE_SCORE                                           = 4222,

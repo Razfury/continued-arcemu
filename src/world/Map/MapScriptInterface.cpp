@@ -144,9 +144,9 @@ Creature* MapScriptInterface::SpawnCreature(uint32 Entry, float cX, float cY, fl
 	sp->death_state = 0;
 	sp->channel_target_creature = sp->channel_target_go = sp->channel_spell = 0;
 	sp->MountedDisplayID = 0;
-	sp->Item1SlotDisplay = 0;
-	sp->Item2SlotDisplay = 0;
-	sp->Item3SlotDisplay = 0;
+	sp->Item1SlotDisplay = proto->weaponslot_1;
+	sp->Item2SlotDisplay = proto->weaponslot_2;
+	sp->Item3SlotDisplay = proto->weaponslot_3;
 	sp->CanFly = 0;
 	sp->phase = phase;
 

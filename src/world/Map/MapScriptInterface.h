@@ -75,6 +75,18 @@ class SERVER_DECL MapScriptInterface
 			return GetObjectNearestCoords<Creature, TYPEID_UNIT>(Entry, x, y, z);
 		}
 
+
+		ARCEMU_INLINE Creature* GetCreatureSpawnIdNearestCoords(float x, float y, float z = 0.0f, uint32 Entry = 0, uint32 spawnid = 0)
+		{
+			if (GetObjectNearestCoords<Creature, TYPEID_UNIT>(Entry, x, y, z)->spawnid == spawnid)
+			{
+				return GetObjectNearestCoords<Creature, TYPEID_UNIT>(Entry, x, y, z);
+			}
+			else
+				return GetObjectNearestCoords<Creature, TYPEID_UNIT>(Entry, x, y, z); // Should never happen
+		}
+
+
 		ARCEMU_INLINE Player* GetPlayerNearestCoords(float x, float y, float z = 0.0f, uint32 Entry = 0)
 		{
 			return GetObjectNearestCoords<Player, TYPEID_PLAYER>(Entry, x, y, z);
