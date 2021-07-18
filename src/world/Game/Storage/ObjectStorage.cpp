@@ -26,7 +26,7 @@ const char * gItemPrototypeFormat						= "uuuusuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
 const char * gItemNameFormat							= "usu";
 const char * gCreatureNameFormat						= "usssuuuuuuuuuuffcuuuuuuu";
 const char * gGameObjectNameFormat						= "uuussssuuuuuuuuuuuuuuuuuuuuuuuufuuuuuu";
-const char * gCreatureProtoFormat						= "uuuuuuufuuuffuuffuuuuuuuuffsuuufffuuuuuuuuuuuuuuuuu";
+const char * gCreatureProtoFormat						= "uuuuuuufuuuffuuffuuuuuuuuffsuuufffuuuuuuuuuuuuuuuuuuuu";
 const char * gDisplayBoundingFormat						= "ufffffff";
 const char * gVendorRestrictionEntryFormat				= "uuuuuuuu";
 const char * gAreaTriggerFormat							= "ucuusffffuu";
@@ -189,6 +189,33 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 				break;
 		}
 		itr->Destruct();
+	}
+
+	Log.Notice("ObjectStorage", "Loading creature_proto weapons info...");
+	{
+		QueryResult* result = WorldDatabase.Query("SELECT entry, weaponslot_1, weaponslot_2, weaponslot_3 FROM creature_proto;");
+
+		if (result)
+		{
+			do
+			{
+				Field* fields = result->Fetch();
+				uint32 entry = fields[0].GetUInt32();
+				CreatureProto* creature_proto = CreatureProtoStorage.LookupEntry(entry);
+				if (creature_proto == nullptr)
+				{
+					Log.Error("ObjectStorage", "Invalid Entry %u in table creature_proto!", entry);
+					continue;
+				}
+
+				creature_proto->weaponslot_1 = fields[1].GetUInt32();
+				creature_proto->weaponslot_2 = fields[2].GetUInt32();
+				creature_proto->weaponslot_3 = fields[3].GetUInt32();
+
+			} while (result->NextRow());
+
+			delete result;
+		}
 	}
 
 	// Load AI Agents
