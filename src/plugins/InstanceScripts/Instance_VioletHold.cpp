@@ -1098,27 +1098,27 @@ public:
 		switch (urand(0, 5)) // Add this to the azure binders script to make this script cleaner. 
 		{
 		case 0: //Erekem
-			_unit->ForceMovement(1872.82f, 864.60f, 43.33f, 1.82f, 0);
+			_unit->GetAIInterface()->MoveTo(1872.82f, 864.60f, 43.33f, 1.82f);
 			ReleaseTimer_Erekem = AddTimer(10000);
 			break;
 		case 1: //Moragg
-			_unit->ForceMovement(1894.56f, 740.974f, 47.66f, 4.7f, 0);
+			_unit->GetAIInterface()->MoveTo(1894.56f, 740.974f, 47.66f, 4.7f);
 			ReleaseTimer_Moragg = AddTimer(10000);
 			break;
 		case 2: // Ichoron
-			_unit->ForceMovement(1912.23f, 782.13f, 36.66f, 5.5f, 0);
+			_unit->GetAIInterface()->MoveTo(1912.23f, 782.13f, 36.66f, 5.5f);
 			ReleaseTimer_Ichoron = AddTimer(10000);
 			break;
 		case 3: // Xevozz
-			_unit->ForceMovement(1906.29f, 842.44f, 38.63f, 0.97f, 0);
+			_unit->GetAIInterface()->MoveTo(1906.29f, 842.44f, 38.63f, 0.97f);
 			ReleaseTimer_Xevozz = AddTimer(10000);
 			break;
 		case 4: // Lavanthos
-			_unit->ForceMovement(1854.26f, 761.06f, 38.65f, 4.05f, 0);
+			_unit->GetAIInterface()->MoveTo(1854.26f, 761.06f, 38.65f, 4.05f);
 			ReleaseTimer_Lavanthos = AddTimer(10000);
 			break;
 		case 5: // Zuramat
-			_unit->ForceMovement(1924.46f, 851.81f, 47.18f, 0.89f, 0);
+			_unit->GetAIInterface()->MoveTo(1924.46f, 851.81f, 47.18f, 0.89f);
 			ReleaseTimer_Zuramat = AddTimer(10000);
 			break;
 		}
