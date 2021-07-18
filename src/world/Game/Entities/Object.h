@@ -317,6 +317,8 @@ class SERVER_DECL Object : public EventableObject
 		//! Set float property
 		void  SetFloatValue(const uint32 index, const float value);
 
+		void removeUnitFlags();
+
 		void  SetFlag(const uint32 index, uint32 newFlag);
 
 		void  RemoveFlag(const uint32 index, uint32 oldFlag);

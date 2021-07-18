@@ -592,16 +592,81 @@ void Object::SetFloatValue(const uint32 index, const float value)
 	}
 }
 
+void Object::removeUnitFlags()
+{
+	SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+
+	if (IsCreature() && this)
+	{
+		TO_CREATURE(this)->GetAIInterface()->SetAllowedToEnterCombat(true);
+		TO_CREATURE(this)->GetAIInterface()->SetAIType(AITYPE_LONER);
+	}
+}
 
 void Object::SetFlag(const uint32 index, uint32 newFlag)
 {
-	SetUInt32Value(index, GetUInt32Value(index) | newFlag);
+	//SetUInt32Value(index, GetUInt32Value(index) | newFlag);
+
+	ASSERT(index < m_valuesCount);
+
+	//no change -> no update
+	if ((m_uint32Values[index] & newFlag) == newFlag)
+		return;
+
+	m_uint32Values[index] |= newFlag;
+
+	if (IsInWorld())
+	{
+		m_updateMask.SetBit(index);
+
+		if (!m_objectUpdated)
+		{
+			m_mapMgr->ObjectUpdated(this);
+			m_objectUpdated = true;
+		}
+	}
+
+	//If the new flags are making them unattackable or unselectable update combat status.
+	if ((newFlag == UNIT_FLAG_NOT_ATTACKABLE_2) | (newFlag == UNIT_FLAG_NOT_ATTACKABLE_9) | (newFlag == UNIT_FLAG_NOT_SELECTABLE))
+	{
+		if (IsCreature() && this)
+		{
+			TO_CREATURE(this)->GetAIInterface()->SetAllowedToEnterCombat(false);
+			TO_CREATURE(this)->GetAIInterface()->SetAIType(AITYPE_PASSIVE);
+		}
+	}
 }
 
 
 void Object::RemoveFlag(const uint32 index, uint32 oldFlag)
 {
-	SetUInt32Value(index, GetUInt32Value(index) & ~oldFlag);
+	ASSERT(index < m_valuesCount);
+
+	//no change -> no update
+	if ((m_uint32Values[index] & oldFlag) == 0)
+		return;
+
+	m_uint32Values[index] &= ~oldFlag;
+
+	if (IsInWorld())
+	{
+		m_updateMask.SetBit(index);
+
+		if (!m_objectUpdated)
+		{
+			m_mapMgr->ObjectUpdated(this);
+			m_objectUpdated = true;
+		}
+	}
+
+	if ((oldFlag == UNIT_FLAG_NOT_ATTACKABLE_2) | (oldFlag == UNIT_FLAG_NOT_ATTACKABLE_9) | (oldFlag == UNIT_FLAG_NOT_SELECTABLE))
+	{
+		if (IsCreature() && this)
+		{
+			TO_CREATURE(this)->GetAIInterface()->SetAllowedToEnterCombat(true);
+			TO_CREATURE(this)->GetAIInterface()->SetAIType(AITYPE_LONER);
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////
