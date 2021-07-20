@@ -630,6 +630,7 @@ enum InstanceMaps
 	MAP_BLACK_TEMPLE = 564,  //Black Temple
 	MAP_NEXUS = 576,  //Nexus
 	MAP_MAGISTERS_TERRACE = 585,  //Magister's Terrace
+	MAP_AHN_KAHET = 619,
 	MAP_HALLS_OF_STONE = 599,  //Halls of Stone
 	MAP_DRAK_THARON_KEEP = 600,  //Drak'Tharon Keep
 	MAP_AZJOL_NERUB = 601,  //Azjol-Nerub

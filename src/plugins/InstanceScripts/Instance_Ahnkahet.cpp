@@ -108,6 +108,16 @@ public:
 		return (*Iter).second.mState;
 	};
 
+	void OnPlayerEnter(Player* player)
+	{
+		if (player)
+		{
+			// Hack! Load missing cells so the whole instance is spawned some scripts need this DO NOT REMOVE.
+			player->GetMapMgr()->VisitCoordsInstance(528.72f, -846.00f, player);
+			player->UpdateVisibility();
+		}
+	}
+
 	void OnCreatureDeath(Creature* pVictim, Unit* pKiller)
 	{
 		EncounterMap::iterator Iter = mEncounters.find(pVictim->GetEntry());
@@ -409,5 +419,7 @@ public:
 
 void SetupAhnkahet(ScriptMgr* mgr)
 {
+	mgr->register_instance_script(MAP_AHN_KAHET, &AhnkahetScript::Create);
+
 	mgr->register_creature_script(31104, &mob_ahnkahar_watcher::Create);
 }
