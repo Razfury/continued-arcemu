@@ -163,8 +163,8 @@ public:
 
 	void OnLoad()
 	{
-		// We only spawn on heroic modes.
-		if (_unit->GetMapMgr()->GetMapId() == 619 && !IsHeroic())
+		// We only show on heroic mode.
+		if (_unit->GetMapMgr()->GetMapId() == MAP_AHN_KAHET && !IsHeroic())
 		{
 			_unit->SetVisible(false);
 		}
