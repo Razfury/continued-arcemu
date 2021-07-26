@@ -4445,7 +4445,7 @@ void Unit::SetVisible(bool state)
 	if (CombatStatus.IsInCombat())
 		return;
 
-	if (state == true)
+	if (state == false)
 	{
 		SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		SetDisplayId(11686);

@@ -166,7 +166,7 @@ public:
 		// We only spawn on heroic modes.
 		if (_unit->GetMapMgr()->GetMapId() == 619 && !IsHeroic())
 		{
-			_unit->SetVisible(true);
+			_unit->SetVisible(false);
 		}
 		ParentClass::OnLoad();
 	}
