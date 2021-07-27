@@ -4123,8 +4123,23 @@ void AIInterface::EventLeaveCombat(Unit* pUnit, uint32 misc1)
 		{
 			if(SavedFollow == NULL)
 			{
-				SetReturnPosition();
-				MoveEvadeReturn();
+				if (!hasWaypoints())
+				{
+					SetReturnPosition();
+					MoveEvadeReturn();
+				}
+				else
+				{
+					if (getCurrentWaypoint() == NULL)
+					{
+						SetReturnPosition();
+						MoveEvadeReturn();
+					}
+					else
+					{
+						m_Unit->MoveToWaypoint(getCurrentWaypoint());
+					}
+				}
 			}
 			else
 				m_AIState = STATE_FOLLOWING;
