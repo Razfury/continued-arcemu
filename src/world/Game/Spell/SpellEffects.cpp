@@ -550,6 +550,28 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 
 	if(GetProto()->EffectChainTarget[i])//chain
 	{
+		if (GetProto()->Id == 53595) // Hammer of the righteous
+		{
+			if (p_caster == NULL)
+				return;
+
+			static_damage = true;
+			float WMIN = 1.0f;
+			float WMAX = 2.0f;
+			float MWS = 2.0f;
+
+			Item* it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+
+			if (it && it->GetProto())
+
+			{
+				WMIN = it->GetProto()->Damage[0].Min;
+				WMAX = it->GetProto()->Damage[0].Max;
+				MWS = it->GetProto()->Delay / 1000.0f;
+			}
+			damage += float2int32(((WMIN + RandomUInt(WMAX - WMIN)) / (2 * MWS)) * 4 + (u_caster->GetStat(STAT_STRENGTH) / 5.5f) * 4 + (u_caster->GetAP() / 14) * 4);
+		}
+
 		if(GetProto()->Id == 32445 || GetProto()->Id == 28883)
 		{
 			int32 reduce = (int32)(GetProto()->dmg_multiplier[i] * 100.0f);
