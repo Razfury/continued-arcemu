@@ -1060,6 +1060,8 @@ class SERVER_DECL Unit : public Object
 
         void updateModeStatus();
 
+		Unit* GetUnit(uint32 GUID);
+
 		uint8 CastSpell(Unit* Target, uint32 SpellID, bool triggered);
 		uint8 CastSpell(Unit* Target, SpellEntry* Sp, bool triggered);
 		uint8 CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered);
@@ -1572,7 +1574,7 @@ class SERVER_DECL Unit : public Object
 			_setFaction();
 		}
 
-		void SetVisible(bool state);
+		void SetVisible(bool state, bool skipcombat = false);
 
 		virtual void SendChatMessage(uint8 type, uint32 lang, const char* msg, uint32 delay = 0) = 0;
 		void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char* msg);

@@ -24,6 +24,8 @@
 #ifndef INSTANCE_SCRIPTS_SETUP_H
 #define INSTANCE_SCRIPTS_SETUP_H
 
+#define IN_MILLISECONDS 1000
+
 //Instances
 void SetupAhnkahet(ScriptMgr* mgr);
 void SetupArcatraz(ScriptMgr* mgr);

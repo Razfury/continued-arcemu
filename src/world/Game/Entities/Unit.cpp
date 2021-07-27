@@ -4438,11 +4438,11 @@ void Unit::updateModeStatus()
     } while (result->NextRow());
 }
 
-void Unit::SetVisible(bool state)
+void Unit::SetVisible(bool state, bool skipcombat)
 {
 	CreatureProto* proto = CreatureProtoStorage.LookupEntry(GetEntry());
 
-	if (CombatStatus.IsInCombat())
+	if (CombatStatus.IsInCombat() && skipcombat == false)
 		return;
 
 	if (state == false)
@@ -4913,33 +4913,33 @@ void Unit::DespawnCombatSummons()
 {
     if (combatSummon1GUID > 0)
     {
-        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon1GUID))
-            cr->Despawn(1000, 0);
+        if (Creature* cr_1 = GetMapMgr()->GetCreature(combatSummon1GUID))
+            cr_1->Despawn(1000, 0);
     }
     if (combatSummon2GUID > 0)
     {
-        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon2GUID))
-            cr->Despawn(1000, 0);
+        if (Creature* cr_2 = GetMapMgr()->GetCreature(combatSummon2GUID))
+            cr_2->Despawn(1000, 0);
     }
     if (combatSummon3GUID > 0)
     {
-        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon3GUID))
-            cr->Despawn(1000, 0);
+        if (Creature* cr_3 = GetMapMgr()->GetCreature(combatSummon3GUID))
+            cr_3->Despawn(1000, 0);
     }
     if (combatSummon4GUID > 0)
     {
-        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon4GUID))
-            cr->Despawn(1000, 0);
+        if (Creature* cr_4 = GetMapMgr()->GetCreature(combatSummon4GUID))
+            cr_4->Despawn(1000, 0);
     }
     if (combatSummon5GUID > 0)
     {
-        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon5GUID))
-            cr->Despawn(1000, 0);
+        if (Creature* cr_5 = GetMapMgr()->GetCreature(combatSummon5GUID))
+            cr_5->Despawn(1000, 0);
     }
     if (combatSummon6GUID > 0)
     {
-        if (Creature* cr = GetMapMgr()->GetCreature(combatSummon6GUID))
-            cr->Despawn(1000, 0);
+        if (Creature* cr_6 = GetMapMgr()->GetCreature(combatSummon6GUID))
+            cr_6->Despawn(1000, 0);
     }
 
     combatSummon1GUID = 0;
@@ -7302,6 +7302,16 @@ bool CombatStatusHandler::IsInCombat() const
 		default:
 			return false;
 	}
+}
+
+Unit* Unit::GetUnit(uint32 guid)
+{
+	if (this)
+	{
+		return GetMapMgr()->GetUnit(guid);
+	}
+
+	return NULL;
 }
 
 void Unit::awardAchievement(uint32 achievementid)
